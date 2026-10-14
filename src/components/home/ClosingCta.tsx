@@ -19,13 +19,12 @@ export function ClosingCta({
   return (
     <section aria-labelledby={headingId} className="relative isolate overflow-hidden bg-suma-cream">
       <div className="container-suma section-y relative lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16">
-        <AnimatedSumaSymbol
-          variant="subtle"
-          trigger="in-view"
-          className="absolute right-[clamp(1.25rem,4vw,3rem)] top-4 w-12 lg:hidden"
-        />
-
         <div className="max-w-3xl">
+          <AnimatedSumaSymbol
+            variant="cta"
+            trigger="in-view"
+            className="mb-8 ml-3 w-[clamp(7rem,30vw,9.5rem)] lg:hidden"
+          />
           <Reveal>
             <h2 id={headingId} className="text-display-lg text-suma-navy">
               {title}

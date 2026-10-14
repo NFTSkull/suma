@@ -101,10 +101,13 @@ export const symbolMotion: Record<SymbolVariant, SymbolMotion> = {
   },
 };
 
-/** Factor de recorrido según el ancho de la ventana: menos desplazamiento en tablet y móvil. */
+/**
+ * Factor de recorrido según el ancho de la ventana: algo menos de desplazamiento
+ * en tablet y móvil, sin llegar a que el movimiento pase desapercibido.
+ */
 export function travelScale(viewportWidth: number): number {
-  if (viewportWidth < 640) return 0.55;
-  if (viewportWidth < 1024) return 0.75;
+  if (viewportWidth < 640) return 0.8;
+  if (viewportWidth < 1024) return 0.9;
   return 1;
 }
 

@@ -299,7 +299,8 @@
     display: none;
   }
 }
-body:has(.suma-splash[data-state="playing"]) #contenido * {
+/* Incluye el fundido de salida para que la entrada del hero se vea completa. */
+body:has(.suma-splash:is([data-state="playing"], [data-state="leaving"])) #contenido * {
   animation-play-state: paused;
 }
 

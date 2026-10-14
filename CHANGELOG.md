@@ -3,6 +3,7 @@
 ## [Sin publicar]
 
 ### Cambiado
+- Animaciones visibles en móvil: el isotipo del hero se une al entrar en pantalla (en móvil queda bajo el pliegue y antes terminaba sin que nadie lo viera; en escritorio se comporta igual que antes); recorrido de las piezas mayor en móvil y tablet; el CTA final muestra en móvil el isotipo animado completo sobre el titular en lugar de la marca de 48 px; la entrada del hero espera a que termine el fundido de la pantalla de carga para verse completa. Pruebas: 64.
 - Composición tipográfica del hero rediseñada: H1 único en cuatro líneas en mayúsculas con Poppins (800/900, cargada con `next/font` solo en el hero): "CREATIVIDAD" en blanco sobre bloque naranja, "QUE SUMA." en navy, pausa editorial, "ESTRATEGIA" en blanco sobre bloque magenta y "QUE IMPULSA." en navy; mismo tamaño en todas las líneas, alineación izquierda y tamaños con `clamp()` (4 líneas también en móvil). Eyebrow "CREATIVIDAD + TECNOLOGÍA" en Quicksand SemiBold y nuevo texto de apoyo. Se eliminó el trazo naranja. Entrada escalonada (eyebrow → bloque naranja que se despliega → complemento → bloque magenta → complemento → descripción) en ~1.1 s, sin rebotes y desactivada con `prefers-reduced-motion`. CTAs, rutas y ubicación sin cambios. Pruebas: 62.
 - Los SVG del símbolo del hero se cargan con `loading="eager"` (son el LCP).
 

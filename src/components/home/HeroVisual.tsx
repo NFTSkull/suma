@@ -73,9 +73,10 @@ export function HeroVisual() {
           />
         </svg>
       </div>
+      {/* En móvil el visual queda bajo el pliegue: se une cuando el usuario llega a él. */}
       <AnimatedSumaSymbol
         variant="hero"
-        trigger="load"
+        trigger="in-view"
         preload
         className="absolute left-1/2 top-[52%] w-[50%] -translate-x-1/2 sm:w-[58%] -translate-y-1/2"
       />
