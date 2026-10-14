@@ -1,26 +1,315 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ───────────────────────────── SUMA design tokens ───────────────────────────── */
+@theme {
+  /* Colores maestros (no modificar) */
+  --color-suma-orange: #ff5a00;
+  --color-suma-pink: #ff2ed1;
+  --color-suma-purple: #3b0ca8;
+  --color-suma-navy: #0b1240;
+  --color-suma-cream: #fff4e6;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Derivados para superficies, texto accesible y estados */
+  --color-suma-orange-ink: #c24400; /* naranja legible sobre crema (4.7:1) */
+  --color-suma-pink-ink: #b3008f; /* rosa legible sobre crema (5.8:1) */
+  --color-suma-cream-deep: #f8e8d3;
+  --color-suma-cream-soft: #fffaf3;
+  --color-suma-navy-soft: #1a2260;
+  --color-suma-navy-deep: #070c2c;
+  --color-suma-line: rgb(11 18 64 / 0.12);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --font-display: var(--font-league-spartan), "League Spartan", system-ui, sans-serif;
+  --font-sans: var(--font-quicksand), "Quicksand", system-ui, sans-serif;
+
+  --breakpoint-xs: 26rem;
+
+  --radius-blob: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  --radius-card: 1.75rem;
+
+  --shadow-soft: 0 1px 2px rgb(11 18 64 / 0.04), 0 12px 32px -12px rgb(11 18 64 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(11 18 64 / 0.05), 0 28px 60px -24px rgb(11 18 64 / 0.35);
+  --shadow-device: 0 40px 80px -30px rgb(11 18 64 / 0.55);
+
+  /* Suma Flow: movimiento */
+  --ease-flow: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-breathe: breathe 14s var(--ease-soft) infinite;
+  --animate-drift: drift 22s var(--ease-soft) infinite;
+  --animate-drift-reverse: drift-reverse 26s var(--ease-soft) infinite;
+  --animate-typing: typing 1.2s ease-in-out infinite;
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.06) rotate(4deg); }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    33% { transform: translate3d(3%, -4%, 0) rotate(8deg); }
+    66% { transform: translate3d(-2%, 3%, 0) rotate(-6deg); }
+  }
+  @keyframes drift-reverse {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    40% { transform: translate3d(-4%, 3%, 0) rotate(-10deg); }
+    70% { transform: translate3d(2%, -2%, 0) rotate(5deg); }
+  }
+  @keyframes menu-in {
+    from { opacity: 0; transform: translate3d(0, -8px, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes enter {
+    from { opacity: 0; transform: translate3d(0, 18px, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes enter-scale {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes float-card {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -8px, 0); }
+  }
+  @keyframes typing {
+    0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-2px); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --dur-micro: 180ms;
+  --dur-panel: 360ms;
+  --dur-reveal: 700ms;
+  --header-h: 4.5rem;
+  color-scheme: light;
+}
+
+/* ───────────────────────────── Base ───────────────────────────── */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
+
+  body {
+    background: var(--color-suma-cream);
+    color: var(--color-suma-navy);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-suma-pink);
+    color: var(--color-suma-navy);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-suma-purple);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .on-dark :focus-visible,
+  .on-dark:focus-visible {
+    outline-color: var(--color-suma-orange);
+  }
+}
+
+/* ───────────────────────────── Utilidades SUMA ───────────────────────────── */
+@utility container-suma {
+  width: 100%;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+
+/* Carriles horizontales a sangre completa alineados con container-suma. */
+@utility gutter-x {
+  --gutter: max(clamp(1.25rem, 4vw, 3rem), calc((100% - 88rem) / 2 + clamp(1.25rem, 4vw, 3rem)));
+  padding-inline: var(--gutter);
+  scroll-padding-inline: var(--gutter);
+}
+
+@utility section-y {
+  padding-block: clamp(4.5rem, 10vw, 9rem);
+}
+
+@utility text-display-xl {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.75rem, 7.2vw, 6.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+}
+
+@utility text-display-lg {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+@utility text-display-md {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+@utility text-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@utility text-lead {
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.6;
+}
+
+@utility blob {
+  border-radius: var(--radius-blob);
+}
+
+@utility hide-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ───────────────────────────── Reveal (Suma Flow) ─────────────────────────────
+   Solo se oculta contenido cuando el navegador ejecuta scripts; sin JS (o en
+   navegadores sin soporte de la media query) todo queda visible. */
+@media (scripting: enabled) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity var(--dur-reveal) var(--ease-flow),
+      transform var(--dur-reveal) var(--ease-flow);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  [data-reveal="mask"] {
+    transform: none;
+    clip-path: inset(0 0 100% 0 round 2rem);
+    transition:
+      opacity var(--dur-reveal) var(--ease-flow),
+      clip-path 1s var(--ease-flow);
+  }
+  [data-reveal][data-visible="true"] {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0 round 0);
+  }
+
+  /* Línea de flujo que se dibuja */
+  .flow-path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.6s var(--ease-flow);
+  }
+  [data-visible="true"] .flow-path {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ─────────────────────────── Isotipo animado ─────────────────────────── */
+.suma-symbol__glow {
+  position: absolute;
+  inset: -22%;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+.suma-symbol[data-theme="cream"] .suma-symbol__glow {
+  background: radial-gradient(
+    closest-side,
+    rgb(255 46 209 / 0.14),
+    rgb(255 90 0 / 0.07) 55%,
+    transparent 100%
+  );
+}
+.suma-symbol[data-theme="navy"] .suma-symbol__glow {
+  background: radial-gradient(
+    closest-side,
+    rgb(255 46 209 / 0.3),
+    rgb(59 12 168 / 0.28) 50%,
+    transparent 100%
+  );
+}
+/* Sin JS el símbolo se ve formado; con JS espera oculto a su disparador. */
+@media (scripting: enabled) {
+  .suma-symbol:not([data-state]) [data-piece],
+  .suma-symbol:not([data-state]) .suma-symbol__glow {
+    opacity: 0;
+  }
+}
+
+/* ───────────────────────────── Pantalla de carga ───────────────────────────── */
+.suma-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: var(--color-suma-cream);
+  transition:
+    opacity 650ms var(--ease-flow),
+    visibility 0s linear 650ms;
+}
+.suma-splash[data-state="leaving"] {
+  opacity: 0;
+  visibility: hidden;
+}
+/* Si la hidratación nunca ocurre, la pantalla se retira sola. */
+.suma-splash[data-state="pending"] {
+  animation: splash-failsafe 400ms ease 4s forwards;
+}
+@keyframes splash-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@media (scripting: none) {
+  .suma-splash {
+    display: none;
+  }
+}
+body:has(.suma-splash[data-state="playing"]) #contenido * {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+  .flow-path {
+    stroke-dashoffset: 0;
+  }
 }
