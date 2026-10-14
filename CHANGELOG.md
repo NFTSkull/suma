@@ -2,6 +2,10 @@
 
 ## [Sin publicar]
 
+### Cambiado
+- Composición tipográfica del hero rediseñada: H1 único en cuatro líneas en mayúsculas con Poppins (800/900, cargada con `next/font` solo en el hero): "CREATIVIDAD" en blanco sobre bloque naranja, "QUE SUMA." en navy, pausa editorial, "ESTRATEGIA" en blanco sobre bloque magenta y "QUE IMPULSA." en navy; mismo tamaño en todas las líneas, alineación izquierda y tamaños con `clamp()` (4 líneas también en móvil). Eyebrow "CREATIVIDAD + TECNOLOGÍA" en Quicksand SemiBold y nuevo texto de apoyo. Se eliminó el trazo naranja. Entrada escalonada (eyebrow → bloque naranja que se despliega → complemento → bloque magenta → complemento → descripción) en ~1.1 s, sin rebotes y desactivada con `prefers-reduced-motion`. CTAs, rutas y ubicación sin cambios. Pruebas: 62.
+- Los SVG del símbolo del hero se cargan con `loading="eager"` (son el LCP).
+
 ### Añadido
 - Prueba de que el selector no toma el foco al montarse (también en StrictMode).
 - Pantalla de carga con la animación oficial del logo (`SumaStudioLogoReveal`, GSAP): se muestra en cada carga de la página (no en la navegación interna), abre la página arriba salvo que la URL lleve `#sección`, pausa las animaciones del hero mientras dura, se retira con un fundido y respeta `prefers-reduced-motion`. Pruebas: 48.

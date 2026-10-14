@@ -1,49 +1,78 @@
+import type { CSSProperties } from "react";
+import { Poppins } from "next/font/google";
 import { ButtonLink } from "@/components/ui/Button";
 import { site } from "@/content/site";
 import { HeroVisual } from "./HeroVisual";
 
-const enter = (delay: number) => ({ animationDelay: `${delay}ms` });
-const enterClass = "motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_both]";
+/** Solo el titular del hero usa Poppins; se carga aquí para no añadirla al resto del sitio. */
+const poppins = Poppins({ subsets: ["latin"], weight: ["800", "900"], display: "swap" });
+
+const delay = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
+const enterClass = "motion-safe:animate-[enter_600ms_var(--ease-flow)_both]";
+const riseClass = "motion-safe:animate-[hero-rise_600ms_var(--ease-flow)_both]";
+const blockClass = "motion-safe:animate-[hero-block_520ms_cubic-bezier(0.7,0,0.2,1)_both]";
+
+type Line = { text: string; block?: "orange" | "pink"; at: number; gap?: boolean };
+
+/** Orden de lectura y coreografía: bloque → palabra → complemento. */
+const lines: Line[] = [
+  { text: "Creatividad", block: "orange", at: 80 },
+  { text: "que suma.", at: 420 },
+  { text: "Estrategia", block: "pink", at: 540, gap: true },
+  { text: "que impulsa.", at: 880 },
+];
+
+const blockColor = { orange: "bg-suma-orange", pink: "bg-suma-pink" } as const;
 
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative isolate overflow-hidden bg-suma-cream">
-      <div className="container-suma grid items-center gap-12 pb-28 pt-10 md:pb-36 md:pt-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:pb-44">
+      <div className="container-suma grid items-center gap-14 pb-28 pt-12 md:pb-36 md:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:pb-44">
         <div className="relative z-10">
-          <p className={`text-eyebrow inline-flex items-center gap-3 text-suma-orange-ink ${enterClass}`} style={enter(40)}>
-            <span aria-hidden="true" className="h-0.5 w-8 rounded-full bg-current" />
-            Estudio creativo + tecnología para wellness
+          <p
+            className={`flex items-center gap-3 text-[0.72rem] font-semibold uppercase leading-none tracking-[0.2em] text-suma-navy/80 sm:text-xs ${enterClass}`}
+            style={delay(0)}
+          >
+            <span aria-hidden="true" className="h-px w-7 bg-suma-navy/40" />
+            <span>
+              Creatividad <span className="text-suma-orange-ink">+</span> Tecnología
+            </span>
           </p>
 
-          <h1 id="hero-title" className="mt-7">
-            <span className={`text-display-xl block text-suma-navy ${enterClass}`} style={enter(110)}>
-              Más tiempo para crear{" "}
-              <span className="relative inline-block whitespace-nowrap">
-                bienestar.
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 300 24"
-                  preserveAspectRatio="none"
-                  className="absolute -bottom-2 left-0 h-[0.22em] w-full text-suma-orange"
-                >
-                  <path d="M3 16 C 60 4, 120 22, 180 10 S 270 6, 297 14" stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" />
-                </svg>
-              </span>
-            </span>
-            <span
-              className={`mt-5 block font-display text-[clamp(1.5rem,3vw,2.5rem)] font-semibold leading-[1.08] tracking-[-0.02em] text-suma-purple ${enterClass}`}
-              style={enter(240)}
-            >
-              Nosotros nos encargamos de hacer que todo fluya.
-            </span>
+          <h1
+            id="hero-title"
+            className={`${poppins.className} mt-7 text-[clamp(2.25rem,12.4vw,3.75rem)] font-extrabold uppercase leading-[0.98] tracking-[-0.035em] text-suma-navy sm:mt-9 sm:text-[clamp(3.75rem,10.8vw,5.5rem)] lg:text-[clamp(3.75rem,6.5vw,6rem)]`}
+          >
+            {lines.map(({ text, block, at, gap }) =>
+              block ? (
+                <span key={text} className={`block ${gap ? "mt-[0.42em]" : ""}`}>
+                  <span className="relative -ml-[0.16em] inline-block px-[0.16em] pb-[0.04em] pt-[0.1em] font-black text-white">
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 origin-left ${blockColor[block]} ${blockClass}`}
+                      style={delay(at)}
+                    />
+                    <span className={`relative block ${riseClass}`} style={delay(at + 200)}>
+                      {text}
+                    </span>
+                  </span>{" "}
+                </span>
+              ) : (
+                <span key={text} className={`block pt-[0.06em] ${riseClass}`} style={delay(at)}>
+                  {text}{" "}
+                </span>
+              ),
+            )}
           </h1>
 
-          <p className={`text-lead mt-8 max-w-xl text-suma-navy/75 ${enterClass}`} style={enter(340)}>
-            Chatbots, CRM, aplicaciones, páginas web y publicidad digital diseñados para estudios, spas y marcas que
-            quieren crecer sin perder su esencia.
+          <p
+            className={`mt-9 max-w-[26rem] text-[clamp(1.0625rem,1.3vw,1.1875rem)] font-medium leading-[1.65] text-suma-navy/80 sm:mt-11 ${enterClass}`}
+            style={delay(1000)}
+          >
+            Diseñamos soluciones digitales que conectan, simplifican y hacen crecer tu negocio.
           </p>
 
-          <div className={`mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 ${enterClass}`} style={enter(420)}>
+          <div className={`mt-9 flex flex-wrap items-center gap-x-7 gap-y-4 md:mt-10 ${enterClass}`} style={delay(1080)}>
             <ButtonLink href="/#selector" size="lg" arrow>
               Quiero mejorar mi negocio
             </ButtonLink>
@@ -52,7 +81,10 @@ export function Hero() {
             </ButtonLink>
           </div>
 
-          <p className={`mt-12 flex items-center gap-2 text-sm font-semibold text-suma-navy/65 ${enterClass}`} style={enter(500)}>
+          <p
+            className={`mt-10 flex items-center gap-2 text-sm font-semibold text-suma-navy/65 md:mt-12 ${enterClass}`}
+            style={delay(1140)}
+          >
             <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 text-suma-orange-ink" fill="currentColor">
               <path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5c0 3.3 4.5 8.5 4.5 8.5s4.5-5.2 4.5-8.5A4.5 4.5 0 0 0 8 1.5Zm0 6.2a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4Z" />
             </svg>

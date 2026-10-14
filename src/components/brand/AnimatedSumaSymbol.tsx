@@ -200,6 +200,7 @@ export const AnimatedSumaSymbol = memo(function AnimatedSumaSymbol({
                   width={SYMBOL_VIEWBOX.width}
                   height={SYMBOL_VIEWBOX.height}
                   preload={preload}
+                  loading={preload ? "eager" : undefined}
                   draggable={false}
                   className="absolute max-w-none"
                   style={symbolImageFrame}
