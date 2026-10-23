@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { League_Spartan, Quicksand } from "next/font/google";
+import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
 import { SplashScreen } from "@/components/brand/SplashScreen";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${leagueSpartan.variable} ${quicksand.variable} antialiased`}
     >
       <body className="flex min-h-dvh flex-col">
+        <GoogleTagManagerNoScript id={site.gtmId} />
         <SplashScreen />
         <Header />
         <main id="contenido" className="flex-1">
@@ -65,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
         <JsonLd data={organizationJsonLd} />
+        <GoogleTagManager id={site.gtmId} />
       </body>
     </html>
   );

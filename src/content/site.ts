@@ -18,6 +18,8 @@ export const site = {
     whatsapp: null as string | null,
   },
   social: [] as { label: string; href: string }[],
+  /** Contenedor de Google Tag Manager. */
+  gtmId: "GTM-W2CSD45N",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, ""),
   locale: "es_MX",
 } as const;

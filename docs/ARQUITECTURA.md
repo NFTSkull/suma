@@ -48,6 +48,9 @@ El contexto del selector se transfiere al formulario mediante `sessionStorage` (
 
 - Selector de necesidades de "Lo que hacemos" (`ServiceShortcuts`): cada opción hace `scrollIntoView` (suave o directo según `prefers-reduced-motion`) hasta la tarjeta `servicio-<slug>` (`capabilityAnchorId`) y, al terminar el desplazamiento (`scrollend` o respaldo de 900 ms), escribe `data-emphasis` en ella durante 1.6 s. El énfasis es un `outline` en el color del servicio (`--emphasis`), sin cambio de layout. Nunca se desplaza al cargar.
 
+## Medición
+Google Tag Manager se monta en el layout raíz (`src/components/analytics/GoogleTagManager.tsx`): el fragmento oficial con `next/script` (`afterInteractive`) y el `<noscript>` como primer hijo de `<body>`. El id vive en `site.gtmId`. Las etiquetas (Analytics, píxeles, etc.) se configuran en GTM, no en el código.
+
 ## Variables de entorno
 | Variable | Uso |
 |---|---|

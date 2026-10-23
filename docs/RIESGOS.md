@@ -9,6 +9,6 @@
 | R5 | Aviso de privacidad sin datos del responsable (razón social, domicilio, correo ARCO). | Alto (legal) | Plantilla basada en LFPDPPP con marcadores visibles; requiere revisión legal. |
 | R6 | Fotografía de Unsplash (licencia libre), no propia. | Bajo | Créditos en `src/content/photos.ts`. Sustituir por sesión propia cuando exista. |
 | R7 | Rate limit en memoria (por instancia). | Bajo | Suficiente para tráfico inicial; usar almacén compartido si se escala. |
-| R8 | Analítica con consentimiento no implementada. | Bajo | Sin scripts de terceros; integrar junto con banner de consentimiento cuando se defina la herramienta. |
+| R8 | Google Tag Manager (`GTM-W2CSD45N`) activo sin banner de consentimiento, y el aviso de privacidad aún no menciona cookies ni herramientas de medición. | Medio (legal) | GTM se carga después de la hidratación y no lleva etiquetas propias en el código. Añadir al aviso de privacidad las cookies y herramientas que se configuren en GTM (revisión legal) y, si se requiere, un banner de consentimiento con Consent Mode. |
 | R9 | Core Web Vitals no medidos en producción. | Medio | Imágenes optimizadas con `next/image`, fuentes con `next/font`, JS cliente acotado. Medir tras despliegue. |
 | R10 | Avisos de `npm audit` en dependencias de desarrollo (no en producción: `npm audit --omit=dev` = 0). | Bajo | Revisar al actualizar herramientas de prueba. |

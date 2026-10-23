@@ -2,6 +2,9 @@
 
 ## [Sin publicar]
 
+### Añadido
+- Google Tag Manager (`GTM-W2CSD45N`) en todas las páginas: fragmento oficial cargado con `next/script` (`afterInteractive`) y `<noscript>` al inicio de `<body>`. Pruebas: 94.
+
 ### Seguridad
 - `next` y `eslint-config-next` de 16.4.0 a 16.4.2 (parche de una vulnerabilidad conocida de 16.4.0). `npm audit --omit=dev`: 0 vulnerabilidades.
 
