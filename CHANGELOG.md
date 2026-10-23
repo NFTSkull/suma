@@ -2,6 +2,9 @@
 
 ## [Sin publicar]
 
+### Seguridad
+- `next` y `eslint-config-next` de 16.4.0 a 16.4.2 (parche de una vulnerabilidad conocida de 16.4.0). `npm audit --omit=dev`: 0 vulnerabilidades.
+
 ### Cambiado
 - Favicon: la "S" provisional se sustituye por el isotipo oficial de SUMA (`public/brand/simbolo_capas.svg`), con fondo transparente y recortado a un cuadrado alrededor del símbolo para que se lea en la pestaña.
 - Home: "Te entendemos" y "Lo que hacemos" se fusionan en una sola sección. Se retira de la home la sección "Te entendemos" (titular, seis situaciones y panel de solución); `SituationsExplorer` y `situations` se conservan porque `/soluciones` los usa. "Lo que hacemos" conserva titular, tarjetas, visuales y enlaces, y suma la pregunta "¿Qué te gustaría mejorar hoy?" con un selector de cinco necesidades (`ServiceShortcuts`): Responder mensajes → Chatbots, Organizar clientes y citas → CRM, Crear una experiencia móvil → Apps, Mejorar mi página web → Web, Atraer más clientes → Publicidad. Cada opción es un botón real (`aria-pressed`, `aria-controls`) que desplaza suavemente a la tarjeta existente (respeta el header sticky y `prefers-reduced-motion`), marca la opción con un subrayado naranja y da a la tarjeta un contorno temporal en su color (~360 ms de entrada, 1.6 s visible) sin mover el layout. Con teclado el foco pasa al enlace de la tarjeta. En móvil las opciones forman una fila deslizable; desde `sm` se acomodan en filas. Se retira el texto "No se trata de agregar más herramientas…". Cada tarjeta tiene id estable `servicio-<slug>`. Pruebas: 91.
