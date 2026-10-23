@@ -29,7 +29,7 @@ src/
     industries/             Plantilla de páginas de industria
     selector/               Selector de soluciones (reglas tipadas)
     contact/                Formulario de contacto
-  content/                  site, navigation, services, industries, situations, process, selector-rules, brand-assets, photos
+  content/                  site, navigation, services, service-shortcuts, industries, situations, process, selector-rules, brand-assets, photos
   lib/                      contact-schema, recommend, seo, rate-limit, action-log, contact-delivery, cn
 ```
 
@@ -43,7 +43,10 @@ El contexto del selector se transfiere al formulario mediante `sessionStorage` (
 - `Reveal` usa IntersectionObserver; el contenido solo se oculta dentro de `@media (scripting: enabled)` (sin JS todo es visible) y el estado visible se escribe en el DOM sin re-render.
 - `prefers-reduced-motion` desactiva animaciones ambientales y revelaciones.
 - Isotipo animado (`AnimatedSumaSymbol`, GSAP): tres capas `next/image` con las piezas oficiales de `public/brand/`. Como comparten viewBox, la pose final es desplazamiento cero; la caja recorta el margen transparente (`SYMBOL_BOUNDS`). Coreografía y variantes en `suma-symbol-config.ts`. Con `trigger="load"` espera a la pantalla de carga (`splash-signal.ts`); con `in-view` arranca al 35 % visible. Los bucles se pausan fuera de pantalla y el símbolo formado oscila como una sola pieza (nunca se desalinea).
-- Pantalla de carga (`SplashScreen`, montada en el layout raíz): reproduce `SumaStudioLogoReveal` (única pieza que usa GSAP), en cada carga completa (la navegación interna no la repite porque vive en el layout raíz). Si la URL no trae `#sección`, desactiva la restauración de scroll del navegador y abre arriba. Mientras está en `playing` las animaciones de `#contenido` quedan en pausa; sin JavaScript no se muestra y, si la hidratación falla, se retira sola a los 4 s. Es decorativa (`aria-hidden`).
+- Pantalla de carga (`SplashScreen`, montada en el layout raíz): reproduce `SumaStudioLogoReveal` (única pieza que usa GSAP), en cada carga completa (la navegación interna no la repite porque vive en el layout raíz). Si la URL no trae `#sección`, desactiva la restauración de scroll del navegador y abre arriba. Mientras está en `playing` o `leaving` las animaciones de `#contenido` quedan en pausa; sin JavaScript no se muestra y, si la hidratación falla, se retira sola a los 4 s. Es decorativa (`aria-hidden`).
+- Transformación "Antes → Con SUMA" del manifiesto (`SumaScrollTransformation`): contenido en `src/content/transformation.ts`, lógica pura de umbrales e histéresis en `scroll-transformation.ts`. Un IntersectionObserver (margen 20 %) activa un listener pasivo de scroll solo mientras el bloque está cerca; cada evento se agrupa en un rAF y React solo se actualiza cuando cambia el estado. Cambia a "Con SUMA" cuando el centro del bloque sube al 60 % de la ventana y vuelve a "Antes" al bajar del 72 %. El estado se refleja en `data-state` y una única variable CSS (`--p`) anima opacidad y transform; ambas capas de texto comparten celda, así la altura no cambia. Sin JS o con movimiento reducido se ve el estado final. Una elección manual (botones `aria-pressed`) se respeta hasta que el bloque sale de pantalla.
+
+- Selector de necesidades de "Lo que hacemos" (`ServiceShortcuts`): cada opción hace `scrollIntoView` (suave o directo según `prefers-reduced-motion`) hasta la tarjeta `servicio-<slug>` (`capabilityAnchorId`) y, al terminar el desplazamiento (`scrollend` o respaldo de 900 ms), escribe `data-emphasis` en ella durante 1.6 s. El énfasis es un `outline` en el color del servicio (`--emphasis`), sin cambio de layout. Nunca se desplaza al cargar.
 
 ## Variables de entorno
 | Variable | Uso |

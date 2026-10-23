@@ -8,7 +8,6 @@ import { ImpactBlock } from "@/components/home/ImpactBlock";
 import { IndustriesCarousel } from "@/components/home/IndustriesCarousel";
 import { Manifesto } from "@/components/home/Manifesto";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
-import { SituationsExplorer } from "@/components/home/SituationsExplorer";
 import { SumaEnAccion } from "@/components/home/SumaEnAccion";
 import { NeedsSelector } from "@/components/selector/NeedsSelector";
 import { ButtonLink } from "@/components/ui/Button";
@@ -24,22 +23,6 @@ export default function HomePage() {
     <>
       <Hero />
       <Manifesto />
-
-      {/* Te entendemos */}
-      <section aria-labelledby="entendemos-title" className="section-y bg-suma-cream-deep/60">
-        <div className="container-suma">
-          <SectionHeading
-            id="entendemos-title"
-            eyebrow="Te entendemos"
-            title="Sabemos todo lo que pasa detrás de una gran experiencia."
-            lead="Elige la situación que más se parece a tu día. Te mostramos por dónde podríamos empezar."
-          />
-          <div className="mt-14">
-            <SituationsExplorer />
-          </div>
-        </div>
-      </section>
-
       <Capabilities />
 
       {/* SUMA en acción */}

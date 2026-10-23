@@ -5,6 +5,7 @@ import { industries, industryBySlug } from "./industries";
 import { allRoutes, footerNav, legalLinks, mainNav } from "./navigation";
 import { photos } from "./photos";
 import { processSteps } from "./process";
+import { capabilityAnchorId, serviceShortcuts } from "./service-shortcuts";
 import { serviceBySlug, services } from "./services";
 import { situations } from "./situations";
 
@@ -48,6 +49,11 @@ describe("contenido", () => {
   it("las situaciones apuntan a servicios existentes", () => {
     expect(situations).toHaveLength(6);
     for (const s of situations) expect(serviceBySlug[s.solution.service]).toBeDefined();
+  });
+
+  it("el selector de necesidades cubre los cinco servicios, uno por opción y en su orden", () => {
+    expect(serviceShortcuts.map((s) => s.service)).toEqual(services.map((s) => s.slug));
+    expect(new Set(serviceShortcuts.map((s) => capabilityAnchorId(s.service))).size).toBe(5);
   });
 
   it("el proceso tiene cuatro etapas", () => {

@@ -236,6 +236,75 @@
   }
 }
 
+/* ──────────────── Transformación "Antes → Con SUMA" (manifiesto) ────────────────
+   --p: 0 = antes, 1 = con SUMA. Sin JS queda en 1 (estado final). Solo se
+   animan opacity y transform; ambas capas comparten celda, así la altura no cambia. */
+.suma-shift {
+  --p: 1;
+}
+.suma-shift[data-state="before"] {
+  --p: 0;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .suma-shift:not([data-state]) {
+    --p: 0;
+  }
+}
+/* La capa saliente se desvanece rápido; la entrante aparece cuando la otra ya
+   casi no se ve, para que los textos nunca se lean superpuestos. */
+.suma-shift__layer {
+  grid-area: 1 / 1;
+  transition:
+    opacity 200ms var(--ease-soft) calc(var(--i, 0) * 45ms),
+    transform 260ms var(--ease-soft) calc(var(--i, 0) * 45ms);
+}
+.suma-shift[data-state="after"] [data-layer="after"],
+.suma-shift[data-state="before"] [data-layer="before"] {
+  transition:
+    opacity 340ms var(--ease-soft) calc(var(--i, 0) * 45ms + 150ms),
+    transform 400ms var(--ease-flow) calc(var(--i, 0) * 45ms + 150ms);
+}
+.suma-shift__layer[data-layer="before"] {
+  opacity: calc(1 - var(--p));
+  transform: translate3d(0, calc(var(--p) * -8px), 0);
+}
+.suma-shift__layer[data-layer="after"] {
+  opacity: var(--p);
+  transform: translate3d(0, calc((1 - var(--p)) * 8px), 0);
+}
+.suma-shift__rule {
+  transform: scaleX(var(--p));
+  transition: transform 400ms var(--ease-flow) calc(var(--i, 0) * 45ms + 150ms);
+}
+.suma-shift__dot {
+  transform: translate3d(calc(var(--p) * (2.5rem - 7px)), 0, 0);
+  transition: transform 480ms var(--ease-flow);
+}
+.suma-shift__label {
+  transition: opacity 380ms var(--ease-soft);
+}
+.suma-shift__label[data-for="before"] {
+  opacity: calc(1 - 0.3 * var(--p));
+}
+.suma-shift__label[data-for="after"] {
+  opacity: calc(0.7 + 0.3 * var(--p));
+}
+
+/* ──────────────── Énfasis temporal de tarjeta ("Lo que hacemos") ────────────────
+   El contorno no ocupa espacio: el énfasis nunca mueve el layout. */
+.capability-card {
+  border-radius: 2rem;
+  outline: 2px solid transparent;
+  outline-offset: 12px;
+  transition:
+    outline-color 360ms var(--ease-soft),
+    outline-offset 360ms var(--ease-flow);
+}
+.capability-card[data-emphasis="true"] {
+  outline-color: var(--emphasis, var(--color-suma-orange));
+  outline-offset: 6px;
+}
+
 /* ─────────────────────────── Isotipo animado ─────────────────────────── */
 .suma-symbol__glow {
   position: absolute;
@@ -320,5 +389,8 @@ body:has(.suma-splash:is([data-state="playing"], [data-state="leaving"])) #conte
   }
   .flow-path {
     stroke-dashoffset: 0;
+  }
+  .suma-shift * {
+    transition-delay: 0s !important;
   }
 }

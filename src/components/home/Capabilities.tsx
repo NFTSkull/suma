@@ -1,12 +1,14 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AdJourneyMini, ChatMini, CrmMini, PhoneMini, WebScreensMini } from "@/components/visuals/MiniVisuals";
+import { capabilityAnchorId } from "@/content/service-shortcuts";
 import { getService, serviceInlineName } from "@/content/services";
 import type { ServiceSlug } from "@/types/content";
 import { cn } from "@/lib/cn";
+import { ServiceShortcuts } from "./ServiceShortcuts";
 
 function CardArrow({ light }: { light?: boolean }) {
   return (
@@ -43,33 +45,39 @@ function CapabilityCard({
 }) {
   const s = getService(slug);
   return (
-    <Reveal className={cn("h-full", className)}>
-      <Link
-        href={s.href}
-        className={cn(
-          "group relative flex h-full flex-col overflow-hidden rounded-[2rem] p-7 transition-[transform,box-shadow] duration-[var(--dur-panel)] ease-[var(--ease-flow)] hover:-translate-y-1 hover:shadow-lift md:p-9",
-          layout === "split" && "lg:grid lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-8",
-          surface,
-          light && "on-dark",
-        )}
-      >
-        <div className="relative z-10 flex flex-col">
-          <p className={cn("text-eyebrow flex items-center gap-3", light ? "text-suma-cream/75" : "text-suma-navy/65")}>
-            <span className="font-display text-base tracking-normal">{number}</span>
-            {s.shortName}
-          </p>
-          <h3 className={cn("mt-5 text-display-md", light ? "text-suma-cream" : "text-suma-navy")}>{s.home.title}</h3>
-          <p className={cn("mt-4 max-w-md text-base leading-relaxed", light ? "text-suma-cream/80" : "text-suma-navy/75")}>{s.home.text}</p>
-          <span className={cn("mt-6 inline-flex items-center gap-3 font-bold", light ? "text-suma-cream" : "text-suma-navy")}>
-            <CardArrow light={light} />
-            <span>Conocer {serviceInlineName[s.slug]}</span>
-          </span>
-        </div>
-        <div className="relative mt-10 flex flex-1 items-end justify-center transition-transform duration-[var(--dur-reveal)] ease-[var(--ease-flow)] group-hover:-translate-y-1.5 lg:mt-8">
-          {visual}
-        </div>
-      </Link>
-    </Reveal>
+    <div
+      id={capabilityAnchorId(slug)}
+      className={cn("capability-card scroll-mt-4", className)}
+      style={{ "--emphasis": `var(--color-suma-${s.color})` } as CSSProperties}
+    >
+      <Reveal className="h-full">
+        <Link
+          href={s.href}
+          className={cn(
+            "group relative flex h-full flex-col overflow-hidden rounded-[2rem] p-7 transition-[transform,box-shadow] duration-[var(--dur-panel)] ease-[var(--ease-flow)] hover:-translate-y-1 hover:shadow-lift md:p-9",
+            layout === "split" && "lg:grid lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-8",
+            surface,
+            light && "on-dark",
+          )}
+        >
+          <div className="relative z-10 flex flex-col">
+            <p className={cn("text-eyebrow flex items-center gap-3", light ? "text-suma-cream/75" : "text-suma-navy/65")}>
+              <span className="font-display text-base tracking-normal">{number}</span>
+              {s.shortName}
+            </p>
+            <h3 className={cn("mt-5 text-display-md", light ? "text-suma-cream" : "text-suma-navy")}>{s.home.title}</h3>
+            <p className={cn("mt-4 max-w-md text-base leading-relaxed", light ? "text-suma-cream/80" : "text-suma-navy/75")}>{s.home.text}</p>
+            <span className={cn("mt-6 inline-flex items-center gap-3 font-bold", light ? "text-suma-cream" : "text-suma-navy")}>
+              <CardArrow light={light} />
+              <span>Conocer {serviceInlineName[s.slug]}</span>
+            </span>
+          </div>
+          <div className="relative mt-10 flex flex-1 items-end justify-center transition-transform duration-[var(--dur-reveal)] ease-[var(--ease-flow)] group-hover:-translate-y-1.5 lg:mt-8">
+            {visual}
+          </div>
+        </Link>
+      </Reveal>
+    </div>
   );
 }
 
@@ -77,24 +85,18 @@ export function Capabilities() {
   return (
     <section aria-labelledby="capacidades-title" className="section-y relative bg-suma-cream">
       <div className="container-suma">
-        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
-          <SectionHeading
-            id="capacidades-title"
-            eyebrow="Lo que hacemos"
-            title={
-              <>
-                Cinco maneras de hacer que tu negocio <span className="text-suma-purple">fluya.</span>
-              </>
-            }
-          />
-          <Reveal>
-            <p className="text-lead max-w-md text-suma-navy/75 lg:pb-3">
-              No se trata de agregar más herramientas. Se trata de crear las correctas.
-            </p>
-          </Reveal>
-        </div>
+        <SectionHeading
+          id="capacidades-title"
+          eyebrow="Lo que hacemos"
+          title={
+            <>
+              Cinco maneras de hacer que tu negocio <span className="text-suma-purple">fluya.</span>
+            </>
+          }
+        />
+        <ServiceShortcuts />
 
-        <div className="mt-16 grid gap-5 lg:grid-cols-12">
+        <div className="mt-10 grid gap-5 md:mt-12 lg:grid-cols-12">
           <CapabilityCard
             slug="chatbots"
             number="01"

@@ -14,6 +14,7 @@ Comando de verificación por bloque: `npm run lint && npm run typecheck && npm t
 ## Componentes (Testing Library)
 - Selector: avanzar, regresar, reiniciar, resultado con CTA y guardado de contexto.
 - Explorador de situaciones: selección con clic y teclado (flechas).
+- "Lo que hacemos" + selector de necesidades: cinco opciones en orden, cada una desplaza a su tarjeta (`servicio-<slug>`), énfasis tras `scrollend` o respaldo y retirada posterior, una sola tarjeta enfatizada, movimiento reducido, foco con teclado vs. puntero, sin scroll al montar y enlaces de tarjetas intactos.
 - Demo chatbot: pregunta → horarios → confirmación de ejemplo.
 - Formulario: errores accesibles, no muestra éxito ante 503, sí ante 200, evita doble envío.
 

@@ -1,5 +1,6 @@
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { Reveal } from "@/components/ui/Reveal";
+import { SumaScrollTransformation } from "./SumaScrollTransformation";
 
 export function Manifesto() {
   return (
@@ -26,17 +27,15 @@ export function Manifesto() {
             </Reveal>
           </p>
 
-          <div className="mt-14 grid gap-10 md:grid-cols-[1fr_1.3fr] md:items-end">
-            <Reveal delay={150}>
+          {/* Orden del DOM = orden móvil (titular → transformación → firma); en escritorio la firma vuelve a la izquierda. */}
+          <div className="mt-14 grid gap-12 md:grid-cols-[1fr_1.3fr] md:items-end md:gap-10">
+            <Reveal delay={240} className="md:col-start-2 md:row-start-1">
+              <SumaScrollTransformation />
+            </Reveal>
+            <Reveal delay={150} className="md:col-start-1 md:row-start-1">
               <p className="text-eyebrow flex items-center gap-3 text-suma-navy/70">
                 <span aria-hidden="true" className="blob inline-block size-4 bg-suma-orange" />
                 SUMA STUDIO / Diseñado para fluir
-              </p>
-            </Reveal>
-            <Reveal delay={240}>
-              <p className="text-lead text-suma-navy/75">
-                Creemos que las mejores herramientas son las que se adaptan a las personas. Por eso diseñamos soluciones
-                para que tu operación sea más clara, tu atención más sencilla y tu experiencia digital más cercana.
               </p>
             </Reveal>
           </div>

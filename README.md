@@ -22,7 +22,7 @@ Copia `.env.example` a `.env.local` y completa:
 - `CONTACT_WEBHOOK_URL` **o** `RESEND_API_KEY` + `CONTACT_TO_EMAIL` — entrega del formulario. Sin ninguno, el formulario informa que no está conectado (no simula envíos).
 
 ## Marca
-Los SVG oficiales están en `public/brand/` y los usan la pantalla de carga y el isotipo animado. El logo de header/footer sigue siendo provisional: para activarlo, regístralo en `src/content/brand-assets.ts`; reemplaza también `src/app/icon.svg`.
+Los SVG oficiales están en `public/brand/` y los usan la pantalla de carga, el isotipo animado y el favicon (`src/app/icon.svg`, isotipo oficial recortado a cuadrado). El logo de header/footer sigue siendo provisional: para activarlo, regístralo en `src/content/brand-assets.ts`.
 
 ## Documentación
 - `docs/PRODUCTO.md`, `docs/ARQUITECTURA.md`, `docs/API_CONTRATOS.md`, `docs/TEST_PLAN.md`, `docs/RIESGOS.md`
