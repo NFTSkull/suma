@@ -1,0 +1,19 @@
+name: QA integracion Precalix B2B (solo datos simulados)
+on:
+  push:
+    branches:
+      - test/precalix-b2b-sandbox
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cliente-externo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Contrato externo y seguridad sin llamadas reales
+        run: node --test integraciones/precalix/cliente.test.mjs
