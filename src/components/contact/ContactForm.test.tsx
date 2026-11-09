@@ -26,6 +26,8 @@ async function fillValid(user: UserEvent) {
 }
 
 const send = () => screen.getByRole("button", { name: /Enviar mensaje|Enviando/ });
+/** Respuesta de la API cuando el proveedor confirmó la entrega. */
+const delivered = () => new Response(JSON.stringify({ ok: true, delivered: true }), { status: 200 });
 
 describe("ContactForm", () => {
   it("muestra errores accesibles y no envía si faltan datos", async () => {
@@ -53,8 +55,8 @@ describe("ContactForm", () => {
     expect(screen.getByLabelText("Nombre")).toHaveValue("Ana López");
   });
 
-  it("muestra éxito solo ante 200 y envía datos válidos", async () => {
-    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+  it("muestra éxito solo con entrega confirmada y envía datos válidos", async () => {
+    fetchMock.mockResolvedValue(delivered());
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValid(user);
@@ -76,8 +78,20 @@ describe("ContactForm", () => {
     expect(send()).toBeDisabled();
     await user.click(send());
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    resolve(new Response("{}", { status: 200 }));
+    resolve(delivered());
     expect(await screen.findByText("Gracias, recibimos tu mensaje.")).toBeInTheDocument();
+  });
+
+  it("un 200 sin entrega confirmada (descarte anti-spam) no muestra éxito y conserva los datos", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+
+    expect(await screen.findByText("No pudimos confirmar el envío.")).toBeInTheDocument();
+    expect(screen.queryByText(/recibimos tu mensaje/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Correo electrónico")).toHaveValue("ana@ejemplo.mx");
   });
 
   it("prellena con el contexto del selector y permite quitarlo", async () => {
@@ -103,20 +117,11 @@ describe("ContactForm · analítica", () => {
   beforeEach(() => {
     (window as DL).dataLayer = [];
   });
-  afterEach(() => vi.restoreAllMocks());
-
-  /** Simula que la persona tardó más del mínimo anti-spam en llenar el formulario. */
-  const afterHumanDelay = () => {
-    const later = Date.now() + 10_000;
-    vi.spyOn(Date, "now").mockReturnValue(later);
-  };
-
-  it("envía generate_lead una sola vez cuando el backend confirma, sin datos personales", async () => {
-    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+  it("envía generate_lead una sola vez cuando el backend confirma la entrega, sin datos personales", async () => {
+    fetchMock.mockResolvedValue(delivered());
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValid(user);
-    afterHumanDelay();
     await user.click(send());
     await screen.findByText("Gracias, recibimos tu mensaje.");
 
@@ -134,14 +139,14 @@ describe("ContactForm · analítica", () => {
     for (const value of personal) expect(json).not.toContain(value);
   });
 
-  it("no cuenta como lead un 200 que la API descarta por demasiado rápido", async () => {
+  it("un 200 descartado por anti-spam no es lead: solo form_error unconfirmed", async () => {
     fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValid(user);
     await user.click(send());
-    await screen.findByText("Gracias, recibimos tu mensaje.");
-    expect(events()).toEqual([]);
+    await screen.findByText("No pudimos confirmar el envío.");
+    expect((window as DL).dataLayer).toEqual([{ event: "form_error", form_name: "contacto", error_type: "unconfirmed" }]);
   });
 
   it.each([
@@ -154,7 +159,6 @@ describe("ContactForm · analítica", () => {
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValid(user);
-    afterHumanDelay();
     await user.click(send());
     await waitFor(() => expect(events()).toEqual(["form_error"]));
     expect((window as DL).dataLayer![0]).toEqual({ event: "form_error", form_name: "contacto", error_type: errorType });

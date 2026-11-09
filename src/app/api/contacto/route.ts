@@ -1,5 +1,5 @@
 import { actionLog } from "@/lib/action-log";
-import { deliverLead, getDeliveryConfig } from "@/lib/contact-delivery";
+import { deliverLead, getDeliveryConfig, type DeliveryResult } from "@/lib/contact-delivery";
 import { antiSpamSchema, contactSchema, fieldErrors, isSilentlyDiscarded } from "@/lib/contact-schema";
 import { contactRateLimiter } from "@/lib/rate-limit";
 
@@ -46,25 +46,28 @@ export async function POST(request: Request) {
     fromSelector: Boolean(parsed.data.contexto),
   };
 
-  const config = getDeliveryConfig();
+  const { config, issue } = getDeliveryConfig();
   if (!config) {
-    actionLog({ action: "contact.submit", outcome: "not_configured", ...meta });
+    actionLog({ action: "contact.submit", outcome: "not_configured", ...(issue ? { reason: issue } : {}), ...meta });
     return json(503, { ok: false, error: "not_configured" });
   }
 
-  let delivered = false;
+  let result: DeliveryResult = { ok: false };
   try {
-    delivered = await deliverLead(config, parsed.data);
+    result = await deliverLead(config, parsed.data);
   } catch {
-    delivered = false;
+    result = { ok: false };
   }
 
   actionLog({
     action: "contact.submit",
-    outcome: delivered ? "delivered" : "delivery_failed",
+    outcome: result.ok ? "delivered" : "delivery_failed",
     provider: config.provider,
+    ...(result.ok && result.providerId ? { providerId: result.providerId } : {}),
+    ...(!result.ok && result.providerStatus ? { providerStatus: result.providerStatus } : {}),
     ...meta,
   });
 
-  return delivered ? json(200, { ok: true }) : json(502, { ok: false, error: "delivery_failed" });
+  // `delivered: true` solo cuando el proveedor confirmó; el descarte anti-spam responde `{ ok: true }` sin ese campo.
+  return result.ok ? json(200, { ok: true, delivered: true }) : json(502, { ok: false, error: "delivery_failed" });
 }

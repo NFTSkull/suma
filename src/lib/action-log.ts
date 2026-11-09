@@ -9,6 +9,12 @@ export type ActionLogEntry = {
     | "not_configured"
     | "delivery_failed";
   provider?: "webhook" | "resend";
+  /** Motivo de `not_configured` (nombre del problema, nunca el valor de la variable). */
+  reason?: string;
+  /** Código HTTP del proveedor cuando falla la entrega. */
+  providerStatus?: number;
+  /** Id del correo aceptado por Resend, para rastrearlo en su panel. */
+  providerId?: string;
   servicios?: string[];
   tipoNegocio?: string;
   fromSelector?: boolean;

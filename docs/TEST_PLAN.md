@@ -18,7 +18,8 @@ Comando de verificación por bloque: `npm run lint && npm run typecheck && npm t
 - `content/*` — títulos SEO ≤ 56 caracteres, descripciones de 70–160 y títulos únicos.
 
 ## Integración de API
-- `app/api/contacto/route` — 400 JSON inválido, 422 validación, 200 honeypot sin entrega, 503 sin proveedor, 200 con webhook simulado, 502 si el proveedor falla, 429 por exceso.
+- `app/api/contacto/route` — 400 JSON inválido, 422 validación, 200 `{ ok: true }` (sin `delivered`) para honeypot/tiempo sin entrega, 503 sin proveedor, 200 `{ ok: true, delivered: true }` con webhook o Resend simulados, 502 si el proveedor falla, 429 por exceso.
+- Resend (fetch simulado, sin envíos reales): remitente propio, `reply_to`, `Idempotency-Key` estable, 200 sin `id` ⇒ 502, 403 ⇒ 502 con `providerStatus`, remitente ausente/`@resend.dev`/inválido o clave inválida ⇒ 503 con `reason` y sin exponer valores.
 
 ## Componentes (Testing Library)
 - Selector: avanzar, regresar, reiniciar, resultado con CTA y guardado de contexto.

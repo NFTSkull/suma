@@ -2,6 +2,13 @@
 
 ## [Sin publicar]
 
+### Formulario de contacto con Resend
+- La API responde `200 { ok: true, delivered: true }` solo cuando el proveedor confirma la entrega (Resend con `id` del correo, o webhook 2xx); el descarte anti-spam sigue respondiendo `200 { ok: true }`. El formulario muestra éxito y envía `generate_lead` únicamente con `delivered: true`; en otro caso muestra "No pudimos confirmar el envío", conserva los datos y registra `form_error` (`unconfirmed`).
+- Configuración de entrega validada con Zod: para Resend son obligatorios `RESEND_API_KEY` (`re_…`), `CONTACT_TO_EMAIL` y `CONTACT_FROM_EMAIL`; se eliminó el remitente de pruebas `onboarding@resend.dev` como valor por defecto y se rechaza cualquier `@resend.dev`. Si falta algo, `503 not_configured` con el motivo en `action_log`.
+- Compatible con la configuración de producción: `RESEND_API_KEY` cualquier `re_…` sin espacios, `CONTACT_FROM_EMAIL` con o sin nombre visible, `CONTACT_TO_EMAIL` con uno o varios destinatarios separados por comas.
+- Envíos de Resend con `Idempotency-Key` (misma solicitud ⇒ un solo correo), versión de texto plano y `reply_to` del prospecto. `action_log` registra `providerId` (id del correo), `providerStatus` y `reason`, sin datos personales.
+- Pruebas: 140.
+
 ### SEO 360 (rama `seo/auditoria-360`, detalle en `SEO_AUDIT.md`)
 - **Indexación**: URL del sitio resuelta por entorno (`src/lib/site-url.ts`): producción exige `NEXT_PUBLIC_SITE_URL` https (el build falla si falta o es localhost); los previews usan su propia URL y son `noindex` con robots `Disallow: /` y sitemap vacío. `X-Robots-Tag: noindex` en alias `*.vercel.app`. Canonical, `og:url`, `og:image` y `twitter:image` absolutas en todas las páginas (antes las internas no tenían imagen social). El layout raíz ya no hereda canonical `/`. Aviso de privacidad (borrador) en `noindex, follow` y fuera del sitemap. Sitemap sin `changefreq`/`priority`/`lastmod`.
 - **Validación**: `scripts/seo-check.mjs` como `postbuild` (canonical, localhost, Open Graph, H1 único, JSON-LD, FAQ visibles, sitemap ↔ páginas indexables, robots).

@@ -18,7 +18,7 @@ export type AnalyticsEvent =
   | {
       event: "form_error";
       form_name: "contacto";
-      error_type: "not_configured" | "rate_limited" | "validation" | "delivery_failed" | "server_error" | "network";
+      error_type: "not_configured" | "rate_limited" | "validation" | "delivery_failed" | "unconfirmed" | "server_error" | "network";
     }
   | { event: "contact_click"; contact_method: "email" | "whatsapp" | "phone" }
   | { event: "service_cta_click"; service: ServiceSlug; cta_location: "hero" | "closing" }

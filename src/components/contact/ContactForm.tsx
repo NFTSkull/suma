@@ -10,13 +10,12 @@ import {
   businessTypeOptions,
   contactSchema,
   fieldErrors,
-  isSilentlyDiscarded,
   serviceInterestOptions,
   type ContactField,
 } from "@/lib/contact-schema";
 import { SELECTOR_STORAGE_KEY, type SelectorContext } from "@/lib/recommend";
 
-type Status = "idle" | "sending" | "success" | "not_configured" | "rate_limited" | "error";
+type Status = "idle" | "sending" | "success" | "unconfirmed" | "not_configured" | "rate_limited" | "error";
 type Errors = Partial<Record<ContactField, string>>;
 type FormErrorType = Extract<AnalyticsEvent, { event: "form_error" }>["error_type"];
 
@@ -58,6 +57,11 @@ const statusCopy: Record<Exclude<Status, "idle" | "sending">, { title: string; t
     title: "Gracias, recibimos tu mensaje.",
     text: "Te contactaremos pronto para conocer tu negocio y platicar por dónde empezar.",
     tone: "ok",
+  },
+  unconfirmed: {
+    title: "No pudimos confirmar el envío.",
+    text: "Tus datos siguen aquí. Espera unos segundos y vuelve a intentarlo.",
+    tone: "warn",
   },
   not_configured: {
     title: "Tu mensaje no se envió.",
@@ -150,8 +154,12 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...payload, sitio, ...(inicio ? { inicio } : {}) }),
       });
-      if (res.ok) next = "success";
-      else if (res.status === 503) [next, errorType] = ["not_configured", "not_configured"];
+      if (res.ok) {
+        // Solo una entrega confirmada por el proveedor es éxito; un 200 sin `delivered` es un descarte anti-spam.
+        const body = (await res.json().catch(() => null)) as { delivered?: unknown } | null;
+        if (body?.delivered === true) next = "success";
+        else [next, errorType] = ["unconfirmed", "unconfirmed"];
+      } else if (res.status === 503) [next, errorType] = ["not_configured", "not_configured"];
       else if (res.status === 429) [next, errorType] = ["rate_limited", "rate_limited"];
       else if (res.status === 422) {
         const body = (await res.json().catch(() => null)) as { fields?: Errors } | null;
@@ -163,16 +171,14 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
     }
     setStatus(next);
     if (next === "success") {
-      if (!isSilentlyDiscarded({ sitio, inicio }, Date.now())) {
-        track({
-          event: "generate_lead",
-          form_name: "contacto",
-          lead_source: "contact_form",
-          business_type: parsed.data.tipoNegocio,
-          services: parsed.data.servicios.join(","),
-          from_selector: Boolean(parsed.data.contexto),
-        });
-      }
+      track({
+        event: "generate_lead",
+        form_name: "contacto",
+        lead_source: "contact_form",
+        business_type: parsed.data.tipoNegocio,
+        services: parsed.data.servicios.join(","),
+        from_selector: Boolean(parsed.data.contexto),
+      });
       discardContext();
     } else {
       track({ event: "form_error", form_name: "contacto", error_type: errorType });

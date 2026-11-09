@@ -6,15 +6,18 @@ Este documento separa lo que se **encontró**, lo que se **corrigió** en esta r
 
 ---
 
-## 0. Bloqueo comercial crítico
+## 0. Recepción de prospectos (formulario)
 
-**El formulario de contacto de producción no entrega mensajes.**
+**Resuelto en producción (2026-11-09).** En la auditoría inicial `POST /api/contacto` respondía `503 not_configured`, porque no había proveedor. Después se configuró Resend con una cuenta propia de SUMA:
+- **Vercel Production:** `RESEND_API_KEY` (sensible), `CONTACT_TO_EMAIL` y `CONTACT_FROM_EMAIL` (remitente en `sumastudio.mx`).
+- **DNS:** DKIM `resend._domainkey`, SPF/MX en `send.` y DMARC `p=none` publicados.
+- **Prueba real:** el equipo verificó una solicitud recibida en Gmail.
 
-- En Vercel solo existe `NEXT_PUBLIC_SITE_URL` (entorno *production*). No hay `CONTACT_WEBHOOK_URL` ni `RESEND_API_KEY` + `CONTACT_TO_EMAIL`.
-- Prueba ejecutada el 2026-11-09 con un envío válido de prueba: `POST https://www.sumastudio.mx/api/contacto` → `503 {"ok":false,"error":"not_configured"}`. Al no haber proveedor configurado, no se entregó nada.
-- La interfaz lo comunica con honestidad ("Tu mensaje no se envió"), pero **hoy ningún prospecto llega a SUMA**. Todo el trabajo SEO de esta rama atrae visitas a un formulario que no entrega.
-- Acción requerida (no la hice porque necesita credenciales y una decisión de negocio): configurar en Vercel, entorno *Production*, `CONTACT_WEBHOOK_URL` (Make/Zapier/n8n) **o** `RESEND_API_KEY` + `CONTACT_TO_EMAIL` (+ `CONTACT_FROM_EMAIL`), y redeplegar. Después, hacer un envío real de prueba.
-- Mientras tanto, `generate_lead` no se disparará nunca (correcto: no hay leads confirmados) y cada intento quedará como `form_error` con `error_type: not_configured`, lo que permite medir cuánta demanda se está perdiendo.
+Esta rama endurece el flujo sin cambiar esa configuración:
+- **Éxito confirmado:** la API responde `{ ok: true, delivered: true }` solo si Resend devuelve el `id` del correo. El descarte anti-spam responde `{ ok: true }` sin `delivered`, y el formulario no lo muestra como éxito ni lo cuenta como lead.
+- **Configuración validada** con Zod. Ya no se usa en silencio `onboarding@resend.dev`; se acepta un remitente con o sin nombre y uno o varios destinatarios separados por comas.
+- **Idempotencia:** `Idempotency-Key` evita correos duplicados.
+- **Registro:** `action_log` guarda el `id` del correo de Resend, sin datos personales.
 
 ---
 
@@ -154,8 +157,8 @@ Ver la sección 10, Recomendaciones de contenido.
 
 | Evento | Cuándo | Parámetros |
 |---|---|---|
-| `generate_lead` | La API respondió `200` **y** el envío no cumple la regla de descarte silencioso (honeypot o llenado en menos de 2.5 s), con la misma función que usa la API (`isSilentlyDiscarded`). Una vez por envío exitoso. | `form_name: "contacto"`, `lead_source: "contact_form"`, `business_type` (id, p. ej. `spa`), `services` (ids separados por comas), `from_selector` (bool) |
-| `form_error` | El envío falla. Solo para diagnóstico. | `form_name: "contacto"`, `error_type`: `not_configured` · `rate_limited` · `validation` (422 del servidor) · `delivery_failed` (502) · `server_error` · `network` |
+| `generate_lead` | La API respondió `200 { ok: true, delivered: true }`: el proveedor confirmó la entrega (Resend devolvió el `id` del correo o el webhook respondió 2xx). Un descarte anti-spam responde sin `delivered` y no cuenta. Una vez por envío exitoso. | `form_name: "contacto"`, `lead_source: "contact_form"`, `business_type` (id, p. ej. `spa`), `services` (ids separados por comas), `from_selector` (bool) |
+| `form_error` | El envío falla. Solo para diagnóstico. | `form_name: "contacto"`, `error_type`: `not_configured` · `rate_limited` · `validation` (422 del servidor) · `delivery_failed` (502) · `unconfirmed` (200 sin entrega confirmada) · `server_error` · `network` |
 | `contact_click` | Clic en `mailto:`, `tel:` o un enlace de WhatsApp (`wa.me`, `api.whatsapp.com`). Hoy no hay canales publicados, así que no se dispara hasta que existan. | `contact_method`: `email` · `phone` · `whatsapp` |
 | `service_cta_click` | Clic en "Hablemos de tu proyecto" del hero o del cierre de una página de servicio. | `service` (slug), `cta_location`: `hero` · `closing` |
 | `needs_selector_completed` | Clic en "Ver recomendación" del selector de soluciones (home y `/soluciones`). | `business_type`, `challenge`, `recommended_services` (ids separados por comas) |
@@ -291,14 +294,14 @@ No hay bloques repetidos con "todos los enlaces".
 |---|---|
 | `npm run lint` | ✓ sin errores ni avisos |
 | `npm run typecheck` | ✓ |
-| `npm test` (Vitest) | ✓ 24 archivos, 130 pruebas (antes 94). Nuevas: URL del sitio, grafo JSON-LD y metadata, límites de títulos y descripciones, eventos del formulario (lead confirmado sin datos personales, descarte por spam sin lead, `form_error` por 503/429/502/500/red), clics de contacto y CTA, selector una vez en StrictMode, Consent Mode y preferencias |
+| `npm test` (Vitest) | ✓ 24 archivos, 140 pruebas (antes 94). Nuevas: entrega confirmada con Resend (delivered, id, idempotencia, configuración inválida ⇒ 503), URL del sitio, grafo JSON-LD y metadata, límites de títulos y descripciones, eventos del formulario (lead confirmado sin datos personales, descarte por spam sin lead, `form_error` por 503/429/502/500/red), clics de contacto y CTA, selector una vez en StrictMode, Consent Mode y preferencias |
 | `npm run build` con URL de producción + `seo-check` | ✓ 19 páginas, 18 URLs en el sitemap, sin avisos |
 | Build simulado de preview + `seo-check` | ✓ robots `Disallow: /`, sitemap vacío, `noindex` |
 | Build con el adaptador real de Vercel (`@vercel/next` vía `NEXT_ADAPTER_PATH`), producción y preview | ✓ `seo-check` lee `.next/output` (19 páginas en producción; preview no indexable) |
 | Despliegue de preview en Vercel del PR | ✓ `seo-check ✓ preview no indexable [vercel-adapter]`. El primer intento falló porque el validador solo leía `.next/server/app`; ya está corregido |
 | Build de producción sin URL o con localhost | ✓ falla con mensaje claro |
 | Prueba negativa de `seo-check` con un dominio equivocado | ✓ detecta los errores |
-| Schema Markup Validator (18 páginas) | ✓ 0 errores y 0 avisos |
+| Schema Markup Validator (18 páginas) | ✓ 0 errores y 0 avisos (2026-11-09). Al revalidar más tarde el servicio respondió 405; el JSON-LD no ha cambiado desde esa validación |
 | Navegador (build local con `next start`) | ✓ consentimiento por defecto antes de `gtm.js`; GTM cargado una vez; `service_cta_click` una vez; navegación interna sin recargar GTM; H1 nuevo idéntico en posición a producción |
 | Lighthouse móvil sobre producción (9 páginas, antes de cambios) | Ver la sección 6 |
 | `POST /api/contacto` en producción | `503 not_configured` (bloqueo, sección 0) |
@@ -326,7 +329,8 @@ No hay bloques repetidos con "todos los enlaces".
 
 | Riesgo | Mitigación |
 |---|---|
-| Formulario sin proveedor en producción (sección 0) | Configurar `CONTACT_WEBHOOK_URL` o Resend. **Prioridad 1.** |
+| Formulario: el buzón de `CONTACT_TO_EMAIL` es un Gmail conectado, pendiente de sustituir por un buzón oficial de SUMA | Cambiar solo la variable en Vercel cuando exista el buzón; el código acepta uno o varios destinatarios |
+| `sumastudio.mx` no tiene MX: `contacto@sumastudio.mx` envía pero no recibe | Las respuestas van al prospecto por `reply_to`; añadir buzón (Google Workspace u otro) si se quiere recibir en el dominio |
 | Consent Mode y el texto del aviso sin revisión legal | No hacer merge sin revisión; la constante `ANALYTICS_DEFAULT` permite pasar a *opt-in* |
 | `seo-check` como `postbuild` podría bloquear un despliegue si un cambio futuro rompe canonical o JSON-LD | Es intencional: falla con un mensaje concreto por página; se corre en local con `npm run build` |
 | Si `NEXT_PUBLIC_SITE_URL` se borra en Vercel, el build de producción falla | Intencional: evita publicar canonical a localhost |
