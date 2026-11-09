@@ -42,7 +42,7 @@ export function PrivacyPreferences() {
           Preferencias de privacidad
         </h2>
         <p className="mt-3 text-base text-suma-navy/80">
-          Usamos Google Analytics para saber qué páginas se visitan y mejorar el sitio. No usamos cookies publicitarias ni compartimos datos para anuncios.
+          Con tu permiso usamos Google Analytics para saber qué páginas se visitan y mejorar el sitio. Sin él, no se carga ninguna herramienta de medición. No usamos cookies publicitarias ni compartimos datos para anuncios.
         </p>
         <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl bg-suma-cream-soft p-4">
           <input

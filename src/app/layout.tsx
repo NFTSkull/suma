@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { League_Spartan, Quicksand } from "next/font/google";
 import { AnalyticsClicks } from "@/components/analytics/AnalyticsClicks";
-import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
+import { ConsentBanner } from "@/components/analytics/ConsentBanner";
+import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
 import { SplashScreen } from "@/components/brand/SplashScreen";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -49,7 +50,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${leagueSpartan.variable} ${quicksand.variable} antialiased`}
     >
       <body className="flex min-h-dvh flex-col">
-        <GoogleTagManagerNoScript id={site.gtmId} />
         <SplashScreen />
         <Header />
         <main id="contenido" className="flex-1">
@@ -61,7 +61,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {consentDefaultsScript()}
         </Script>
         <AnalyticsClicks />
+        {/* GTM solo se carga con consentimiento de medición (ver ConsentBanner). */}
         <GoogleTagManager id={site.gtmId} />
+        <ConsentBanner />
       </body>
     </html>
   );

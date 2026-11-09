@@ -3,42 +3,35 @@ import {
   ANALYTICS_DEFAULT,
   CONSENT_STORAGE_KEY,
   consentDefaultsScript,
-  OPT_IN_REGIONS,
+  getConsentSnapshot,
   parseStoredConsent,
   readAnalyticsConsent,
+  resetConsentMemoryForTests,
   saveAnalyticsConsent,
 } from "./consent";
 
 type W = Window & { dataLayer?: IArguments[]; gtag?: unknown };
 const calls = () => ((window as W).dataLayer ?? []).map((a) => Array.from(a));
 const run = () => new Function(consentDefaultsScript())();
+const DENIED_ADS = { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" };
 
 describe("Consent Mode", () => {
   beforeEach(() => {
     localStorage.clear();
+    resetConsentMemoryForTests();
     delete (window as W).dataLayer;
     delete (window as W).gtag;
   });
 
-  it("por defecto niega toda la publicidad y la medición en EEE/UK/CH", () => {
+  it("sin decisión todo está denegado, en todas las regiones", () => {
+    expect(ANALYTICS_DEFAULT).toBe("denied");
     run();
-    const [regional, global, redaction] = calls();
-    expect(regional[0]).toBe("consent");
-    expect(regional[1]).toBe("default");
-    expect(regional[2]).toMatchObject({
-      ad_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-      analytics_storage: "denied",
-      region: [...OPT_IN_REGIONS],
-    });
-    expect(global[2]).toEqual({
-      ad_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-      analytics_storage: ANALYTICS_DEFAULT,
-    });
+    const [defaults, redaction, passthrough] = calls();
+    expect(defaults).toEqual(["consent", "default", { ...DENIED_ADS, analytics_storage: "denied" }]);
+    expect(defaults[2]).not.toHaveProperty("region");
     expect(redaction).toEqual(["set", "ads_data_redaction", true]);
+    expect(passthrough).toEqual(["set", "url_passthrough", false]);
+    expect(getConsentSnapshot()).toBe("unset");
   });
 
   it("los comandos van como objetos arguments (formato que exige GTM)", () => {
@@ -46,20 +39,22 @@ describe("Consent Mode", () => {
     expect(Object.prototype.toString.call((window as W).dataLayer![0])).toBe("[object Arguments]");
   });
 
-  it("respeta una elección guardada de rechazo en todas las regiones", () => {
-    localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify({ v: 1, analytics: "denied" }));
+  it("una aceptación guardada se respeta desde el primer comando; la publicidad sigue denegada", () => {
+    localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify({ v: 1, analytics: "granted" }));
     run();
-    const [regional, global] = calls();
-    expect((regional[2] as Record<string, string>).analytics_storage).toBe("denied");
-    expect((global[2] as Record<string, string>).analytics_storage).toBe("denied");
+    expect(calls()[0][2]).toEqual({ ...DENIED_ADS, analytics_storage: "granted" });
   });
 
   it("guardar la preferencia la persiste y envía consent update sin activar publicidad", () => {
+    saveAnalyticsConsent("granted");
+    expect(readAnalyticsConsent()).toBe("granted");
+    expect(getConsentSnapshot()).toBe("granted");
     saveAnalyticsConsent("denied");
-    expect(readAnalyticsConsent()).toBe("denied");
     expect(calls()).toEqual([
-      ["consent", "update", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied", analytics_storage: "denied" }],
+      ["consent", "update", { ...DENIED_ADS, analytics_storage: "granted" }],
+      ["consent", "update", { ...DENIED_ADS, analytics_storage: "denied" }],
     ]);
+    expect(JSON.parse(localStorage.getItem(CONSENT_STORAGE_KEY)!)).toEqual({ v: 1, analytics: "denied" });
   });
 
   it("ignora valores guardados inválidos", () => {

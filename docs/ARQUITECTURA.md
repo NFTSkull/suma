@@ -49,8 +49,8 @@ El contexto del selector se transfiere al formulario mediante `sessionStorage` (
 - Selector de necesidades de "Lo que hacemos" (`ServiceShortcuts`): cada opción hace `scrollIntoView` (suave o directo según `prefers-reduced-motion`) hasta la tarjeta `servicio-<slug>` (`capabilityAnchorId`) y, al terminar el desplazamiento (`scrollend` o respaldo de 900 ms), escribe `data-emphasis` en ella durante 1.6 s. El énfasis es un `outline` en el color del servicio (`--emphasis`), sin cambio de layout. Nunca se desplaza al cargar.
 
 ## Medición
-Google Tag Manager se monta en el layout raíz (`src/components/analytics/GoogleTagManager.tsx`): el fragmento oficial con `next/script` (`afterInteractive`) y el `<noscript>` como primer hijo de `<body>`. El id vive en `site.gtmId`. Las etiquetas (Analytics, píxeles, etc.) se configuran en GTM, no en el código.
-- Consent Mode v2 (`src/lib/consent.ts`): script `beforeInteractive` con los defaults antes de GTM; "Preferencias de privacidad" (`PrivacyPreferences`) en el footer guarda la elección en `localStorage` y envía `consent update`.
+Google Tag Manager (`src/components/analytics/GoogleTagManager.tsx`, id en `site.gtmId`) se carga con el fragmento oficial vía `next/script` (`afterInteractive`) **solo si hay consentimiento de medición**; sin aceptación no se descarga `gtm.js` y no hay `<noscript>`. Las etiquetas (GA4 `G-1WSGMR965K`) se configuran en GTM, no en el código.
+- Consentimiento (`src/lib/consent.ts`): script `beforeInteractive` con Consent Mode v2 (todo `denied` por defecto, o la elección guardada); almacén con suscripción (`useAnalyticsConsent`) que comparten `ConsentBanner` (aparece sin decisión), `PrivacyPreferences` (footer) y `GoogleTagManager`. Aceptar envía `consent update` y luego carga GTM; la elección vive en `localStorage` (`suma-consent`).
 - Eventos (`src/lib/analytics.ts`, `dataLayer`): `generate_lead`, `form_error`, `contact_click`, `service_cta_click`, `needs_selector_completed`; tabla de parámetros en `SEO_AUDIT.md` §4. Los clics se capturan con un listener delegado único (`AnalyticsClicks`). No se envía `page_view` (lo mide GA4).
 
 ## SEO técnico

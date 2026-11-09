@@ -24,7 +24,7 @@ Recibe una solicitud de contacto y la entrega al proveedor configurado.
 ### Respuestas
 | Código | Cuerpo | Significado |
 |---|---|---|
-| 200 | `{ ok: true, delivered: true }` | **Entrega confirmada** por el proveedor (webhook 2xx, o Resend 2xx con `id` del correo). Es la única respuesta que el formulario muestra como éxito y que genera `generate_lead`. |
+| 200 | `{ ok: true, delivered: true }` | **Aceptado por el proveedor** (webhook 2xx, o Resend 2xx con `id` del correo). Es la única respuesta que el formulario muestra como éxito y que genera `generate_lead`. "Aceptado por Resend" no equivale a "entregado en el buzón": la entrega final se verifica en el panel de Resend con el `id` registrado en `action_log`. |
 | 200 | `{ ok: true }` | Descartado en silencio por anti-spam (honeypot o llenado en < 2.5 s). No se entrega nada; el formulario lo muestra como "No pudimos confirmar el envío". |
 | 400 | `{ ok: false, error: "invalid_json" }` | Cuerpo no es JSON |
 | 422 | `{ ok: false, error: "validation", fields: Record<campo, mensaje> }` | Validación Zod fallida |

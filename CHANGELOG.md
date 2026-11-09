@@ -2,6 +2,14 @@
 
 ## [Sin publicar]
 
+### Consentimiento opt-in y aviso de privacidad
+- `ANALYTICS_DEFAULT = "denied"` en todas las regiones; `ad_storage`, `ad_user_data` y `ad_personalization` siempre `denied`.
+- GTM ya no se carga sin consentimiento: `gtm.js` solo se descarga tras "Aceptar estadísticas" (primero `consent update`, después GTM) y en visitas posteriores si la aceptación está guardada. Se retiró el `<noscript>` de GTM.
+- Banner de consentimiento (`ConsentBanner`): aparece solo sin decisión guardada; discreto, no modal, "Rechazar" y "Aceptar estadísticas" con el mismo peso, enlace al aviso de privacidad. "Preferencias de privacidad" en el footer parte desmarcada y permite cambiar la decisión.
+- Aviso de privacidad reescrito con los servicios reales (formulario, Resend, alojamiento, buzón receptor, GTM y GA4 con consentimiento, almacenamiento local, conservación, ARCO), con aviso visible de borrador y datos legales pendientes marcados. Sigue `noindex`.
+- Documentación: "aceptado por Resend" (lo que mide `generate_lead`) frente a "entregado en el buzón".
+- Pruebas: 148.
+
 ### Formulario de contacto con Resend
 - La API responde `200 { ok: true, delivered: true }` solo cuando el proveedor confirma la entrega (Resend con `id` del correo, o webhook 2xx); el descarte anti-spam sigue respondiendo `200 { ok: true }`. El formulario muestra éxito y envía `generate_lead` únicamente con `delivered: true`; en otro caso muestra "No pudimos confirmar el envío", conserva los datos y registra `form_error` (`unconfirmed`).
 - Configuración de entrega validada con Zod: para Resend son obligatorios `RESEND_API_KEY` (`re_…`), `CONTACT_TO_EMAIL` y `CONTACT_FROM_EMAIL`; se eliminó el remitente de pruebas `onboarding@resend.dev` como valor por defecto y se rechaza cualquier `@resend.dev`. Si falta algo, `503 not_configured` con el motivo en `action_log`.

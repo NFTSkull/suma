@@ -147,7 +147,7 @@ Ver la sección 10, Recomendaciones de contenido.
 
 ### Encontrado
 
-- **Carga de GTM:** el contenedor `GTM-W2CSD45N` se carga una vez (con `next/script` `afterInteractive` y `<noscript>` al inicio de `<body>`). No hay otra instalación de GA4 en el código.
+- **Carga de GTM:** el contenedor `GTM-W2CSD45N` se cargaba una vez (con `next/script` `afterInteractive` y `<noscript>` al inicio de `<body>`) y sin consentimiento. Ahora solo se carga tras aceptar estadísticas (sección 5). No hay otra instalación de GA4 en el código.
 - **Eventos:** no existía ningún evento de conversión.
 - **Riesgo de leads falsos:** la API responde `200` también cuando descarta spam en silencio, así que un `generate_lead` basado solo en el 200 contaría spam como prospecto.
 
@@ -171,13 +171,21 @@ Ver la sección 10, Recomendaciones de contenido.
   - El código no envía ningún `page_view`.
 - **Páginas vistas:** las mide GA4 con la medición mejorada ("cambios de página basados en eventos del historial"). Verifiqué en el navegador que la navegación interna no vuelve a cargar `gtm.js`.
 
-### Configuración pendiente en GTM (no está en el código y no tengo acceso al contenedor)
+**`generate_lead` significa "correo aceptado por Resend", no "correo en el buzón".** Resend responde con el `id` del correo cuando lo acepta para envío; la llegada a la bandeja de entrada se confirma después y fuera del sitio (panel de Resend, con el `id` que queda en `action_log`, o webhooks `email.delivered`/`email.bounced` si se configuran). Un rebote posterior no revierte el `generate_lead`.
 
-1. **Etiqueta de configuración de GA4** (Google tag) con el ID de medición, disparada en *Initialization – All Pages*. **No** crear un activador de *History Change* para `page_view`: la medición mejorada de GA4 ya cubre la navegación de Next.js.
-2. **Activadores de evento personalizado:** `generate_lead`, `form_error`, `contact_click`, `service_cta_click` y `needs_selector_completed`.
-3. **Etiquetas de evento de GA4:** una por evento, que pasen como parámetros las variables de capa de datos de la tabla anterior.
-4. **En GA4:** marcar **solo `generate_lead`** como evento clave (conversión) y registrar las dimensiones personalizadas que se quieran analizar (`service`, `business_type`, `error_type`…).
-5. **Configuración del contenedor:** activar *Consent Overview* y verificar que GA4 respete `analytics_storage` (su comprobación de consentimiento integrada).
+### Estado del contenedor GTM (revisado en el `gtm.js` público, 2026-11-09)
+
+- **Ya configurado:** etiqueta de Google de GA4 `G-1WSGMR965K` con medición mejorada (páginas vistas por historial, desplazamiento, clics salientes, formularios, etc.), redacción automática y `generate_lead` marcado como evento clave.
+- **Falta (bloquea medir conversiones):** el contenedor **no tiene activadores ni etiquetas de evento** para `generate_lead`, `form_error`, `contact_click`, `service_cta_click` ni `needs_selector_completed`. El sitio los envía a `dataLayer`, pero GTM no los reenvía a GA4, así que hoy no llegan.
+
+### Configuración pendiente en GTM
+
+1. **Activadores de evento personalizado:** `generate_lead`, `form_error`, `contact_click`, `service_cta_click` y `needs_selector_completed`.
+2. **Etiquetas de evento de GA4** (`G-1WSGMR965K`): una por evento, que pasen como parámetros las variables de capa de datos de la tabla anterior.
+3. **En GA4:** dejar **solo `generate_lead`** como evento clave y registrar las dimensiones personalizadas que se quieran analizar (`service`, `business_type`, `error_type`…).
+4. **Medición mejorada, interacciones con formularios:** genera `form_start`/`form_submit` al enviar, aunque el envío falle. No marcarlos como conversión, o desactivar esa opción para no confundirlos con `generate_lead`.
+5. **No** crear un activador de *History Change* para `page_view`: la medición mejorada ya cubre la navegación de Next.js.
+6. Publicar la versión del contenedor y validar con la vista previa de GTM sobre `https://www.sumastudio.mx`, después de aceptar estadísticas en el banner.
 
 ---
 
@@ -188,18 +196,40 @@ Ver la sección 10, Recomendaciones de contenido.
 - GTM estaba activo **sin Consent Mode**, así que las etiquetas se comportaban como si hubiera consentimiento total, incluido el publicitario.
 - El aviso de privacidad **no mencionaba** cookies ni herramientas de medición.
 
-### Preparado en esta rama (**requiere revisión legal antes de publicar**)
+### Implementado en esta rama: consentimiento previo (opt-in) en todas las regiones
 
-- **Consent Mode v2:** los valores por defecto se fijan **antes** de que cargue GTM (`next/script` `beforeInteractive` en el layout raíz). En el navegador verifiqué que los comandos `consent default` quedan antes de `gtm.js` en `dataLayer`:
-  - `ad_storage`, `ad_user_data` y `ad_personalization`: **siempre `denied`**, porque no hay base para activarlos.
-  - `analytics_storage`: si la persona ya eligió, se respeta su elección; si no, `denied` en el EEE, Reino Unido y Suiza, y `ANALYTICS_DEFAULT` (`granted`) en el resto.
-  - `ads_data_redaction: true` y `url_passthrough: false`.
-- **"Preferencias de privacidad"** (enlace en el footer):
-  - Abre un `<dialog>` nativo con una sola opción, "Medición de visitas".
-  - Guarda la elección en `localStorage`, envía `consent update` y nunca activa la publicidad.
-  - No hay banner intrusivo.
-- **Borrador del aviso:** se añadió la sección "Cookies y tecnologías de medición", con un marcador de revisión legal.
-- **Decisión pendiente (legal y negocio):** en México la LFPDPPP exige informar el uso de cookies y tecnologías de rastreo y ofrecer cómo deshabilitarlas, lo que corresponde a un modelo de aviso con exclusión voluntaria. Si el despacho legal prefiere el consentimiento previo (*opt-in*) en todas las regiones, basta con cambiar `ANALYTICS_DEFAULT` a `"denied"` en `src/lib/consent.ts` y añadir un banner. No publiques esta rama sin esa validación.
+- **Valores por defecto** (`next/script` `beforeInteractive`, antes de cualquier etiqueta):
+  - `analytics_storage`, `ad_storage`, `ad_user_data` y `ad_personalization` empiezan en `denied` en todas las regiones (`ANALYTICS_DEFAULT = "denied"`).
+  - Si la persona ya eligió, el valor por defecto refleja su elección.
+  - Se añaden `ads_data_redaction: true` y `url_passthrough: false`.
+- **GTM bloqueado hasta el consentimiento.** No basta con denegar el almacenamiento: `gtm.js` **no se descarga** mientras no haya aceptación. Al aceptar, primero se envía `consent update` y después carga GTM. Se quitó el `<noscript>` de GTM, porque sin JavaScript no se puede pedir permiso.
+- **Banner** (`ConsentBanner`):
+  - Aparece solo si no hay decisión guardada. Es discreto, no es modal y no mueve el foco.
+  - "Rechazar" y "Aceptar estadísticas" tienen el mismo tamaño, sin casillas premarcadas, y enlaza al aviso de privacidad.
+  - Guarda la elección en `localStorage` y se respeta en las páginas siguientes.
+- **"Preferencias de privacidad"** (footer): permite cambiar la decisión después. Si no hay decisión, la casilla parte desmarcada.
+- **Verificado en el navegador** (build de producción en local):
+  - Sin decisión: 0 peticiones a Google, banner visible.
+  - Aceptar: `consent update=granted` → `gtm.js` → GA4 `page_view` con `G-1WSGMR965K`.
+  - Página siguiente: GTM carga solo, con el valor por defecto `granted` y sin banner.
+  - Rechazar: 0 peticiones a Google y banner oculto.
+  - Móvil (375 px): sin desbordamiento horizontal y botones de 48 px de alto.
+- **Retirar el consentimiento a media visita:** si GTM ya estaba cargado, se envía `consent update=denied` (GA4 deja de usar cookies) y GTM ya no se carga en las páginas siguientes.
+
+### Pendiente legal (bloquea el merge)
+
+El aviso de privacidad se reescribió con los servicios reales: formulario, Resend, proveedor de alojamiento, buzón receptor, GTM y GA4 solo con consentimiento, almacenamiento local, conservación y derechos ARCO. Sigue en `noindex` y con un aviso visible de borrador. Datos que deben proporcionar los responsables de SUMA (no se inventó ninguno):
+
+1. Razón social o nombre del titular responsable.
+2. Domicilio para oír y recibir notificaciones.
+3. Correo de privacidad y, en su caso, persona o área responsable.
+4. Correo o medio para solicitudes ARCO, procedimiento, plazos de respuesta y forma de acreditar identidad.
+5. Plazo de conservación de los datos del formulario y criterio de eliminación.
+6. Periodo de retención configurado en GA4.
+7. Servicio de correo definitivo del buzón receptor (hoy, un Gmail conectado).
+8. Si el seguimiento comercial posterior es una finalidad secundaria y el mecanismo para negarse a ella.
+9. Revisión legal de las remisiones o transferencias a Resend, Google y el proveedor de alojamiento, incluidas las internacionales.
+10. Fecha de entrada en vigor y aprobación del texto por un especialista.
 
 ---
 
@@ -331,9 +361,10 @@ No hay bloques repetidos con "todos los enlaces".
 |---|---|
 | Formulario: el buzón de `CONTACT_TO_EMAIL` es un Gmail conectado, pendiente de sustituir por un buzón oficial de SUMA | Cambiar solo la variable en Vercel cuando exista el buzón; el código acepta uno o varios destinatarios |
 | `sumastudio.mx` no tiene MX: `contacto@sumastudio.mx` envía pero no recibe | Las respuestas van al prospecto por `reply_to`; añadir buzón (Google Workspace u otro) si se quiere recibir en el dominio |
-| Consent Mode y el texto del aviso sin revisión legal | No hacer merge sin revisión; la constante `ANALYTICS_DEFAULT` permite pasar a *opt-in* |
+| Aviso de privacidad incompleto y sin revisión legal (datos del responsable, ARCO, plazos) | Mantener el PR abierto hasta completar los 10 puntos de la sección 5; el consentimiento ya es *opt-in* |
+| Con *opt-in*, GA4 solo medirá a quien acepte: las cifras serán menores que antes | Esperado y correcto; no usar modelado publicitario |
 | `seo-check` como `postbuild` podría bloquear un despliegue si un cambio futuro rompe canonical o JSON-LD | Es intencional: falla con un mensaje concreto por página; se corre en local con `npm run build` |
 | Si `NEXT_PUBLIC_SITE_URL` se borra en Vercel, el build de producción falla | Intencional: evita publicar canonical a localhost |
-| Los eventos de GA4 no aparecerán hasta configurar las etiquetas en GTM (sección 4) | Lista de pasos en la sección 4 |
+| Los eventos personalizados no llegan a GA4: el contenedor publicado no tiene activadores ni etiquetas para ellos (sección 4) | Configurar en GTM los pasos de la sección 4 antes de medir conversiones |
 | Cambiar títulos puede mover temporalmente posiciones ya obtenidas | El sitio es reciente y con poco histórico; los títulos nuevos son más claros y no compiten entre sí |
 | La copia local del proyecto en `~/Desktop/Suma` está en iCloud con los archivos en estado `dataless` (no legibles desde la terminal) | Trabajé sobre un clon limpio en `~/Developer/suma`. Conviene mover el proyecto fuera del Escritorio sincronizado o marcarlo como "Mantener descargado" |
