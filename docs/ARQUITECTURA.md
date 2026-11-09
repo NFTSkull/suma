@@ -50,6 +50,13 @@ El contexto del selector se transfiere al formulario mediante `sessionStorage` (
 
 ## Medición
 Google Tag Manager se monta en el layout raíz (`src/components/analytics/GoogleTagManager.tsx`): el fragmento oficial con `next/script` (`afterInteractive`) y el `<noscript>` como primer hijo de `<body>`. El id vive en `site.gtmId`. Las etiquetas (Analytics, píxeles, etc.) se configuran en GTM, no en el código.
+- Consent Mode v2 (`src/lib/consent.ts`): script `beforeInteractive` con los defaults antes de GTM; "Preferencias de privacidad" (`PrivacyPreferences`) en el footer guarda la elección en `localStorage` y envía `consent update`.
+- Eventos (`src/lib/analytics.ts`, `dataLayer`): `generate_lead`, `form_error`, `contact_click`, `service_cta_click`, `needs_selector_completed`; tabla de parámetros en `SEO_AUDIT.md` §4. Los clics se capturan con un listener delegado único (`AnalyticsClicks`). No se envía `page_view` (lo mide GA4).
+
+## SEO técnico
+- `src/lib/site-url.ts`: URL base e indexabilidad por entorno (`VERCEL_ENV`). `src/lib/seo.ts`: `buildMetadata` (canonical, Open Graph y Twitter absolutos; noindex para `noindexRoutes`) y `pageGraph` (un `@graph` JSON-LD por página con `@id` estables).
+- `robots.ts` y `sitemap.ts` dependen de `site.indexable`; el sitemap usa `indexableRoutes`.
+- `scripts/seo-check.mjs` (postbuild) valida el HTML prerenderizado, el sitemap y robots. `scripts/indexnow.mjs` notifica cambios puntuales a IndexNow (clave en `public/<clave>.txt`).
 
 ## Variables de entorno
 | Variable | Uso |

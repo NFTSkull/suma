@@ -2,6 +2,17 @@
 
 ## [Sin publicar]
 
+### SEO 360 (rama `seo/auditoria-360`, detalle en `SEO_AUDIT.md`)
+- **Indexación**: URL del sitio resuelta por entorno (`src/lib/site-url.ts`): producción exige `NEXT_PUBLIC_SITE_URL` https (el build falla si falta o es localhost); los previews usan su propia URL y son `noindex` con robots `Disallow: /` y sitemap vacío. `X-Robots-Tag: noindex` en alias `*.vercel.app`. Canonical, `og:url`, `og:image` y `twitter:image` absolutas en todas las páginas (antes las internas no tenían imagen social). El layout raíz ya no hereda canonical `/`. Aviso de privacidad (borrador) en `noindex, follow` y fuera del sitemap. Sitemap sin `changefreq`/`priority`/`lastmod`.
+- **Validación**: `scripts/seo-check.mjs` como `postbuild` (canonical, localhost, Open Graph, H1 único, JSON-LD, FAQ visibles, sitemap ↔ páginas indexables, robots).
+- **JSON-LD**: un `@graph` por página con `@id` estables (Organization, WebSite, WebPage/CollectionPage/AboutPage/ContactPage, BreadcrumbList, Service ×5, FAQPage solo con preguntas visibles, ItemList en índices). `ProfessionalService` → `Organization`. Logo PNG oficial (`public/brand/isotipo-512.png`) y `apple-icon.png`. Schema Markup Validator: 0 errores y 0 avisos en 18 páginas.
+- **On-page**: el nombre del servicio/sector forma parte del H1 (mismo aspecto visual); títulos ≤ 56 caracteres + marca y descripciones de 70–160; textos de enlace descriptivos entre servicios e industrias.
+- **Medición**: eventos `generate_lead` (solo con entrega confirmada por el backend), `form_error`, `contact_click`, `service_cta_click` y `needs_selector_completed` vía `dataLayer`, sin datos personales.
+- **Consentimiento** (pendiente de revisión legal): Consent Mode v2 con publicidad siempre `denied` y medición según elección guardada; "Preferencias de privacidad" en el footer; sección de cookies en el borrador del aviso.
+- **Rendimiento**: imagen LCP del hero de `/servicios/paginas-web` con `preload`; `priority` (obsoleto en Next 16) → `preload`.
+- **IndexNow**: clave pública en `public/` y `scripts/indexnow.mjs` (simulación por defecto, solo URLs publicadas o eliminadas, sin endpoint público).
+- Pruebas: 130.
+
 ### Añadido
 - Google Tag Manager (`GTM-W2CSD45N`) en todas las páginas: fragmento oficial cargado con `next/script` (`afterInteractive`) y `<noscript>` al inicio de `<body>`. Pruebas: 94.
 

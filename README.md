@@ -13,8 +13,12 @@ npm run dev        # http://localhost:3000
 npm run lint
 npm run typecheck
 npm test
-npm run build && npm start
+npm run build && npm start   # build ejecuta seo-check al terminar
+npm run seo:check            # valida el último build (canonical, sitemap, JSON-LD…)
+npm run indexnow -- /ruta    # simula una notificación IndexNow (añade --send para enviar)
 ```
+
+Auditoría SEO, eventos de GA4 y pendientes: `SEO_AUDIT.md`.
 
 ## Configuración
 Copia `.env.example` a `.env.local` y completa:
