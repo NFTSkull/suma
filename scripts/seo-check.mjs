@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
  * Validación SEO posterior a `next build` (se ejecuta como `postbuild`).
- * Revisa el HTML prerenderizado, el sitemap y robots.txt de `.next/server/app`.
+ * Revisa el HTML prerenderizado, el sitemap y robots.txt. Lee la salida que se
+ * despliega: en Vercel el adaptador de Next escribe `.next/output` (Build Output
+ * API); fuera de Vercel, `next build` deja los prerenders en `.next/server/app`.
  *
  * Falla (exit 1) ante: URLs a localhost con un dominio público configurado, canonical
  * ausente/duplicada/relativa o distinta de la URL de la página, og:url/og:image
@@ -12,8 +14,31 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
-const APP_DIR = path.resolve(".next/server/app");
 const LOCAL = "http://localhost:3000";
+
+/** Ubicación de robots, sitemap y HTML según quién generó la salida. */
+const LAYOUTS = [
+  {
+    name: "vercel-adapter",
+    root: path.resolve(".next/output"),
+    robots: "static/robots.txt",
+    sitemap: "static/sitemap.xml",
+    htmlDir: "functions",
+    htmlSuffix: ".prerender-fallback.html",
+  },
+  {
+    name: "next",
+    root: path.resolve(".next/server/app"),
+    robots: "robots.txt.body",
+    sitemap: "sitemap.xml.body",
+    htmlDir: ".",
+    htmlSuffix: ".html",
+  },
+];
+// Si conviven salidas de builds distintos, la más reciente es la del build actual.
+const layout = LAYOUTS.filter((l) => existsSync(path.join(l.root, l.robots))).sort(
+  (a, b) => statSync(path.join(b.root, b.robots)).mtimeMs - statSync(path.join(a.root, a.robots)).mtimeMs,
+)[0];
 const vercelEnv = process.env.VERCEL_ENV;
 const errors = [];
 const warnings = [];
@@ -21,14 +46,14 @@ let pageCount = 0;
 const fail = (msg) => errors.push(msg);
 const warn = (msg) => warnings.push(msg);
 
-if (!existsSync(APP_DIR)) {
-  console.error("seo-check: no existe .next/server/app; ejecuta `next build` primero.");
+if (!layout) {
+  console.error("seo-check: no se encontró robots.txt prerenderizado en .next/output/static ni en .next/server/app; ejecuta `next build` primero.");
   process.exit(1);
 }
 
-const read = (rel) => readFileSync(path.join(APP_DIR, rel), "utf8");
-const sitemapXml = existsSync(path.join(APP_DIR, "sitemap.xml.body")) ? read("sitemap.xml.body") : "";
-const robotsTxt = existsSync(path.join(APP_DIR, "robots.txt.body")) ? read("robots.txt.body") : "";
+const read = (rel) => readFileSync(path.join(layout.root, rel), "utf8");
+const sitemapXml = existsSync(path.join(layout.root, layout.sitemap)) ? read(layout.sitemap) : "";
+const robotsTxt = read(layout.robots);
 const sitemapUrls = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim());
 
 // Previews de Vercel: deben bloquear todo y no publicar sitemap.
@@ -47,19 +72,23 @@ function htmlFiles(dir, prefix = "") {
   const out = [];
   for (const name of readdirSync(dir)) {
     const full = path.join(dir, name);
-    if (statSync(full).isDirectory()) out.push(...htmlFiles(full, `${prefix}/${name}`));
-    else if (name.endsWith(".html") && !name.startsWith("_")) out.push(`${prefix}/${name}`);
+    if (statSync(full).isDirectory()) {
+      if (!name.endsWith(".func") && !name.endsWith(".segments")) out.push(...htmlFiles(full, `${prefix}/${name}`));
+    } else if (name.endsWith(layout.htmlSuffix) && !name.startsWith("_")) out.push(`${prefix}/${name}`);
   }
   return out;
 }
 
-const routeOf = (file) => (file === "/index.html" ? "/" : file.replace(/\.html$/, ""));
+const routeOf = (file) => {
+  const route = file.slice(0, -layout.htmlSuffix.length);
+  return route === "/index" ? "/" : route;
+};
 const urlOf = (route) => `${base}${route === "/" ? "" : route}`;
 const attr = (head, re) => [...head.matchAll(re)].map((m) => m[1]);
 const decode = (s) => s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 
-const pages = htmlFiles(APP_DIR).map((file) => {
-  const html = read(file.slice(1));
+const pages = htmlFiles(path.join(layout.root, layout.htmlDir)).map((file) => {
+  const html = read(path.join(layout.htmlDir, file.slice(1)));
   const route = routeOf(file);
   const [head = "", body = ""] = html.split("</head>");
   return { file, route, html, head, body };
@@ -184,7 +213,7 @@ function report() {
     console.error(`seo-check: ${errors.length} error(es).`);
     process.exit(1);
   }
-  if (vercelEnv && vercelEnv !== "production") console.log("seo-check ✓ preview no indexable (robots bloquea todo y el sitemap está vacío).");
-  else console.log(`seo-check ✓ ${pageCount} páginas, ${sitemapUrls.length} URLs en sitemap, base ${base}.`);
+  if (vercelEnv && vercelEnv !== "production") console.log(`seo-check ✓ preview no indexable (robots bloquea todo y el sitemap está vacío) [${layout.name}].`);
+  else console.log(`seo-check ✓ ${pageCount} páginas, ${sitemapUrls.length} URLs en sitemap, base ${base} [${layout.name}].`);
   process.exit(0);
 }
