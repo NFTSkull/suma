@@ -42,7 +42,7 @@ export const industries: Industry[] = [
       { q: "Mi estudio es pequeño, ¿esto es para mí?", a: "Sí. Podemos empezar con una sola pieza, como un asistente o un sitio web, y crecer cuando lo necesites." },
     ],
     seo: {
-      title: "Tecnología para estudios de yoga y pilates: reservas, CRM y chatbots",
+      title: "Software y web para estudios de yoga y pilates",
       description: "Chatbots, CRM, apps y páginas web para estudios de yoga, pilates, reformer y barre en Monterrey y todo México.",
       keywords: ["CRM para estudios de yoga", "desarrollo web para estudios de pilates", "reservas para estudio de pilates"],
     },
@@ -132,8 +132,8 @@ export const industries: Industry[] = [
       { q: "¿Pueden conectar pagos recurrentes?", a: "Es posible integrar procesadores de pago con cobro recurrente; lo definimos según tus necesidades y requisitos fiscales." },
     ],
     seo: {
-      title: "Apps y CRM para fitness boutique y estudios de entrenamiento",
-      description: "Aplicaciones, CRM y publicidad para fitness boutique: reservas, membresías, comunidad y retención en México.",
+      title: "Apps y CRM para fitness boutique en México",
+      description: "Aplicaciones, CRM y publicidad para fitness boutique y estudios de entrenamiento: reservas, membresías, comunidad y retención en Monterrey y México.",
       keywords: ["app para gimnasio boutique", "CRM fitness", "aplicaciones para centros wellness"],
     },
   },
@@ -177,8 +177,8 @@ export const industries: Industry[] = [
       { q: "¿Pueden ayudar con el lanzamiento de un producto?", a: "Sí. Podemos diseñar la página de lanzamiento, la campaña y el seguimiento de interesados." },
     ],
     seo: {
-      title: "Ecommerce y marketing digital para marcas wellness en México",
-      description: "Tiendas en línea, campañas y seguimiento para marcas de productos wellness, belleza y autocuidado.",
+      title: "Ecommerce y marketing para marcas wellness",
+      description: "Tiendas en línea, campañas y seguimiento para marcas de productos wellness, belleza y autocuidado en México.",
       keywords: ["marketing digital para negocios wellness en México", "ecommerce marca wellness", "tienda en línea skincare"],
     },
   },
@@ -222,7 +222,7 @@ export const industries: Industry[] = [
       { q: "Organizo pocos retiros al año, ¿vale la pena?", a: "Sí, si la inversión es proporcional. Podemos crear una base reutilizable para cada nueva edición." },
     ],
     seo: {
-      title: "Páginas web e inscripciones para retiros y experiencias wellness",
+      title: "Páginas web para retiros y experiencias wellness",
       description: "Diseño web, chatbots y campañas para organizadores de retiros, talleres y experiencias de bienestar en México.",
       keywords: ["página web para retiros de yoga", "inscripciones para retiros", "marketing para experiencias wellness"],
     },
@@ -266,7 +266,7 @@ export const industries: Industry[] = [
       { q: "¿Cuidan la confidencialidad de mis clientes?", a: "Sí. Definimos qué información se guarda, quién puede verla y cómo se protege, de acuerdo con tu aviso de privacidad." },
     ],
     seo: {
-      title: "Páginas web y agenda para terapeutas y profesionales del bienestar",
+      title: "Web y agenda para terapeutas y coaches de bienestar",
       description: "Presencia digital, agenda en línea y seguimiento para terapeutas, instructores, coaches y profesionales del bienestar en México.",
       keywords: ["página web para terapeutas", "agenda en línea para masajistas", "marketing para coaches de bienestar"],
     },

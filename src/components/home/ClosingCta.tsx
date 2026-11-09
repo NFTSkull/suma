@@ -8,6 +8,8 @@ type Props = {
   text?: string;
   secondary?: { label: string; href: string };
   headingId?: string;
+  /** Atributos `data-*` de analítica para el CTA principal. */
+  primaryAttrs?: Record<`data-${string}`, string>;
 };
 
 export function ClosingCta({
@@ -15,6 +17,7 @@ export function ClosingCta({
   text = "Cuéntanos qué estás construyendo, qué te está frenando o qué te gustaría mejorar. En SUMA STUDIO podemos ayudarte a encontrar una solución digital que tenga sentido para tu negocio.",
   secondary = { label: "Conocer todos los servicios", href: "/servicios" },
   headingId = "cierre-title",
+  primaryAttrs,
 }: Props) {
   return (
     <section aria-labelledby={headingId} className="relative isolate overflow-hidden bg-suma-cream">
@@ -34,7 +37,7 @@ export function ClosingCta({
             <p className="text-lead mt-8 max-w-2xl text-suma-navy/75">{text}</p>
           </Reveal>
           <Reveal delay={220} className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
-            <ButtonLink href={primaryCta.href} size="lg" arrow>
+            <ButtonLink href={primaryCta.href} size="lg" arrow {...primaryAttrs}>
               {primaryCta.label}
             </ButtonLink>
             {secondary && (

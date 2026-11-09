@@ -2,15 +2,19 @@ import type { Metadata } from "next";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { site } from "@/content/site";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageGraph } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
+const seo = {
   title: "Contacto: hablemos de tu proyecto",
   description:
-    "Cuéntanos sobre tu negocio de bienestar. SUMA STUDIO, desde Monterrey, Nuevo León, para todo México: chatbots, CRM, apps, páginas web y publicidad digital.",
+    "Cuéntanos sobre tu negocio de bienestar. SUMA STUDIO, desde Monterrey para todo México: chatbots, CRM, apps, páginas web y publicidad digital.",
   path: "/contacto",
-});
+};
+const crumbs = [{ name: "Contacto", path: "/contacto" }];
+
+export const metadata: Metadata = buildMetadata(seo);
 
 const next = [
   "Leemos tu mensaje y revisamos lo que nos cuentas de tu negocio.",
@@ -24,7 +28,7 @@ export default function ContactoPage() {
       <OrganicShape shape="b" color="orange" animate="drift" className="absolute -left-40 top-[28rem] -z-10 hidden size-80 opacity-80 lg:block" />
       <div className="container-suma grid gap-14 pb-28 pt-8 md:pt-12 lg:grid-cols-[0.85fr_1.15fr]">
         <div>
-          <Breadcrumbs items={[{ name: "Contacto", path: "/contacto" }]} />
+          <Breadcrumbs items={crumbs} />
           <p className="text-eyebrow mt-10 text-suma-orange-ink">Contacto</p>
           <h1 id="page-title" className="text-display-lg mt-6">
             Hablemos de tu proyecto.
@@ -49,6 +53,7 @@ export default function ContactoPage() {
           <ContactForm />
         </div>
       </div>
+      <JsonLd data={pageGraph({ path: seo.path, name: seo.title, description: seo.description, type: "ContactPage", crumbs })} />
     </section>
   );
 }

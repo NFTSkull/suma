@@ -1,4 +1,7 @@
+"use client";
+
 import Script from "next/script";
+import { useAnalyticsConsent } from "./useAnalyticsConsent";
 
 /** Fragmento oficial de GTM, sin cambios salvo el id del contenedor. */
 export const gtmSnippet = (id: string) =>
@@ -8,25 +11,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','${id}');`;
 
-/** Carga GTM después de la hidratación (estrategia recomendada para gestores de etiquetas). */
+/**
+ * Carga GTM solo con consentimiento de medición. Sin elección o con rechazo no se
+ * descarga gtm.js. No hay `<noscript>`: sin JavaScript no se puede pedir
+ * consentimiento, así que tampoco se mide.
+ */
 export function GoogleTagManager({ id }: { id: string }) {
+  const consent = useAnalyticsConsent();
+  if (consent !== "granted") return null;
   return (
     <Script id="google-tag-manager" strategy="afterInteractive">
       {gtmSnippet(id)}
     </Script>
-  );
-}
-
-/** Respaldo sin JavaScript; va como primer hijo de `<body>`. */
-export function GoogleTagManagerNoScript({ id }: { id: string }) {
-  return (
-    <noscript>
-      <iframe
-        src={`https://www.googletagmanager.com/ns.html?id=${id}`}
-        height="0"
-        width="0"
-        style={{ display: "none", visibility: "hidden" }}
-      />
-    </noscript>
   );
 }

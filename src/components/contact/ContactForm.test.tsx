@@ -26,6 +26,8 @@ async function fillValid(user: UserEvent) {
 }
 
 const send = () => screen.getByRole("button", { name: /Enviar mensaje|Enviando/ });
+/** Respuesta de la API cuando el proveedor confirmó la entrega. */
+const delivered = () => new Response(JSON.stringify({ ok: true, delivered: true }), { status: 200 });
 
 describe("ContactForm", () => {
   it("muestra errores accesibles y no envía si faltan datos", async () => {
@@ -53,8 +55,8 @@ describe("ContactForm", () => {
     expect(screen.getByLabelText("Nombre")).toHaveValue("Ana López");
   });
 
-  it("muestra éxito solo ante 200 y envía datos válidos", async () => {
-    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+  it("muestra éxito solo con entrega confirmada y envía datos válidos", async () => {
+    fetchMock.mockResolvedValue(delivered());
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValid(user);
@@ -76,8 +78,20 @@ describe("ContactForm", () => {
     expect(send()).toBeDisabled();
     await user.click(send());
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    resolve(new Response("{}", { status: 200 }));
+    resolve(delivered());
     expect(await screen.findByText("Gracias, recibimos tu mensaje.")).toBeInTheDocument();
+  });
+
+  it("un 200 sin entrega confirmada (descarte anti-spam) no muestra éxito y conserva los datos", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+
+    expect(await screen.findByText("No pudimos confirmar el envío.")).toBeInTheDocument();
+    expect(screen.queryByText(/recibimos tu mensaje/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Correo electrónico")).toHaveValue("ana@ejemplo.mx");
   });
 
   it("prellena con el contexto del selector y permite quitarlo", async () => {
@@ -92,5 +106,77 @@ describe("ContactForm", () => {
     await user.click(screen.getByRole("button", { name: "Quitar contexto" }));
     expect(screen.queryByText("Desde el selector de soluciones")).not.toBeInTheDocument();
     expect(sessionStorage.getItem(SELECTOR_STORAGE_KEY)).toBeNull();
+  });
+});
+
+describe("ContactForm · analítica", () => {
+  type DL = Window & { dataLayer?: Record<string, unknown>[] };
+  const events = () => ((window as DL).dataLayer ?? []).map((e) => e.event);
+  const personal = ["Ana López", "Estudio Flor", "ana@ejemplo.mx", "81 1234 5678", "8112345678"];
+
+  beforeEach(() => {
+    (window as DL).dataLayer = [];
+  });
+  it("envía generate_lead una sola vez cuando el backend confirma la entrega, sin datos personales", async () => {
+    fetchMock.mockResolvedValue(delivered());
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+    await screen.findByText("Gracias, recibimos tu mensaje.");
+
+    expect(events()).toEqual(["generate_lead"]);
+    const lead = (window as DL).dataLayer![0];
+    expect(lead).toEqual({
+      event: "generate_lead",
+      form_name: "contacto",
+      lead_source: "contact_form",
+      business_type: "yoga-pilates",
+      services: "chatbots",
+      from_selector: false,
+    });
+    const json = JSON.stringify((window as DL).dataLayer);
+    for (const value of personal) expect(json).not.toContain(value);
+  });
+
+  it("un 200 descartado por anti-spam no es lead: solo form_error unconfirmed", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+    await screen.findByText("No pudimos confirmar el envío.");
+    expect((window as DL).dataLayer).toEqual([{ event: "form_error", form_name: "contacto", error_type: "unconfirmed" }]);
+  });
+
+  it.each([
+    [503, "not_configured"],
+    [429, "rate_limited"],
+    [502, "delivery_failed"],
+    [500, "server_error"],
+  ])("un %i envía form_error %s y nunca generate_lead", async (status, errorType) => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: false }), { status }));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+    await waitFor(() => expect(events()).toEqual(["form_error"]));
+    expect((window as DL).dataLayer![0]).toEqual({ event: "form_error", form_name: "contacto", error_type: errorType });
+  });
+
+  it("un fallo de red envía form_error network", async () => {
+    fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+    await waitFor(() => expect((window as DL).dataLayer).toEqual([{ event: "form_error", form_name: "contacto", error_type: "network" }]));
+  });
+
+  it("los errores de validación en el navegador no generan eventos", async () => {
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await user.click(send());
+    expect(events()).toEqual([]);
   });
 });

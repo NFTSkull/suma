@@ -12,10 +12,14 @@ import { SumaEnAccion } from "@/components/home/SumaEnAccion";
 import { NeedsSelector } from "@/components/selector/NeedsSelector";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { services } from "@/content/services";
+import { buildMetadata, HOME_SEO, ids, pageGraph, serviceNode } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/" },
+  ...buildMetadata(HOME_SEO),
+  title: { absolute: HOME_SEO.title },
 };
 
 export default function HomePage() {
@@ -120,6 +124,15 @@ export default function HomePage() {
 
       <ImpactBlock />
       <ClosingCta />
+      <JsonLd
+        data={pageGraph({
+          path: HOME_SEO.path,
+          name: HOME_SEO.title,
+          description: HOME_SEO.description,
+          about: services.map((s) => ids.service(s)),
+          extra: services.map(serviceNode),
+        })}
+      />
     </>
   );
 }

@@ -5,16 +5,21 @@ import { SituationsExplorer } from "@/components/home/SituationsExplorer";
 import { PageHero } from "@/components/layout/PageHero";
 import { NeedsSelector } from "@/components/selector/NeedsSelector";
 import { ButtonLink } from "@/components/ui/Button";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { buildMetadata } from "@/lib/seo";
+import { services } from "@/content/services";
+import { buildMetadata, ids, pageGraph } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
+const seo = {
   title: "Soluciones digitales para negocios de bienestar",
   description:
     "Descubre qué solución necesita tu negocio wellness: un selector sencillo, situaciones comunes y cómo se conectan chatbots, CRM, apps, web y publicidad.",
   path: "/soluciones",
   keywords: ["soluciones digitales para negocios de bienestar", "automatización para negocios wellness"],
-});
+};
+const crumbs = [{ name: "Soluciones", path: "/soluciones" }];
+
+export const metadata: Metadata = buildMetadata(seo);
 
 export default function SolucionesPage() {
   return (
@@ -22,7 +27,7 @@ export default function SolucionesPage() {
       <PageHero
         eyebrow="Soluciones"
         accent="purple"
-        crumbs={[{ name: "Soluciones", path: "/soluciones" }]}
+        crumbs={crumbs}
         title="Empieza por lo que hoy te quita más tiempo."
         lead="No vendemos paquetes cerrados. Partimos de lo que pasa en tu negocio y te recomendamos la pieza que más puede ayudarte ahora."
       >
@@ -70,6 +75,15 @@ export default function SolucionesPage() {
       </section>
 
       <ClosingCta />
+      <JsonLd
+        data={pageGraph({
+          path: seo.path,
+          name: seo.title,
+          description: seo.description,
+          crumbs,
+          about: services.map((s) => ids.service(s)),
+        })}
+      />
     </>
   );
 }

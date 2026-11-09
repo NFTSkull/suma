@@ -10,10 +10,10 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { getIndustry, industries } from "@/content/industries";
 import { photos } from "@/content/photos";
-import { serviceBySlug } from "@/content/services";
+import { serviceBySlug, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
-import { faqJsonLd } from "@/lib/seo";
+import { ids, pageGraph } from "@/lib/seo";
 import type { IndustrySlug, SumaColor } from "@/types/content";
 import { IndustryDemo } from "./IndustryDemo";
 
@@ -46,16 +46,23 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
   const photo = photos[ind.photo];
   const secondary = photos[ind.secondaryPhoto];
   const others = industries.filter((i) => i.slug !== slug).slice(0, 3);
+  const crumbs = [
+    { name: "Industrias", path: "/industrias" },
+    { name: ind.name, path: ind.href },
+  ];
 
   return (
     <>
       <section aria-labelledby="industria-title" className="relative isolate overflow-hidden bg-suma-cream">
         <div className="container-suma grid gap-12 pb-20 pt-8 md:pb-28 md:pt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <Breadcrumbs items={[{ name: "Industrias", path: "/industrias" }, { name: ind.name, path: ind.href }]} />
-            <p className={cn("text-eyebrow mt-10 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_both]", c.ink)}>{ind.hero.eyebrow}</p>
-            <h1 id="industria-title" className="text-display-lg mt-6 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_80ms_both]">
-              {ind.hero.title}
+            <Breadcrumbs items={crumbs} />
+            {/* El sector forma parte del H1; visualmente sigue siendo el eyebrow. */}
+            <h1 id="industria-title" className="mt-10">
+              <span className={cn("text-eyebrow block motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_both]", c.ink)}>{ind.hero.eyebrow}</span>{" "}
+              <span className="text-display-lg mt-6 block motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_80ms_both]">
+                {ind.hero.title}
+              </span>
             </h1>
             <p className="text-lead mt-8 max-w-2xl text-suma-navy/75 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_160ms_both]">
               {ind.hero.lead}
@@ -73,7 +80,7 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
             <OrganicShape shape="a" color={accent.color} animate="drift" className="absolute -right-10 -top-10 size-56 md:size-72" />
             <OrganicShape shape="d" color="navy" className="absolute -bottom-8 -left-8 size-28 opacity-90" />
             <div className={cn("relative aspect-[4/5] overflow-hidden motion-safe:animate-[enter-scale_900ms_var(--ease-flow)_both]", maskClass[accent.mask])}>
-              <Image src={photo.src} alt={photo.alt} fill priority sizes="(min-width: 64rem) 36rem, 92vw" className="object-cover" quality={80} />
+              <Image src={photo.src} alt={photo.alt} fill preload sizes="(min-width: 64rem) 36rem, 92vw" className="object-cover" quality={80} />
             </div>
             <p className="relative mt-4 max-w-sm rounded-2xl bg-suma-cream-soft p-4 text-sm font-semibold shadow-soft">{ind.benefit}</p>
           </div>
@@ -150,7 +157,7 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
                       <p className={cn("mt-2", principal ? "opacity-90" : "text-suma-navy/75")}>{sv.why}</p>
                     </div>
                     <span className="inline-flex items-center gap-2 text-sm font-bold">
-                      Conocer el servicio <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
+                      Conocer {serviceInlineName[s.slug]} <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
                     </span>
                   </Link>
                 </li>
@@ -208,7 +215,16 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
         secondary={{ label: "Explorar soluciones", href: "/soluciones" }}
       />
 
-      <JsonLd data={faqJsonLd(ind.faqs)} />
+      <JsonLd
+        data={pageGraph({
+          path: ind.href,
+          name: ind.seo.title,
+          description: ind.seo.description,
+          crumbs,
+          about: ind.services.map((sv) => ids.service(serviceBySlug[sv.slug])),
+          faqs: ind.faqs,
+        })}
+      />
     </>
   );
 }

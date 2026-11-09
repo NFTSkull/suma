@@ -73,3 +73,9 @@ export const allRoutes: string[] = [
   "/contacto",
   "/aviso-de-privacidad",
 ];
+
+/** Rutas públicas que todavía no deben indexarse (borradores con datos pendientes). */
+export const noindexRoutes: string[] = ["/aviso-de-privacidad"];
+
+/** Rutas que van al sitemap. */
+export const indexableRoutes: string[] = allRoutes.filter((r) => !noindexRoutes.includes(r));

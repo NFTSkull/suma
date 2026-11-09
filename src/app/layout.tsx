@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { League_Spartan, Quicksand } from "next/font/google";
-import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
+import { AnalyticsClicks } from "@/components/analytics/AnalyticsClicks";
+import { ConsentBanner } from "@/components/analytics/ConsentBanner";
+import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
 import { SplashScreen } from "@/components/brand/SplashScreen";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
-import { JsonLd } from "@/components/ui/JsonLd";
+import Script from "next/script";
 import { site } from "@/content/site";
-import { organizationJsonLd } from "@/lib/seo";
+import { consentDefaultsScript } from "@/lib/consent";
+import { HOME_SEO } from "@/lib/seo";
 import "./globals.css";
 
 const leagueSpartan = League_Spartan({
@@ -23,25 +26,13 @@ const quicksand = Quicksand({
   display: "swap",
 });
 
-const defaultTitle = "SUMA STUDIO · Tecnología y experiencias digitales para negocios de bienestar";
-const defaultDescription =
-  "Chatbots, CRM, aplicaciones, páginas web y publicidad digital para estudios de yoga y pilates, spas y marcas wellness. Desde Monterrey, Nuevo León, para todo México.";
-
+/** Sin canonical ni og:url aquí: cada página declara los suyos (`buildMetadata`). */
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: defaultTitle, template: "%s · SUMA STUDIO" },
-  description: defaultDescription,
+  title: { default: HOME_SEO.title, template: "%s · SUMA STUDIO" },
+  description: HOME_SEO.description,
   applicationName: site.name,
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    locale: site.locale,
-    siteName: site.name,
-    title: defaultTitle,
-    description: defaultDescription,
-    url: "/",
-  },
-  twitter: { card: "summary_large_image", title: defaultTitle, description: defaultDescription },
+  ...(site.indexable ? {} : { robots: { index: false, follow: false } }),
   formatDetection: { telephone: false, email: false, address: false },
 };
 
@@ -59,15 +50,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${leagueSpartan.variable} ${quicksand.variable} antialiased`}
     >
       <body className="flex min-h-dvh flex-col">
-        <GoogleTagManagerNoScript id={site.gtmId} />
         <SplashScreen />
         <Header />
         <main id="contenido" className="flex-1">
           {children}
         </main>
         <Footer />
-        <JsonLd data={organizationJsonLd} />
+        {/* Valores por defecto de Consent Mode: deben ejecutarse antes que GTM. */}
+        <Script id="consent-defaults" strategy="beforeInteractive">
+          {consentDefaultsScript()}
+        </Script>
+        <AnalyticsClicks />
+        {/* GTM solo se carga con consentimiento de medición (ver ConsentBanner). */}
         <GoogleTagManager id={site.gtmId} />
+        <ConsentBanner />
       </body>
     </html>
   );

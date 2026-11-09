@@ -2,6 +2,32 @@
 
 ## [Sin publicar]
 
+### Consentimiento opt-in y aviso de privacidad
+- `ANALYTICS_DEFAULT = "denied"` en todas las regiones; `ad_storage`, `ad_user_data` y `ad_personalization` siempre `denied`.
+- GTM ya no se carga sin consentimiento: `gtm.js` solo se descarga tras "Aceptar estadísticas" (primero `consent update`, después GTM) y en visitas posteriores si la aceptación está guardada. Se retiró el `<noscript>` de GTM.
+- Banner de consentimiento (`ConsentBanner`): aparece solo sin decisión guardada; discreto, no modal, "Rechazar" y "Aceptar estadísticas" con el mismo peso, enlace al aviso de privacidad. "Preferencias de privacidad" en el footer parte desmarcada y permite cambiar la decisión.
+- Aviso de privacidad reescrito con los servicios reales (formulario, Resend, alojamiento, buzón receptor, GTM y GA4 con consentimiento, almacenamiento local, conservación, ARCO), con aviso visible de borrador y datos legales pendientes marcados. Sigue `noindex`.
+- Documentación: "aceptado por Resend" (lo que mide `generate_lead`) frente a "entregado en el buzón".
+- Pruebas: 148.
+
+### Formulario de contacto con Resend
+- La API responde `200 { ok: true, delivered: true }` solo cuando el proveedor confirma la entrega (Resend con `id` del correo, o webhook 2xx); el descarte anti-spam sigue respondiendo `200 { ok: true }`. El formulario muestra éxito y envía `generate_lead` únicamente con `delivered: true`; en otro caso muestra "No pudimos confirmar el envío", conserva los datos y registra `form_error` (`unconfirmed`).
+- Configuración de entrega validada con Zod: para Resend son obligatorios `RESEND_API_KEY` (`re_…`), `CONTACT_TO_EMAIL` y `CONTACT_FROM_EMAIL`; se eliminó el remitente de pruebas `onboarding@resend.dev` como valor por defecto y se rechaza cualquier `@resend.dev`. Si falta algo, `503 not_configured` con el motivo en `action_log`.
+- Compatible con la configuración de producción: `RESEND_API_KEY` cualquier `re_…` sin espacios, `CONTACT_FROM_EMAIL` con o sin nombre visible, `CONTACT_TO_EMAIL` con uno o varios destinatarios separados por comas.
+- Envíos de Resend con `Idempotency-Key` (misma solicitud ⇒ un solo correo), versión de texto plano y `reply_to` del prospecto. `action_log` registra `providerId` (id del correo), `providerStatus` y `reason`, sin datos personales.
+- Pruebas: 140.
+
+### SEO 360 (rama `seo/auditoria-360`, detalle en `SEO_AUDIT.md`)
+- **Indexación**: URL del sitio resuelta por entorno (`src/lib/site-url.ts`): producción exige `NEXT_PUBLIC_SITE_URL` https (el build falla si falta o es localhost); los previews usan su propia URL y son `noindex` con robots `Disallow: /` y sitemap vacío. `X-Robots-Tag: noindex` en alias `*.vercel.app`. Canonical, `og:url`, `og:image` y `twitter:image` absolutas en todas las páginas (antes las internas no tenían imagen social). El layout raíz ya no hereda canonical `/`. Aviso de privacidad (borrador) en `noindex, follow` y fuera del sitemap. Sitemap sin `changefreq`/`priority`/`lastmod`.
+- **Validación**: `scripts/seo-check.mjs` como `postbuild` (canonical, localhost, Open Graph, H1 único, JSON-LD, FAQ visibles, sitemap ↔ páginas indexables, robots).
+- **JSON-LD**: un `@graph` por página con `@id` estables (Organization, WebSite, WebPage/CollectionPage/AboutPage/ContactPage, BreadcrumbList, Service ×5, FAQPage solo con preguntas visibles, ItemList en índices). `ProfessionalService` → `Organization`. Logo PNG oficial (`public/brand/isotipo-512.png`) y `apple-icon.png`. Schema Markup Validator: 0 errores y 0 avisos en 18 páginas.
+- **On-page**: el nombre del servicio/sector forma parte del H1 (mismo aspecto visual); títulos ≤ 56 caracteres + marca y descripciones de 70–160; textos de enlace descriptivos entre servicios e industrias.
+- **Medición**: eventos `generate_lead` (solo con entrega confirmada por el backend), `form_error`, `contact_click`, `service_cta_click` y `needs_selector_completed` vía `dataLayer`, sin datos personales.
+- **Consentimiento** (pendiente de revisión legal): Consent Mode v2 con publicidad siempre `denied` y medición según elección guardada; "Preferencias de privacidad" en el footer; sección de cookies en el borrador del aviso.
+- **Rendimiento**: imagen LCP del hero de `/servicios/paginas-web` con `preload`; `priority` (obsoleto en Next 16) → `preload`.
+- **IndexNow**: clave pública en `public/` y `scripts/indexnow.mjs` (simulación por defecto, solo URLs publicadas o eliminadas, sin endpoint público).
+- Pruebas: 130.
+
 ### Añadido
 - Google Tag Manager (`GTM-W2CSD45N`) en todas las páginas: fragmento oficial cargado con `next/script` (`afterInteractive`) y `<noscript>` al inicio de `<body>`. Pruebas: 94.
 
