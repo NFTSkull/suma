@@ -294,6 +294,8 @@ No hay bloques repetidos con "todos los enlaces".
 | `npm test` (Vitest) | ✓ 24 archivos, 130 pruebas (antes 94). Nuevas: URL del sitio, grafo JSON-LD y metadata, límites de títulos y descripciones, eventos del formulario (lead confirmado sin datos personales, descarte por spam sin lead, `form_error` por 503/429/502/500/red), clics de contacto y CTA, selector una vez en StrictMode, Consent Mode y preferencias |
 | `npm run build` con URL de producción + `seo-check` | ✓ 19 páginas, 18 URLs en el sitemap, sin avisos |
 | Build simulado de preview + `seo-check` | ✓ robots `Disallow: /`, sitemap vacío, `noindex` |
+| Build con el adaptador real de Vercel (`@vercel/next` vía `NEXT_ADAPTER_PATH`), producción y preview | ✓ `seo-check` lee `.next/output` (19 páginas en producción; preview no indexable) |
+| Despliegue de preview en Vercel del PR | ✓ `seo-check ✓ preview no indexable [vercel-adapter]`. El primer intento falló porque el validador solo leía `.next/server/app`; ya está corregido |
 | Build de producción sin URL o con localhost | ✓ falla con mensaje claro |
 | Prueba negativa de `seo-check` con un dominio equivocado | ✓ detecta los errores |
 | Schema Markup Validator (18 páginas) | ✓ 0 errores y 0 avisos |
