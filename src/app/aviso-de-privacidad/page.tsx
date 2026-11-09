@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/ui/JsonLd";
+import { buildMetadata, pageGraph } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
+const seo = {
   title: "Aviso de privacidad",
   description: "Aviso de privacidad del sitio de SUMA STUDIO: qué datos recabamos en el formulario de contacto y para qué los usamos.",
   path: "/aviso-de-privacidad",
-});
+};
+const crumbs = [{ name: "Aviso de privacidad", path: "/aviso-de-privacidad" }];
+
+/** Borrador con datos pendientes: `buildMetadata` lo marca noindex (ver `noindexRoutes`). */
+export const metadata: Metadata = buildMetadata(seo);
 
 function Pendiente({ children }: { children: string }) {
   return <mark className="rounded bg-suma-orange/20 px-1 font-semibold text-suma-navy">[Pendiente: {children}]</mark>;
@@ -18,7 +23,7 @@ export default function AvisoPage() {
       <PageHero
         eyebrow="Legal"
         accent="purple"
-        crumbs={[{ name: "Aviso de privacidad", path: "/aviso-de-privacidad" }]}
+        crumbs={crumbs}
         title="Aviso de privacidad"
         lead="Borrador base conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares. Debe completarse y revisarse por un especialista antes de su publicación."
       />
@@ -53,12 +58,28 @@ export default function AvisoPage() {
           </p>
         </section>
         <section>
+          <h2>Cookies y tecnologías de medición</h2>
+          <p className="mt-3">
+            Este sitio usa Google Tag Manager y Google Analytics para obtener estadísticas de uso: páginas visitadas, tipo de dispositivo, ubicación
+            aproximada y acciones como enviar el formulario o usar el selector de soluciones. Estas estadísticas no incluyen tu nombre, correo, teléfono
+            ni el contenido de tus mensajes.
+          </p>
+          <p className="mt-3">
+            No usamos cookies publicitarias ni compartimos datos con fines de publicidad. Puedes desactivar la medición en cualquier momento desde
+            «Preferencias de privacidad», al pie de cada página, o bloquear las cookies desde la configuración de tu navegador.
+          </p>
+          <p className="mt-3">
+            <Pendiente>revisión legal de esta sección, plazo de conservación de datos de Google Analytics y mecanismo de consentimiento</Pendiente>
+          </p>
+        </section>
+        <section>
           <h2>Cambios a este aviso</h2>
           <p className="mt-3">
             Cualquier cambio se publicará en esta página. Última actualización: <Pendiente>fecha</Pendiente>.
           </p>
         </section>
       </article>
+      <JsonLd data={pageGraph({ path: seo.path, name: seo.title, description: seo.description, crumbs })} />
     </>
   );
 }

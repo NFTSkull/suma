@@ -25,7 +25,7 @@ export function SumaLogo({ tone = "dark", variant = "horizontal", className, hei
         alt="SUMA STUDIO"
         width={Math.round(height * official.ratio)}
         height={height}
-        priority
+        preload
         className={className}
       />
     );

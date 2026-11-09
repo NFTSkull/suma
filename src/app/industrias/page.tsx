@@ -3,19 +3,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { ClosingCta } from "@/components/home/ClosingCta";
 import { PageHero } from "@/components/layout/PageHero";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { Reveal } from "@/components/ui/Reveal";
 import { industries } from "@/content/industries";
 import { photos } from "@/content/photos";
 import { cn } from "@/lib/cn";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, ids, itemListNode, pageGraph } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Industrias: yoga, pilates, spas, fitness, marcas wellness y retiros",
+const seo = {
+  title: "Tecnología para yoga, spas, fitness y marcas wellness",
   description:
     "Soluciones digitales para estudios de yoga y pilates, spas, fitness boutique, marcas wellness, retiros y profesionales del bienestar en México.",
   path: "/industrias",
   keywords: ["tecnología para negocios de bienestar", "soluciones digitales para spas", "CRM para estudios de yoga"],
-});
+};
+const crumbs = [{ name: "Industrias", path: "/industrias" }];
+
+export const metadata: Metadata = buildMetadata(seo);
 
 const spans = ["md:col-span-7", "md:col-span-5", "md:col-span-5", "md:col-span-7", "md:col-span-6", "md:col-span-6"];
 
@@ -25,7 +29,7 @@ export default function IndustriasPage() {
       <PageHero
         eyebrow="Industrias"
         accent="pink"
-        crumbs={[{ name: "Industrias", path: "/industrias" }]}
+        crumbs={crumbs}
         title="Tu mundo es único. Tus herramientas también deberían serlo."
         lead="Cada tipo de negocio de bienestar tiene su ritmo, sus momentos críticos y su manera de cuidar a las personas. Empezamos por entender el tuyo."
       />
@@ -62,6 +66,17 @@ export default function IndustriasPage() {
         title="¿Tu negocio no aparece aquí?"
         text="Trabajamos con todo tipo de proyectos de bienestar. Cuéntanos el tuyo."
         secondary={{ label: "Explorar soluciones", href: "/soluciones" }}
+      />
+      <JsonLd
+        data={pageGraph({
+          path: seo.path,
+          name: seo.title,
+          description: seo.description,
+          type: "CollectionPage",
+          crumbs,
+          mainEntity: ids.list(seo.path),
+          extra: [itemListNode(seo.path, industries.map((i) => ({ name: i.name, path: i.href })))],
+        })}
       />
     </>
   );

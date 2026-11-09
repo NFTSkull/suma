@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PrivacyPreferences } from "@/components/analytics/PrivacyPreferences";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { SumaLogo } from "@/components/brand/SumaLogo";
 import { ButtonLink } from "@/components/ui/Button";
@@ -91,6 +92,9 @@ export function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <PrivacyPreferences />
+            </li>
             <li className="inline-flex min-h-10 items-center">Fotografía: Unsplash</li>
           </ul>
         </div>

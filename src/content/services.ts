@@ -69,8 +69,8 @@ export const services: Service[] = [
       text: "Cuéntanos cómo te contactan tus clientes y diseñemos un asistente con tu tono.",
     },
     seo: {
-      title: "Chatbots para negocios de bienestar y estudios de pilates",
-      description: "Asistentes inteligentes para estudios, spas y marcas wellness: responden consultas, ayudan a reservar y transfieren a tu equipo cuando hace falta. Desde Monterrey para todo México.",
+      title: "Chatbots para spas y estudios de yoga y pilates",
+      description: "Asistentes para WhatsApp, web e Instagram que responden consultas, ayudan a reservar y pasan la conversación a tu equipo. Desde Monterrey para México.",
       keywords: ["chatbots para negocios de bienestar", "chatbot para estudio de pilates", "automatización de reservas", "chatbot WhatsApp spa"],
     },
   },
@@ -144,7 +144,7 @@ export const services: Service[] = [
     },
     seo: {
       title: "CRM para estudios de yoga, pilates y spas",
-      description: "Sistemas CRM personalizados para negocios wellness: clientes, reservas, membresías, prospectos y seguimiento en un solo lugar.",
+      description: "CRM personalizado para negocios wellness en Monterrey y México: clientes, reservas, membresías, prospectos y seguimiento en un solo lugar.",
       keywords: ["CRM para estudios de yoga", "software para spas", "CRM para estudio de pilates", "sistema de membresías"],
     },
   },
@@ -216,8 +216,8 @@ export const services: Service[] = [
       text: "Cuéntanos qué te gustaría que tus clientes pudieran hacer desde su teléfono.",
     },
     seo: {
-      title: "Aplicaciones móviles para centros wellness y estudios",
-      description: "Apps con la identidad de tu marca para reservar clases, consultar membresías y mantenerte cerca de tu comunidad.",
+      title: "Apps móviles para estudios, spas y fitness boutique",
+      description: "Aplicaciones con la identidad de tu marca para reservar clases, consultar membresías y mantenerte cerca de tu comunidad. Desde Monterrey para México.",
       keywords: ["aplicaciones para centros wellness", "app para estudio de yoga", "app de reservas para gimnasio boutique"],
     },
   },
@@ -364,8 +364,8 @@ export const services: Service[] = [
       text: "Cuéntanos qué quieres impulsar y en qué zona están tus clientes.",
     },
     seo: {
-      title: "Publicidad digital para estudios de pilates y negocios wellness",
-      description: "Campañas en Meta Ads y Google Ads para estudios, spas y marcas wellness en México, conectadas con tu sitio y tu seguimiento.",
+      title: "Publicidad digital para negocios wellness",
+      description: "Campañas en Meta Ads y Google Ads para estudios de pilates, spas y marcas wellness en Monterrey y México, conectadas con tu sitio y tu seguimiento.",
       keywords: ["publicidad para estudios de pilates", "marketing digital para negocios wellness en México", "Meta Ads spa"],
     },
   },

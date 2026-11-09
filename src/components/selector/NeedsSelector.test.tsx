@@ -8,7 +8,29 @@ import { NeedsSelector } from "./NeedsSelector";
 vi.mock("next/link", () => import("@/test/next-link-mock"));
 
 describe("NeedsSelector", () => {
-  beforeEach(() => sessionStorage.clear());
+  beforeEach(() => {
+    sessionStorage.clear();
+    (window as Window & { dataLayer?: unknown[] }).dataLayer = [];
+  });
+
+  it("envía needs_selector_completed una vez al ver la recomendación (también en StrictMode)", async () => {
+    const user = userEvent.setup();
+    render(
+      <StrictMode>
+        <NeedsSelector />
+      </StrictMode>,
+    );
+    await user.click(screen.getByRole("radio", { name: "Yoga, Pilates o Barre" }));
+    await user.click(screen.getByRole("button", { name: "Continuar" }));
+    await user.click(screen.getByRole("radio", { name: /Recibo muchas consultas/ }));
+    await user.click(screen.getByRole("button", { name: "Ver recomendación" }));
+
+    const layer = (window as Window & { dataLayer?: Record<string, unknown>[] }).dataLayer!;
+    expect(layer).toHaveLength(1);
+    expect(layer[0]).toMatchObject({ event: "needs_selector_completed", business_type: "yoga-pilates" });
+    expect(typeof layer[0].challenge).toBe("string");
+    expect(String(layer[0].recommended_services).split(",").length).toBeGreaterThanOrEqual(1);
+  });
 
   it("avanza, regresa y muestra recomendaciones con CTA", async () => {
     const user = userEvent.setup();

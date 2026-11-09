@@ -1,6 +1,6 @@
 import { actionLog } from "@/lib/action-log";
 import { deliverLead, getDeliveryConfig } from "@/lib/contact-delivery";
-import { antiSpamSchema, contactSchema, fieldErrors, MIN_FILL_MS } from "@/lib/contact-schema";
+import { antiSpamSchema, contactSchema, fieldErrors, isSilentlyDiscarded } from "@/lib/contact-schema";
 import { contactRateLimiter } from "@/lib/rate-limit";
 
 const json = (status: number, body: Record<string, unknown>) =>
@@ -29,8 +29,7 @@ export async function POST(request: Request) {
   const { sitio, inicio, ...fields } = raw;
 
   const spam = antiSpamSchema.safeParse({ sitio, inicio });
-  const tooFast = spam.success && spam.data.inicio !== undefined && Date.now() - spam.data.inicio < MIN_FILL_MS;
-  if (!spam.success || spam.data.sitio.trim() !== "" || tooFast) {
+  if (!spam.success || isSilentlyDiscarded(spam.data, Date.now())) {
     actionLog({ action: "contact.submit", outcome: "spam_discarded" });
     return json(200, { ok: true });
   }

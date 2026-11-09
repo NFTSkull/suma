@@ -5,10 +5,12 @@ import { useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from 
 import { Button } from "@/components/ui/Button";
 import { challengeOptions } from "@/content/selector-rules";
 import { cn } from "@/lib/cn";
+import { track, type AnalyticsEvent } from "@/lib/analytics";
 import {
   businessTypeOptions,
   contactSchema,
   fieldErrors,
+  isSilentlyDiscarded,
   serviceInterestOptions,
   type ContactField,
 } from "@/lib/contact-schema";
@@ -16,6 +18,7 @@ import { SELECTOR_STORAGE_KEY, type SelectorContext } from "@/lib/recommend";
 
 type Status = "idle" | "sending" | "success" | "not_configured" | "rate_limited" | "error";
 type Errors = Partial<Record<ContactField, string>>;
+type FormErrorType = Extract<AnalyticsEvent, { event: "form_error" }>["error_type"];
 
 const serviceIds = new Set<string>(serviceInterestOptions.map((o) => o.id));
 const businessIds = new Set<string>(businessTypeOptions.map((o) => o.id));
@@ -139,25 +142,41 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
     setErrors({});
     setStatus("sending");
     let next: Status = "error";
+    let errorType: FormErrorType = "server_error";
+    const inicio = startedAt.current ?? undefined;
     try {
       const res = await fetch("/api/contacto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, sitio, ...(startedAt.current ? { inicio: startedAt.current } : {}) }),
+        body: JSON.stringify({ ...payload, sitio, ...(inicio ? { inicio } : {}) }),
       });
       if (res.ok) next = "success";
-      else if (res.status === 503) next = "not_configured";
-      else if (res.status === 429) next = "rate_limited";
+      else if (res.status === 503) [next, errorType] = ["not_configured", "not_configured"];
+      else if (res.status === 429) [next, errorType] = ["rate_limited", "rate_limited"];
       else if (res.status === 422) {
         const body = (await res.json().catch(() => null)) as { fields?: Errors } | null;
         if (body?.fields) setErrors(body.fields);
-        next = "idle";
-      }
+        [next, errorType] = ["idle", "validation"];
+      } else if (res.status === 502) errorType = "delivery_failed";
     } catch {
-      next = "error";
+      [next, errorType] = ["error", "network"];
     }
     setStatus(next);
-    if (next === "success") discardContext();
+    if (next === "success") {
+      if (!isSilentlyDiscarded({ sitio, inicio }, Date.now())) {
+        track({
+          event: "generate_lead",
+          form_name: "contacto",
+          lead_source: "contact_form",
+          business_type: parsed.data.tipoNegocio,
+          services: parsed.data.servicios.join(","),
+          from_selector: Boolean(parsed.data.contexto),
+        });
+      }
+      discardContext();
+    } else {
+      track({ event: "form_error", form_name: "contacto", error_type: errorType });
+    }
     requestAnimationFrame(() => statusRef.current?.focus());
   }
 

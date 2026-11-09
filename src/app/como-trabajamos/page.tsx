@@ -3,16 +3,20 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
 import { PageHero } from "@/components/layout/PageHero";
 import { Accordion } from "@/components/ui/Accordion";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, pageGraph } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Cómo trabajamos: de una idea a una experiencia que funciona",
+const seo = {
+  title: "Cómo trabajamos: proceso de proyecto digital",
   description:
     "Nuestro proceso para negocios de bienestar: descubrimos, diseñamos, construimos y evolucionamos contigo. Desde Monterrey para todo México.",
   path: "/como-trabajamos",
-});
+};
+const crumbs = [{ name: "Cómo trabajamos", path: "/como-trabajamos" }];
+
+export const metadata: Metadata = buildMetadata(seo);
 
 const principles = [
   { title: "Primero entendemos", text: "Antes de proponer herramientas, conocemos cómo funciona tu negocio hoy y qué te quita más tiempo." },
@@ -36,7 +40,7 @@ export default function ComoTrabajamosPage() {
       <PageHero
         eyebrow="Cómo trabajamos"
         accent="pink"
-        crumbs={[{ name: "Cómo trabajamos", path: "/como-trabajamos" }]}
+        crumbs={crumbs}
         title="De una idea a una experiencia que funciona."
         lead="Un proceso claro, en cuatro etapas, para que sepas siempre en qué punto estamos y qué sigue."
       />
@@ -72,6 +76,7 @@ export default function ComoTrabajamosPage() {
       </section>
 
       <ClosingCta title="¿Empezamos con un diagnóstico?" text="Cuéntanos cómo funciona tu negocio hoy y te proponemos el primer paso." />
+      <JsonLd data={pageGraph({ path: seo.path, name: seo.title, description: seo.description, crumbs, faqs })} />
     </>
   );
 }

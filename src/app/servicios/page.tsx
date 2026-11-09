@@ -4,21 +4,25 @@ import type { ReactNode } from "react";
 import { ClosingCta } from "@/components/home/ClosingCta";
 import { PageHero } from "@/components/layout/PageHero";
 import { ButtonLink } from "@/components/ui/Button";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { Reveal } from "@/components/ui/Reveal";
 import { AdJourneyMini, ChatMini, CrmMini, PhoneMini, WebScreensMini } from "@/components/visuals/MiniVisuals";
 import { services, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, ids, itemListNode, pageGraph } from "@/lib/seo";
 import type { ServiceSlug } from "@/types/content";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Servicios: chatbots, CRM, apps, páginas web y publicidad digital",
+const seo = {
+  title: "Servicios digitales para negocios wellness",
   description:
-    "Cinco servicios para negocios de bienestar en Monterrey y todo México: chatbots, CRM personalizados, aplicaciones móviles, páginas web y publicidad digital.",
+    "Chatbots, CRM personalizados, aplicaciones móviles, páginas web y publicidad digital para negocios de bienestar en Monterrey y todo México.",
   path: "/servicios",
   keywords: ["servicios digitales para negocios wellness", "agencia digital wellness Monterrey"],
-});
+};
+const crumbs = [{ name: "Servicios", path: "/servicios" }];
+
+export const metadata: Metadata = buildMetadata(seo);
 
 const visuals: Record<ServiceSlug, ReactNode> = {
   chatbots: <ChatMini />,
@@ -33,7 +37,7 @@ export default function ServiciosPage() {
     <>
       <PageHero
         eyebrow="Servicios"
-        crumbs={[{ name: "Servicios", path: "/servicios" }]}
+        crumbs={crumbs}
         title="Cinco maneras de hacer que tu negocio fluya."
         lead="Cada servicio resuelve algo concreto. Juntos, conectan la forma en que tus clientes te descubren, te preguntan, reservan y regresan."
       >
@@ -80,6 +84,18 @@ export default function ServiciosPage() {
         title="No necesitas todas las herramientas desde el primer día."
         text="Necesitas las adecuadas para el momento de tu negocio. Cuéntanos dónde estás y te ayudamos a priorizar."
         secondary={{ label: "Cómo trabajamos", href: "/como-trabajamos" }}
+      />
+      <JsonLd
+        data={pageGraph({
+          path: seo.path,
+          name: seo.title,
+          description: seo.description,
+          type: "CollectionPage",
+          crumbs,
+          mainEntity: ids.list(seo.path),
+          about: services.map((s) => ids.service(s)),
+          extra: [itemListNode(seo.path, services.map((s) => ({ name: s.name, path: s.href })))],
+        })}
       />
     </>
   );

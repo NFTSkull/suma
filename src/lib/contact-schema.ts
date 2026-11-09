@@ -98,3 +98,11 @@ export function fieldErrors(error: z.ZodError): Partial<Record<ContactField, str
 
 /** Tiempo mínimo razonable para que una persona complete el formulario. */
 export const MIN_FILL_MS = 2500;
+
+/**
+ * Regla anti-spam compartida: la API responde 200 sin entregar cuando se cumple
+ * (para no enseñar a los bots) y el cliente la usa para no contar ese 200 como lead.
+ */
+export function isSilentlyDiscarded({ sitio, inicio }: { sitio: string; inicio?: number }, now: number): boolean {
+  return sitio.trim() !== "" || (inicio !== undefined && now - inicio < MIN_FILL_MS);
+}

@@ -99,7 +99,8 @@ export function PhoneMini({ className }: { className?: string }) {
   );
 }
 
-export function WebScreensMini({ className }: { className?: string }) {
+/** `preload` solo cuando está en el hero (es la imagen LCP de /servicios/paginas-web). */
+export function WebScreensMini({ className, preload = false }: { className?: string; preload?: boolean }) {
   return (
     <div aria-hidden="true" className={cn("relative h-56 w-full max-w-[30rem]", className)}>
       <div className="absolute left-0 top-0 w-[78%] overflow-hidden rounded-xl bg-suma-cream-soft shadow-lift">
@@ -117,13 +118,13 @@ export function WebScreensMini({ className }: { className?: string }) {
             <span className="mt-3 inline-block rounded-full bg-suma-navy px-2.5 py-1 text-[0.55rem] font-bold text-suma-cream">Reservar clase</span>
           </div>
           <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
-            <Image src={photos.yogaEstudio.src} alt="" fill sizes="160px" className="object-cover" />
+            <Image src={photos.yogaEstudio.src} alt="" fill sizes="160px" preload={preload} className="object-cover" />
           </div>
         </div>
       </div>
       <div className="absolute bottom-0 right-0 w-[30%] overflow-hidden rounded-2xl border-4 border-suma-cream-soft bg-suma-cream-soft shadow-lift">
         <div className="relative aspect-[9/14]">
-          <Image src={photos.spaAlberca.src} alt="" fill sizes="120px" className="object-cover" />
+          <Image src={photos.spaAlberca.src} alt="" fill sizes="120px" preload={preload} className="object-cover" />
           <span className="absolute inset-x-1.5 bottom-1.5 rounded-lg bg-suma-cream-soft/95 px-1.5 py-1 text-[0.5rem] font-bold text-suma-navy">
             Menú de tratamientos
           </span>

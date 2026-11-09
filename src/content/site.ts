@@ -1,3 +1,11 @@
+import { resolveSiteTarget } from "@/lib/site-url";
+
+const target = resolveSiteTarget({
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  VERCEL_ENV: process.env.VERCEL_ENV,
+  VERCEL_URL: process.env.VERCEL_URL,
+});
+
 export const site = {
   name: "SUMA STUDIO",
   institutionalDescriptor: "Creaciones y Producciones",
@@ -20,7 +28,9 @@ export const site = {
   social: [] as { label: string; href: string }[],
   /** Contenedor de Google Tag Manager. */
   gtmId: "GTM-W2CSD45N",
-  url: (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, ""),
+  url: target.url,
+  /** Falso en previews de Vercel: robots y metadata piden no indexar. */
+  indexable: target.indexable,
   locale: "es_MX",
 } as const;
 

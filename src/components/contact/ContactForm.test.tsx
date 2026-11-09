@@ -94,3 +94,85 @@ describe("ContactForm", () => {
     expect(sessionStorage.getItem(SELECTOR_STORAGE_KEY)).toBeNull();
   });
 });
+
+describe("ContactForm · analítica", () => {
+  type DL = Window & { dataLayer?: Record<string, unknown>[] };
+  const events = () => ((window as DL).dataLayer ?? []).map((e) => e.event);
+  const personal = ["Ana López", "Estudio Flor", "ana@ejemplo.mx", "81 1234 5678", "8112345678"];
+
+  beforeEach(() => {
+    (window as DL).dataLayer = [];
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  /** Simula que la persona tardó más del mínimo anti-spam en llenar el formulario. */
+  const afterHumanDelay = () => {
+    const later = Date.now() + 10_000;
+    vi.spyOn(Date, "now").mockReturnValue(later);
+  };
+
+  it("envía generate_lead una sola vez cuando el backend confirma, sin datos personales", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    afterHumanDelay();
+    await user.click(send());
+    await screen.findByText("Gracias, recibimos tu mensaje.");
+
+    expect(events()).toEqual(["generate_lead"]);
+    const lead = (window as DL).dataLayer![0];
+    expect(lead).toEqual({
+      event: "generate_lead",
+      form_name: "contacto",
+      lead_source: "contact_form",
+      business_type: "yoga-pilates",
+      services: "chatbots",
+      from_selector: false,
+    });
+    const json = JSON.stringify((window as DL).dataLayer);
+    for (const value of personal) expect(json).not.toContain(value);
+  });
+
+  it("no cuenta como lead un 200 que la API descarta por demasiado rápido", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+    await screen.findByText("Gracias, recibimos tu mensaje.");
+    expect(events()).toEqual([]);
+  });
+
+  it.each([
+    [503, "not_configured"],
+    [429, "rate_limited"],
+    [502, "delivery_failed"],
+    [500, "server_error"],
+  ])("un %i envía form_error %s y nunca generate_lead", async (status, errorType) => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: false }), { status }));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    afterHumanDelay();
+    await user.click(send());
+    await waitFor(() => expect(events()).toEqual(["form_error"]));
+    expect((window as DL).dataLayer![0]).toEqual({ event: "form_error", form_name: "contacto", error_type: errorType });
+  });
+
+  it("un fallo de red envía form_error network", async () => {
+    fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValid(user);
+    await user.click(send());
+    await waitFor(() => expect((window as DL).dataLayer).toEqual([{ event: "form_error", form_name: "contacto", error_type: "network" }]));
+  });
+
+  it("los errores de validación en el navegador no generan eventos", async () => {
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await user.click(send());
+    expect(events()).toEqual([]);
+  });
+});

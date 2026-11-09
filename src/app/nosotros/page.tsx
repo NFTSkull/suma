@@ -3,18 +3,22 @@ import Image from "next/image";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { ClosingCta } from "@/components/home/ClosingCta";
 import { PageHero } from "@/components/layout/PageHero";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { photos } from "@/content/photos";
 import { site } from "@/content/site";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, ids, pageGraph } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
-  title: "El estudio: creatividad que conecta, tecnología que suma",
+const seo = {
+  title: "El estudio: agencia creativa y tecnológica en Monterrey",
   description:
     "SUMA STUDIO es un estudio creativo y tecnológico en Monterrey, Nuevo León, que diseña experiencias digitales para negocios de bienestar en todo México.",
   path: "/nosotros",
-});
+};
+const crumbs = [{ name: "El estudio", path: "/nosotros" }];
+
+export const metadata: Metadata = buildMetadata(seo);
 
 const beliefs = [
   { title: "El bienestar se siente.", text: "La tecnología también debería. Diseñamos herramientas que se sienten tan cuidadas como la experiencia que ofreces." },
@@ -41,7 +45,7 @@ export default function NosotrosPage() {
     <>
       <PageHero
         eyebrow="El estudio"
-        crumbs={[{ name: "El estudio", path: "/nosotros" }]}
+        crumbs={crumbs}
         title={
           <>
             Creatividad que conecta. <span className="text-suma-purple">Tecnología que suma.</span>
@@ -114,6 +118,9 @@ export default function NosotrosPage() {
       </section>
 
       <ClosingCta />
+      <JsonLd
+        data={pageGraph({ path: seo.path, name: seo.title, description: seo.description, type: "AboutPage", crumbs, mainEntity: ids.organization })}
+      />
     </>
   );
 }

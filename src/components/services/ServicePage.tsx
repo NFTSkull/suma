@@ -13,7 +13,8 @@ import { industryBySlug } from "@/content/industries";
 import { getService, serviceBySlug } from "@/content/services";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
-import { faqJsonLd, serviceJsonLd } from "@/lib/seo";
+import { serviceCtaAttrs } from "@/lib/analytics";
+import { ids, pageGraph, serviceNode } from "@/lib/seo";
 import type { ServiceSlug } from "@/types/content";
 import { ServiceShowcase } from "./ServiceShowcase";
 
@@ -72,7 +73,7 @@ const heroThemes: Record<ServiceSlug, HeroTheme> = {
     visual: (
       <div className="relative">
         <OrganicShape shape="a" color="purple" className="absolute -right-10 -top-14 size-80" />
-        <WebScreensMini className="relative" />
+        <WebScreensMini className="relative" preload />
       </div>
     ),
   },
@@ -90,6 +91,10 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
   const theme = heroThemes[slug];
   const c = colorStyles[s.color];
   const tone = theme.dark ? "light" : "dark";
+  const crumbs = [
+    { name: "Servicios", path: "/servicios" },
+    { name: s.shortName, path: s.href },
+  ];
 
   return (
     <>
@@ -104,22 +109,22 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
           )}
         >
           <div className={cn(theme.layout === "stacked" && "max-w-4xl")}>
-            <Breadcrumbs tone={tone} items={[{ name: "Servicios", path: "/servicios" }, { name: s.shortName, path: s.href }]} />
-            <p
-              className={cn(
-                "text-eyebrow mt-10 inline-flex items-center gap-3",
-                theme.dark ? (s.color === "purple" ? "text-suma-cream" : "text-suma-orange") : c.ink,
-                "motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_both]",
-              )}
-            >
-              <span aria-hidden="true" className={cn("blob size-3.5", theme.dark ? "bg-suma-orange" : c.dot)} />
-              {s.hero.eyebrow}
-            </p>
-            <h1
-              id="servicio-title"
-              className="text-display-lg mt-6 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_80ms_both]"
-            >
-              {s.hero.title}
+            <Breadcrumbs tone={tone} items={crumbs} />
+            {/* El nombre del servicio forma parte del H1; visualmente sigue siendo el eyebrow. */}
+            <h1 id="servicio-title" className="mt-10">
+              <span
+                className={cn(
+                  "text-eyebrow flex w-fit items-center gap-3",
+                  theme.dark ? (s.color === "purple" ? "text-suma-cream" : "text-suma-orange") : c.ink,
+                  "motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_both]",
+                )}
+              >
+                <span aria-hidden="true" className={cn("blob size-3.5", theme.dark ? "bg-suma-orange" : c.dot)} />
+                {s.hero.eyebrow}
+              </span>{" "}
+              <span className="text-display-lg mt-7 block motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_80ms_both]">
+                {s.hero.title}
+              </span>
             </h1>
             <p
               className={cn(
@@ -130,7 +135,7 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
               {s.hero.lead}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
-              <ButtonLink href="/contacto" size="lg" variant={theme.dark ? "accent" : "primary"} arrow>
+              <ButtonLink href="/contacto" size="lg" variant={theme.dark ? "accent" : "primary"} arrow {...serviceCtaAttrs(slug, "hero")}>
                 Hablemos de tu proyecto
               </ButtonLink>
               <ButtonLink href="#experiencia" variant={theme.dark ? "link-light" : "link"}>
@@ -224,7 +229,7 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
                       <p className="mt-3 text-suma-navy/80">{ex.text}</p>
                     </div>
                     <span className="inline-flex items-center gap-2 text-sm font-bold underline decoration-suma-orange decoration-2 underline-offset-4 group-hover:decoration-suma-pink">
-                      Ver industria <span aria-hidden="true">→</span>
+                      Ver soluciones para {ind.name.toLowerCase()} <span aria-hidden="true">→</span>
                     </span>
                   </Link>
                 </Reveal>
@@ -268,10 +273,24 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
         </div>
       </section>
 
-      <ClosingCta title={s.cta.title} text={s.cta.text} secondary={{ label: "Ver todos los servicios", href: "/servicios" }} />
+      <ClosingCta
+        title={s.cta.title}
+        text={s.cta.text}
+        secondary={{ label: "Ver todos los servicios", href: "/servicios" }}
+        primaryAttrs={serviceCtaAttrs(slug, "closing")}
+      />
 
-      <JsonLd data={serviceJsonLd({ name: s.name, description: s.seo.description, path: s.href })} />
-      <JsonLd data={faqJsonLd(s.faqs)} />
+      <JsonLd
+        data={pageGraph({
+          path: s.href,
+          name: s.seo.title,
+          description: s.seo.description,
+          crumbs,
+          mainEntity: ids.service(s),
+          faqs: s.faqs,
+          extra: [serviceNode(s)],
+        })}
+      />
     </>
   );
 }

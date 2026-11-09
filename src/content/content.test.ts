@@ -28,7 +28,7 @@ describe("contenido", () => {
     for (const s of services) {
       expect(s.faqs.length).toBeGreaterThanOrEqual(3);
       expect(s.seo.title.length).toBeGreaterThan(10);
-      expect(s.seo.description.length).toBeLessThanOrEqual(200);
+      expect(s.seo.description.length).toBeLessThanOrEqual(160);
       for (const r of s.related) {
         expect(serviceBySlug[r.slug]).toBeDefined();
         expect(r.slug).not.toBe(s.slug);
@@ -44,6 +44,16 @@ describe("contenido", () => {
       expect(photos[i.photo]).toBeDefined();
       expect(photos[i.secondaryPhoto]).toBeDefined();
     }
+  });
+
+  it("títulos y descripciones caben en resultados de búsqueda (sin contar « · SUMA STUDIO»)", () => {
+    for (const { slug, seo } of [...services, ...industries]) {
+      expect(seo.title.length, `${slug}: ${seo.title}`).toBeLessThanOrEqual(56);
+      expect(seo.description.length, `${slug}: ${seo.description.length}`).toBeGreaterThanOrEqual(70);
+      expect(seo.description.length, `${slug}: ${seo.description.length}`).toBeLessThanOrEqual(160);
+    }
+    const titles = [...services, ...industries].map((x) => x.seo.title);
+    expect(new Set(titles).size).toBe(titles.length);
   });
 
   it("las situaciones apuntan a servicios existentes", () => {

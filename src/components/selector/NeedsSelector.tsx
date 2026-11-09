@@ -7,6 +7,7 @@ import { businessOptions, challengeOptions, type BusinessId, type ChallengeId } 
 import { serviceBySlug, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
+import { track } from "@/lib/analytics";
 import { recommend, SELECTOR_STORAGE_KEY, type SelectorContext } from "@/lib/recommend";
 
 type Step = 1 | 2 | 3;
@@ -83,6 +84,17 @@ export function NeedsSelector() {
     }
   };
 
+  const showResult = () => {
+    if (!business || !challenge || !result) return;
+    setStep(3);
+    track({
+      event: "needs_selector_completed",
+      business_type: business,
+      challenge,
+      recommended_services: result.recommendations.map((r) => r.service).join(","),
+    });
+  };
+
   const reset = () => {
     setBusiness(null);
     setChallenge(null);
@@ -153,7 +165,7 @@ export function NeedsSelector() {
               <button
                 type="button"
                 disabled={!challenge}
-                onClick={() => setStep(3)}
+                onClick={showResult}
                 className="min-h-12 rounded-full bg-suma-navy px-7 font-bold text-suma-cream transition-colors hover:bg-suma-purple disabled:opacity-40"
               >
                 Ver recomendación
