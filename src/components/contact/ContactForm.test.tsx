@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SELECTOR_STORAGE_KEY } from "@/lib/recommend";
+import { site } from "@/content/site";
 import { ContactForm } from "./ContactForm";
 
 vi.mock("next/link", () => import("@/test/next-link-mock"));
@@ -53,6 +54,9 @@ describe("ContactForm", () => {
     expect(await screen.findByText("Tu mensaje no se envió.")).toBeInTheDocument();
     expect(screen.queryByText(/recibimos tu mensaje/)).not.toBeInTheDocument();
     expect(screen.getByLabelText("Nombre")).toHaveValue("Ana López");
+    expect(screen.getByRole("link", { name: "Escribir directamente por WhatsApp" }))
+      .toHaveAttribute("href", site.contact.whatsappUrl);
+    expect(screen.getByText(/no envía ni copia los datos del formulario/i)).toBeInTheDocument();
   });
 
   it("muestra éxito solo con entrega confirmada y envía datos válidos", async () => {
@@ -63,6 +67,7 @@ describe("ContactForm", () => {
     await user.click(send());
 
     expect(await screen.findByText("Gracias, recibimos tu mensaje.")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Escribir directamente por WhatsApp" })).not.toBeInTheDocument();
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body).toMatchObject({ nombre: "Ana López", servicios: ["chatbots"], privacidad: true, sitio: "" });
     expect(typeof body.inicio).toBe("number");
