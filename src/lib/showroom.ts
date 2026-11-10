@@ -1,4 +1,4 @@
-import type { IndividualServiceId } from "@/content/pricing";
+import type { IndividualServiceId, PricingPlanId } from "@/content/pricing";
 import { showroomExperiences, showroomIndustries, type ShowroomExperienceId, type ShowroomIndustryId } from "@/content/showroom";
 import { site } from "@/content/site";
 import { estimatePricing, formatMXN } from "@/lib/pricing";
@@ -9,6 +9,10 @@ export type ShowroomSelection = {
   industry: ShowroomIndustryId;
   experience: ShowroomExperienceId;
   serviceIds: IndividualServiceId[];
+  mode?: "services" | "package";
+  planId?: PricingPlanId;
+  months?: number;
+  adBudget?: number;
   locations: number;
   teamUsers: number;
   platform: string;
@@ -20,9 +24,10 @@ export type ShowroomSelection = {
 /** Reuse the published catalog; no hidden discount, license assumption or price per seat. */
 export function showroomEstimate(selection: ShowroomSelection) {
   return estimatePricing({
-    mode: "services",
-    planId: "flow",
-    months: 1,
+    mode: selection.mode ?? "services",
+    planId: selection.planId ?? "flow",
+    months: selection.months ?? 1,
+    adBudget: selection.adBudget ?? 0,
     serviceIds: selection.serviceIds,
     locations: selection.locations,
     teamUsers: selection.teamUsers,
@@ -54,7 +59,10 @@ export function showroomWhatsAppHref(selection: ShowroomSelection, intent: Showr
     "Negocio: " + safe(selection.businessName || industry.example, 55) + ".",
     "Giro: " + industry.name + ".",
     "Experiencia vista: " + selectedExperience.title + " (demo con datos ficticios).",
-    "Servicios de interés: " + (q.services.length ? q.services.map((s) => s.name).join(", ") : "Por definir") + ".",
+    "Modelo: " + (q.mode === "package" ? q.plan.name : "Servicios individuales") + ".",
+    "Servicios adicionales: " + (q.services.length ? q.services.map((s) => s.name).join(", ") : "Sin complementos") + ".",
+    "Periodo de referencia: " + q.months + " mes(es).",
+    ...(q.monthlyAds ? ["Presupuesto publicitario contemplado: " + formatMXN(q.monthlyAds) + "/mes (externo)."] : []),
     "Equipo: " + q.teamUsers + " personas. Sedes: " + q.locations + ".",
     ...(safe(selection.platform, 65) ? ["Herramientas actuales: " + safe(selection.platform, 65) + "."] : []),
     ...(q.isEmpty ? ["Solicito recomendación de alcance y presupuesto."] : [
