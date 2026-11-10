@@ -87,7 +87,7 @@ export function ShowroomBuilder() {
         <p className="mt-4 text-xs text-suma-navy/60">Todo lo que escribas aquí modifica únicamente la simulación de este navegador. No se guarda ni se envía automáticamente.</p>
       </section>
 
-      <section aria-labelledby="showroom-preview-title" className="grid gap-7 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+      <section id="showroom-explorar" aria-labelledby="showroom-preview-title" className="scroll-mt-24 grid gap-7 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7">
           <p className="text-eyebrow text-suma-orange">02 · Explora</p>
           <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Mira cómo podría funcionar.</h2>
