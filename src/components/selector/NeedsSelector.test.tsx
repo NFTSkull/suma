@@ -56,7 +56,7 @@ describe("NeedsSelector", () => {
     expect(cards.length).toBeGreaterThanOrEqual(1);
     expect(cards.length).toBeLessThanOrEqual(3);
     const waLink = screen.getByRole("link", { name: /Conversemos por WhatsApp/ });
-    expect(waLink).toHaveAttribute("href", whatsappUrlFor({ industry: "Yoga, Pilates o Barre", challenge: "Recibo muchas consultas y no puedo responder todas" }));
+    expect(waLink).toHaveAttribute("href", whatsappUrlFor({ industry: "Yoga, Pilates o Barre", challenge: "Recibo muchas consultas y no puedo responder todas." }));
     expect(waLink.getAttribute("href")).toContain("/528114688882?text=");
     expect(screen.getByRole("link", { name: /Prefiero enviar el formulario/ })).toHaveAttribute("href", "/contacto");
   });
