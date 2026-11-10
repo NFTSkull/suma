@@ -12,14 +12,14 @@ import { estimatePricing, formatMXN, pricingWhatsAppHref } from "@/lib/pricing";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
-  title: "Precios de CRM, chatbots y web para wellness",
+  title: "Precios de publicidad, CRM y chatbots para wellness",
   description:
-    "Conoce los precios de SUMA STUDIO: páginas web, CRM, automatización y publicidad para pilates, yoga y spas. Compara Start, Flow y Growth desde Monterrey.",
+    "Conoce SUMA Ads, Flow y Growth para captar clientes, responder consultas y conectar anuncios con reservas existentes. No necesitas una página nueva para empezar.",
   path: "/precios",
   keywords: [
     "precios CRM para estudios de pilates",
     "paquetes automatización spa",
-    "precios página web yoga y pilates",
+    "precio campañas Meta Ads estudio de pilates",
     "servicios digitales wellness Monterrey",
   ],
 };
@@ -32,12 +32,12 @@ export default function PreciosPage() {
   return (
     <>
       <PageHero
-        eyebrow="Planes y precios · MXN"
+        eyebrow="Captación · Atención · Crecimiento · MXN"
         accent="orange"
         dark
         crumbs={crumbs}
-        title={<>El siguiente paso de tu negocio merece <span className="text-suma-orange">un precio claro.</span></>}
-        lead="Un sitio para que te encuentren. Un sistema para organizarte. O una estrategia para crecer. Empieza con lo que necesitas, sin pagar por herramientas que todavía no usarás."
+        title={<>Más personas te descubren. <span className="text-suma-orange">Más oportunidades avanzan.</span></>}
+        lead="Campañas para atraer personas, atención para no perder consultas y seguimiento para convertir interés en visitas. Aprovechamos tu web, WhatsApp y reservador actuales: no necesitas cambiarlos para comenzar."
       >
         <div className="flex flex-wrap items-center gap-4">
           <ButtonLink href="#planes" variant="light" size="lg" arrow>Explorar paquetes</ButtonLink>
@@ -49,9 +49,9 @@ export default function PreciosPage() {
         <div className="container-suma">
           <SectionHeading
             id="planes-title"
-            eyebrow="Tres maneras de empezar"
-            title={<>Haz que cada inversión <span className="text-suma-purple">tenga sentido.</span></>}
-            lead="Paquetes base para una sede. El diagnóstico nos ayuda a recomendar el adecuado y ajustar el alcance si tu operación lo necesita."
+            eyebrow="Tres soluciones. Sin web obligatoria."
+            title={<>Elige dónde necesitas <span className="text-suma-purple">mejorar primero.</span></>}
+            lead="¿Quieres más clientes, responder mejor o ambas cosas? Los planes se adaptan a tu operación actual. Para una sede y con alcance definido."
           />
           <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
             {pricingPlans.map((plan) => {
@@ -81,9 +81,6 @@ export default function PreciosPage() {
                         ? <>+ <strong className={dark ? "text-suma-cream" : "text-suma-navy"}>{formatMXN(plan.monthly)}/mes</strong> de servicio</>
                         : <>Sin mensualidad obligatoria</>}
                     </p>
-                    {plan.id === "start" && (
-                      <p className={`mt-1 text-xs ${dark ? "text-suma-cream/65" : "text-suma-navy/60"}`}>Mantenimiento opcional: $990/mes</p>
-                    )}
                     <p className={`mt-4 rounded-xl px-3 py-3 text-sm font-bold ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
                       Primer pago base: {formatMXN(firstPayment)}
                     </p>
@@ -116,7 +113,7 @@ export default function PreciosPage() {
             })}
           </div>
           <p className="mt-7 max-w-5xl text-sm leading-relaxed text-suma-navy/70">
-            Precios base en pesos mexicanos, antes de IVA y para una sede. Implementación y servicio mensual se cobran por separado. Las licencias, dominio, hosting adicional, WhatsApp API, IA y pauta publicitaria no están incluidos. La propuesta final depende del alcance e integraciones validados.
+            Precios base en pesos mexicanos, antes de IVA y para una sede. Implementación y mensualidades se cobran por separado. La inversión en anuncios, licencias, hosting adicional y consumo de WhatsApp API o IA se pagan aparte. No exigimos una web nueva. Las reservas e integraciones dependen de permisos y viabilidad comprobada.
           </p>
         </div>
       </section>
@@ -139,9 +136,9 @@ export default function PreciosPage() {
         <div className="container-suma">
           <SectionHeading
             id="independientes-title"
-            eyebrow="Servicios por separado"
-            title="¿Necesitas solo una pieza?"
-            lead="No necesitas un paquete mensual si tu problema se resuelve con una herramienta puntual. También diseñamos proyectos a medida."
+            eyebrow="Elige solo lo que necesitas"
+            title="¿Publicidad, asistente o web? Tú eliges."
+            lead="Si tus reservas ya funcionan, puedes contratar campañas o atención sin comprar otra página. Si necesitas una web o un desarrollo propio, también lo hacemos por separado."
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {individualServices.map((service) => (
@@ -176,8 +173,8 @@ export default function PreciosPage() {
       </section>
 
       <ClosingCta
-        title="No se trata de contratar más. Se trata de elegir mejor."
-        text="Cuéntanos qué herramientas usas, cuántas personas atiendes y qué te gustaría resolver. Te recomendaremos un alcance concreto sin obligarte a contratarlo todo."
+        title="No necesitas cambiar todo para crecer."
+        text="Cuéntanos si tu prioridad es atraer clientes, contestar mensajes o dar seguimiento. Diseñamos una propuesta compatible con los canales y reservas que ya utilizas."
         secondary={{ label: "Ver cómo trabajamos", href: "/como-trabajamos" }}
       />
       <JsonLd data={pageGraph({

@@ -10,9 +10,8 @@ const periods = [1, 3, 6, 12];
 export function PricingEstimator() {
   const [planId, setPlanId] = useState<PricingPlanId>("flow");
   const [months, setMonths] = useState(3);
-  const [startMaintenance, setStartMaintenance] = useState(false);
-  const [growthAdBudget, setGrowthAdBudget] = useState<number>(pricingSettings.defaultGrowthAdBudget);
-  const selection = { planId, months, startMaintenance, growthAdBudget };
+  const [adBudget, setAdBudget] = useState<number>(pricingSettings.defaultAdBudget);
+  const selection = { planId, months, adBudget };
   const quote = estimatePricing(selection);
 
   return (
@@ -62,28 +61,20 @@ export function PricingEstimator() {
           </select>
         </div>
 
-        {planId === "start" && (
-          <label className="mt-7 flex cursor-pointer items-start gap-3 rounded-2xl border border-suma-cream/20 p-4 text-sm">
-            <input
-              type="checkbox"
-              checked={startMaintenance}
-              onChange={(event) => setStartMaintenance(event.target.checked)}
-              className="mt-1 size-5 accent-suma-orange"
-            />
-            <span><strong>Agregar mantenimiento opcional</strong><br />{formatMXN(pricingSettings.startMaintenanceMonthly)} MXN al mes. Sin obligación de contratarlo.</span>
-          </label>
-        )}
+        <p className="mt-6 text-sm leading-relaxed text-suma-cream/75">
+          <strong className="text-suma-cream">¿Ya tienes página o reservador?</strong> Perfecto: Ads y Flow aprovechan lo que hoy utilizas. No tienes que comprar otra web.
+        </p>
 
-        {planId === "growth" && (
+        {(planId === "ads" || planId === "growth") && (
           <div className="mt-7">
             <label htmlFor="pricing-ads" className="block text-sm font-bold">Presupuesto mensual de publicidad (pagado a Meta)</label>
             <select
               id="pricing-ads"
-              value={growthAdBudget}
-              onChange={(event) => setGrowthAdBudget(Number(event.target.value))}
+              value={adBudget}
+              onChange={(event) => setAdBudget(Number(event.target.value))}
               className="mt-3 min-h-12 w-full rounded-2xl border border-suma-cream/30 bg-suma-navy px-4 text-base text-suma-cream focus-visible:outline-suma-orange"
             >
-              {pricingSettings.growthAdBudgets.map((budget) => (
+              {pricingSettings.adBudgets.map((budget) => (
                 <option key={budget} value={budget}>{formatMXN(budget)} MXN al mes</option>
               ))}
             </select>
@@ -107,7 +98,7 @@ export function PricingEstimator() {
             <div className="flex items-start justify-between gap-3 py-3 text-sm">
               <dt>Servicio mensual SUMA</dt><dd className="shrink-0 font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd>
             </div>
-            {quote.plan.id === "growth" && (
+            {(quote.plan.id === "ads" || quote.plan.id === "growth") && (
               <div className="flex items-start justify-between gap-3 py-3 text-sm">
                 <dt>Publicidad mensual externa</dt><dd className="shrink-0 font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd>
               </div>
@@ -115,7 +106,7 @@ export function PricingEstimator() {
           </dl>
           <p className="mt-7 text-xs font-bold uppercase tracking-widest text-suma-navy/60">Total a SUMA en {quote.months} {quote.months === 1 ? "mes" : "meses"}</p>
           <p className="mt-2 font-display text-3xl font-extrabold tabular-nums">{formatMXN(quote.totalSuma)}</p>
-          {quote.plan.id === "growth" && (
+          {(quote.plan.id === "ads" || quote.plan.id === "growth") && (
             <p className="mt-2 text-sm text-suma-navy/70">
               + {formatMXN(quote.totalExternalAds)} de publicidad estimada pagada a Meta en ese periodo.
             </p>

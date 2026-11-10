@@ -131,18 +131,19 @@ export const selectorRules: SelectorRule[] = [
   {
     challenge: "vender",
     business: ["yoga-pilates", "fitness"],
-    summary: "Campañas de clase de prueba con una página de reserva clara pueden atraer nuevos alumnos cerca de tu estudio.",
+    summary: "Campañas de clase de prueba dirigidas a personas cerca de tu estudio, enlazadas a tu WhatsApp o sistema de reservas actual. No necesitas una web nueva.",
     recommendations: [
-      { service: "publicidad-digital", why: "Anuncios de clase muestra para personas en tu zona.", problem: "Clases y horarios que no se llenan." },
-      { service: "paginas-web", why: "Una landing con reserva directa convierte el interés en visitas.", problem: "Interesados que no saben cómo reservar." },
+      { service: "publicidad-digital", why: "Anuncios locales que aprovechan la clase muestra y los horarios disponibles.", problem: "Personas nuevas que aún no conocen tus clases." },
+      { service: "chatbots", why: "Responde dudas frecuentes y transfiere la solicitud al equipo para facilitar el siguiente paso, si el canal permite la integración.", problem: "Consultas por anuncios que se enfrían sin respuesta." },
+      { service: "crm", why: "Organiza los interesados que llegan de campañas y asigna el seguimiento.", problem: "No saber qué pasó después del primer mensaje." },
     ],
   },
   {
     challenge: "vender",
-    summary: "Una estrategia de publicidad digital con una página enfocada puede conectar tu oferta con las personas adecuadas.",
+    summary: "Podemos atraer interesados con campañas y darles seguimiento usando tu web, WhatsApp o reservador actual; creamos una página nueva solo si realmente falta.",
     recommendations: [
-      { service: "publicidad-digital", why: "Campañas con objetivo claro y medición de consultas.", problem: "No saber qué genera nuevos clientes." },
-      { service: "paginas-web", why: "Una página que explica tu oferta y facilita el contacto.", problem: "Visitas que no se convierten." },
+      { service: "publicidad-digital", why: "Campañas con objetivo claro hacia el canal que hoy recibe tus consultas.", problem: "Poca captación o dificultad para medirla." },
+      { service: "crm", why: "Organiza consultas recibidas y sus siguientes pasos.", problem: "Interesados que no se convierten por falta de seguimiento." },
     ],
   },
   // ── Web ────────────────────────────────────────────────────
