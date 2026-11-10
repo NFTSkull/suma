@@ -265,6 +265,29 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
         </div>
       </section>
 
+      {slug === "crm" && (
+        <section aria-labelledby="recurso-crm-title" className="bg-suma-cream-soft py-14 md:py-20">
+          <div className="container-suma grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <p className="text-eyebrow text-suma-purple">Recurso para estudios de pilates</p>
+              <h2 id="recurso-crm-title" className="mt-3 font-display text-3xl font-bold">
+                ¿CRM personalizado o plataforma de reservas?
+              </h2>
+              <p className="mt-4 max-w-3xl text-lg text-suma-navy/80">
+                Compara las opciones con un ejemplo de clases reformer, lista de espera, paquetes y pagos.
+                Es una guía para decidir antes de invertir.
+              </p>
+            </div>
+            <Link
+              href="/guias/software-para-estudios-de-pilates"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-suma-navy px-7 font-bold text-suma-cream transition-colors hover:bg-suma-purple"
+            >
+              Guía de software para pilates →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* FAQ */}
       <section aria-labelledby="faq-title" className="section-y bg-suma-cream-soft">
         <div className="container-suma grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
