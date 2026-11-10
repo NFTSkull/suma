@@ -14,12 +14,20 @@ import { ShowroomImpacto } from "./ShowroomImpacto";
 
 const field = "mt-2 min-h-12 w-full rounded-xl border border-suma-line bg-white px-4 text-base text-suma-navy focus-visible:outline-2 focus-visible:outline-suma-orange";
 const categories = ["Captación", "Atención", "Operación", "Presencia", "Desarrollo"] as const;
+const guidedGoals = [
+  { id: "captar", name: "Atraer más clientes", experience: "ads", recommendations: ["ads", "web", "seo"] },
+  { id: "responder", name: "Responder mejor", experience: "crm", recommendations: ["crm", "chatbot", "automatizacion"] },
+  { id: "operar", name: "Ordenar mi operación", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
+] as const;
+type GuidedGoalId = (typeof guidedGoals)[number]["id"];
 
 export function ShowroomBuilder() {
   const [industry, setIndustry] = useState<ShowroomIndustryId>("pilates");
   const [businessName, setBusinessName] = useState("");
   const [paletteId, setPaletteId] = useState<ShowroomPaletteId>("suma");
   const [experience, setExperience] = useState<ShowroomExperienceId>("crm");
+  const [guidedGoal, setGuidedGoal] = useState<GuidedGoalId>("responder");
+  const [showAllExperiences, setShowAllExperiences] = useState(false);
   const [mode, setMode] = useState<"services" | "package">("services");
   const [planId, setPlanId] = useState<PricingPlanId>("flow");
   const [serviceIds, setServiceIds] = useState<IndividualServiceId[]>(["crm-gestionado"]);
@@ -38,6 +46,10 @@ export function ShowroomBuilder() {
   };
   const quote = showroomEstimate(selection);
   const active = showroomExperiences.find((item) => item.id === experience) ?? showroomExperiences[0];
+  const activeGoal = guidedGoals.find((goal) => goal.id === guidedGoal) ?? guidedGoals[1];
+  const visibleExperiences = showroomExperiences.filter((item) =>
+    showAllExperiences || (activeGoal.recommendations as readonly string[]).includes(item.id)
+  );
   const included = mode === "package"
     ? planId === "growth" ? ["meta-ads", "crm-gestionado"]
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
@@ -94,8 +106,23 @@ export function ShowroomBuilder() {
           <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
             Elige una experiencia. Cada pantalla es un concepto interactivo que puedes probar; no un software real ni una integración activa.
           </p>
-          <div role="group" aria-label="Experiencias para probar" className="mt-6 grid grid-cols-2 gap-2">
-            {showroomExperiences.map((item) => (
+          <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">¿Qué quieres mejorar primero?</p>
+          <div role="group" aria-label="Objetivo principal del negocio" className="mt-3 flex flex-wrap gap-2">
+            {guidedGoals.map((goal) => (
+              <button key={goal.id} type="button" aria-pressed={guidedGoal === goal.id}
+                onClick={() => {
+                  setGuidedGoal(goal.id);
+                  setExperience(goal.experience as ShowroomExperienceId);
+                }}
+                className={"min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-suma-orange " +
+                  (guidedGoal === goal.id ? "border-suma-orange bg-suma-orange text-suma-navy" : "border-white/30 bg-white/5 text-white hover:border-white")}>
+                {goal.name}
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 text-xs leading-relaxed text-suma-cream/60">Te sugerimos tres demos. Puedes explorar todas y solo agregas a tu propuesta lo que elijas.</p>
+          <div role="group" aria-label="Experiencias para probar" className="mt-5 grid grid-cols-2 gap-2">
+            {visibleExperiences.map((item) => (
               <button key={item.id} type="button" aria-pressed={experience === item.id}
                 onClick={() => setExperience(item.id)}
                 className={"min-h-[4.5rem] rounded-2xl border px-3 py-3 text-left transition-colors focus-visible:outline-suma-orange " +
@@ -107,6 +134,11 @@ export function ShowroomBuilder() {
               </button>
             ))}
           </div>
+          <button type="button" onClick={() => setShowAllExperiences((current) => !current)}
+            aria-expanded={showAllExperiences}
+            className="mt-4 min-h-11 w-full rounded-xl border border-white/25 px-4 text-sm font-bold text-suma-cream transition-colors hover:border-suma-orange">
+            {showAllExperiences ? "Ver solo las 3 sugeridas ↑" : "Explorar las 9 experiencias ↓"}
+          </button>
           <div className="mt-7 border-t border-white/15 pt-6">
             <p className="text-xs font-bold uppercase tracking-widest text-suma-orange">Qué estás viendo</p>
             <p className="mt-2 font-display text-xl font-bold">{active.title}</p>
