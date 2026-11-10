@@ -186,6 +186,29 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
         </div>
       </section>
 
+      {slug === "yoga-pilates" && (
+        <section aria-labelledby="guia-industria-title" className="bg-suma-cream py-14 md:py-20">
+          <div className="container-suma grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <p className="text-eyebrow text-suma-orange-ink">Guía de decisión</p>
+              <h2 id="guia-industria-title" className="mt-3 font-display text-3xl font-bold">
+                Software para estudios de pilates: reservas, CRM y membresías.
+              </h2>
+              <p className="mt-4 max-w-3xl text-lg text-suma-navy/80">
+                Una comparación práctica para elegir entre plataformas existentes,
+                automatizaciones y un sistema a medida.
+              </p>
+            </div>
+            <Link
+              href="/guias/software-para-estudios-de-pilates"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-suma-navy px-7 font-bold text-suma-cream transition-colors hover:bg-suma-purple"
+            >
+              Leer guía para estudios de pilates →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* Otras industrias */}
       <section aria-labelledby="otras-title" className="bg-suma-cream py-16">
         <div className="container-suma">
