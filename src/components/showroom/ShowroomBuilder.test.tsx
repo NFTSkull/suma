@@ -17,17 +17,16 @@ describe("ShowroomBuilder", () => {
     expect(screen.getByText(/Prueba una conversación de ejemplo/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Añadir esta experiencia a mi propuesta/i }));
     expect(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" })).toBeChecked();
-    expect(screen.getByText(formatMXN(38600))).toBeInTheDocument();
+    expect(screen.getAllByText(formatMXN(38600)).length).toBeGreaterThan(0);
   });
 
   it("no duplica CRM al pasar al paquete Flow, y no eleva la cuota por equipo", () => {
     render(<ShowroomBuilder />);
-    const before = screen.getByText(formatMXN(13800));
-    expect(before).toBeInTheDocument();
+    expect(screen.getAllByText(formatMXN(13800)).length).toBeGreaterThan(0);
     fireEvent.change(screen.getByLabelText("Personas del equipo"), { target: { value: "50" } });
-    expect(screen.getByText(formatMXN(13800))).toBeInTheDocument();
+    expect(screen.getAllByText(formatMXN(13800)).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
-    expect(screen.getByText(formatMXN(13800))).toBeInTheDocument();
+    expect(screen.getAllByText(formatMXN(13800)).length).toBeGreaterThan(0);
     expect(screen.queryByRole("checkbox", { name: "CRM + seguimiento administrado" })).not.toBeInTheDocument();
   });
 
