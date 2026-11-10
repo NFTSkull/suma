@@ -12,14 +12,16 @@ import { estimatePricing, formatMXN, pricingWhatsAppHref } from "@/lib/pricing";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
-  title: "Precios de publicidad, CRM y chatbots para wellness",
+  title: "Precios CRM sin cobro por usuario, automatización y publicidad",
   description:
-    "Conoce SUMA Ads, Flow y Growth para captar clientes, responder consultas y conectar anuncios con reservas existentes. No necesitas una página nueva para empezar.",
+    "Configura SUMA Ads, Flow o Growth y cotiza servicios individuales: CRM administrado, CRM a medida sin tarifa por asiento, chatbots, automatizaciones, SEO y web. MXN, antes de IVA.",
   path: "/precios",
   keywords: [
     "precios CRM para estudios de pilates",
     "paquetes automatización spa",
     "precio campañas Meta Ads estudio de pilates",
+    "CRM para negocios con equipos sin cobro por usuario",
+    "cotizador personalizado marketing y CRM",
     "servicios digitales wellness Monterrey",
   ],
 };
@@ -32,16 +34,16 @@ export default function PreciosPage() {
   return (
     <>
       <PageHero
-        eyebrow="Captación · Atención · Crecimiento · MXN"
+        eyebrow="CRM · Publicidad · Automatización · MXN"
         accent="orange"
         dark
         crumbs={crumbs}
-        title={<>Más personas te descubren. <span className="text-suma-orange">Más oportunidades avanzan.</span></>}
-        lead="Campañas para atraer personas, atención para no perder consultas y seguimiento para convertir interés en visitas. Aprovechamos tu web, WhatsApp y reservador actuales: no necesitas cambiarlos para comenzar."
+        title={<>Tu negocio crece. <span className="text-suma-orange">Tu inversión sigue clara.</span></>}
+        lead="Paga por lo que tu negocio necesita: CRM y seguimiento, publicidad, chatbots o desarrollo personalizado. Sin web obligatoria ni recargos propios de SUMA por cada integrante de tu equipo."
       >
         <div className="flex flex-wrap items-center gap-4">
           <ButtonLink href="#planes" variant="light" size="lg" arrow>Explorar paquetes</ButtonLink>
-          <ButtonLink href="#simulador" variant="link-light">Simular mi inversión</ButtonLink>
+          <ButtonLink href="#simulador" variant="link-light">Personalizar mi propuesta</ButtonLink>
         </div>
       </PageHero>
 
@@ -49,9 +51,9 @@ export default function PreciosPage() {
         <div className="container-suma">
           <SectionHeading
             id="planes-title"
-            eyebrow="Tres soluciones. Sin web obligatoria."
-            title={<>Elige dónde necesitas <span className="text-suma-purple">mejorar primero.</span></>}
-            lead="¿Quieres más clientes, responder mejor o ambas cosas? Los planes se adaptan a tu operación actual. Para una sede y con alcance definido."
+            eyebrow="Tres planes de servicio · Para una sede"
+            title={<>Precios claros. <span className="text-suma-purple">Sin servicios innecesarios.</span></>}
+            lead="Implementación por única vez + mensualidad de operación. Contrata publicidad, CRM administrado o una solución que conecte ambos. Si ya tienes un reservador, lo aprovechamos."
           />
           <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
             {pricingPlans.map((plan) => {
@@ -108,6 +110,9 @@ export default function PreciosPage() {
                   >
                     {plan.action}
                   </ButtonLink>
+                  <a href="#simulador" className={"mt-4 min-h-10 text-center text-sm font-bold underline decoration-2 underline-offset-4 " + (dark ? "text-suma-cream" : "text-suma-purple")}>
+                    Personalizar con otros servicios
+                  </a>
                 </article>
               );
             })}
@@ -118,14 +123,47 @@ export default function PreciosPage() {
         </div>
       </section>
 
+      <section aria-labelledby="usuarios-title" className="bg-suma-cream-soft py-16 md:py-20">
+        <div className="container-suma">
+          <div className="grid items-start gap-8 rounded-[2rem] border border-suma-line bg-suma-cream p-7 shadow-soft md:grid-cols-[1.05fr_0.95fr] md:p-11">
+            <div>
+              <p className="text-eyebrow text-suma-purple">Sin tarifa SUMA por asiento</p>
+              <h2 id="usuarios-title" className="mt-4 font-display text-3xl font-extrabold leading-tight text-suma-navy md:text-4xl">
+                Tu equipo puede crecer sin que SUMA te cobre por cada integrante.
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-suma-navy/75">
+                En Flow y Growth cobramos un servicio por negocio y alcance, no una tarifa adicional de SUMA por cada persona del equipo. Si necesitas un CRM desarrollado especialmente para tu operación, cotizamos el software sin costo por asiento interno.
+              </p>
+              <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">
+                Importante: las plataformas CRM de terceros pueden cobrar licencias por usuario; las pagas aparte. «Sin tarifa por asiento» no significa servidores, mensajes, contactos o automatizaciones ilimitados. Se acuerdan capacidad, permisos, sedes y volumen.
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] bg-suma-navy p-7 text-suma-cream">
+              <p className="text-eyebrow text-suma-orange">CRM propio a medida</p>
+              <p className="mt-4 text-sm text-suma-cream/80">Desarrollo desde</p>
+              <p className="mt-1 font-display text-4xl font-extrabold">$49,900</p>
+              <p className="mt-2 text-sm text-suma-cream/80">Pago de implementación · soporte opcional desde $2,990/mes.</p>
+              <ul className="mt-5 space-y-2 text-sm text-suma-cream/85">
+                <li>✓ Módulos según tu operación real</li>
+                <li>✓ Sin cobro de SUMA por usuario interno</li>
+                <li>✓ Permisos, sedes e integraciones por alcance</li>
+              </ul>
+              <a href="#simulador" className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-suma-orange px-5 text-center text-sm font-bold text-suma-navy hover:bg-suma-cream">
+                Personalizar un CRM →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="simulador" aria-labelledby="simulador-title" className="scroll-mt-24 bg-suma-cream-deep/50 py-20 md:py-28">
         <div className="container-suma">
           <div className="mb-10">
             <SectionHeading
               id="simulador-title"
-              eyebrow="Cotizador orientativo"
-              title="Ajusta tu escenario, no tus expectativas."
-              lead="Elige un paquete, un periodo y los extras previstos. Conoce cuánto pagarías a SUMA y qué inversión externa debes contemplar antes de conversar."
+              eyebrow="Personaliza y cotiza"
+              title="Un paquete o solo lo que te hace falta."
+              lead="Elige servicios, cantidad de integrantes, sedes, herramientas actuales y prioridades. Verás implementación, mensualidad y costos externos estimados; envía tu selección por WhatsApp."
             />
           </div>
           <PricingEstimator />
@@ -137,16 +175,24 @@ export default function PreciosPage() {
           <SectionHeading
             id="independientes-title"
             eyebrow="Elige solo lo que necesitas"
-            title="¿Publicidad, asistente o web? Tú eliges."
-            lead="Si tus reservas ya funcionan, puedes contratar campañas o atención sin comprar otra página. Si necesitas una web o un desarrollo propio, también lo hacemos por separado."
+            title="Cada servicio tiene un precio de referencia."
+            lead="Campañas, chatbot guiado o con IA, CRM, automatizaciones, SEO, web y desarrollo. Combínalos en el cotizador; las tarifas «desde» requieren alcance acordado."
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {individualServices.map((service) => (
-              <div key={service.name} className="flex min-h-48 flex-col justify-between rounded-[1.6rem] border border-suma-line bg-suma-cream-soft p-6">
+              <div key={service.id} className="flex min-h-48 flex-col justify-between rounded-[1.6rem] border border-suma-line bg-suma-cream-soft p-6">
                 <h3 className="font-display text-xl font-bold">{service.name}</h3>
                 <div className="mt-6">
-                  <p className="font-display text-xl font-extrabold text-suma-purple">{service.price}</p>
-                  <p className="mt-1 text-xs text-suma-navy/65">{service.detail}</p>
+                  <p className="font-display text-xl font-extrabold text-suma-purple">
+                    {service.from ? "Desde " : ""}{formatMXN(service.setup)}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-suma-navy">
+                    {service.monthly ? "+ " + formatMXN(service.monthly) + "/mes" : service.setup ? "Pago único" : "Servicio mensual"}
+                  </p>
+                  <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">{service.detail}</p>
+                  <a href="#simulador" className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-2 underline-offset-4">
+                    Incluir en mi propuesta →
+                  </a>
                 </div>
               </div>
             ))}
@@ -173,8 +219,8 @@ export default function PreciosPage() {
       </section>
 
       <ClosingCta
-        title="No necesitas cambiar todo para crecer."
-        text="Cuéntanos si tu prioridad es atraer clientes, contestar mensajes o dar seguimiento. Diseñamos una propuesta compatible con los canales y reservas que ya utilizas."
+        title="Tu negocio merece una solución que sí le quede."
+        text="Personaliza tus servicios y sedes; te enviamos una propuesta clara para aprovechar lo que ya utilizas sin pagar por herramientas que no necesitas."
         secondary={{ label: "Ver cómo trabajamos", href: "/como-trabajamos" }}
       />
       <JsonLd data={pageGraph({
