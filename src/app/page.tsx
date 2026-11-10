@@ -47,6 +47,10 @@ export default function HomePage() {
           <div className="mt-14">
             <SumaEnAccion />
           </div>
+          <div className="mt-9 flex flex-wrap items-center justify-between gap-5 rounded-[1.5rem] border border-suma-cream/20 bg-suma-cream/5 p-5 md:p-7">
+            <div><p className="font-display text-xl font-bold">Ahora puedes configurar tu propia vista previa.</p><p className="mt-2 max-w-xl text-sm text-suma-cream/70">Elige CRM, chatbot, anuncios, reservas o una app; agrega funciones y recibe un estimado.</p></div>
+            <ButtonLink href="/showroom" variant="accent" size="lg" arrow>Entrar al showroom</ButtonLink>
+          </div>
         </div>
       </section>
 
