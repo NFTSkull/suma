@@ -92,7 +92,7 @@ export default function SoftwarePilatesGuidePage() {
         </ButtonLink>
       </PageHero>
 
-      <main id="guia-pilates" className="bg-suma-cream">
+      <div id="guia-pilates" className="bg-suma-cream">
         <section aria-labelledby="respuesta-title" className="container-suma py-16 md:py-24">
           <div className="max-w-4xl">
             <p className="text-eyebrow text-suma-orange-ink">La respuesta corta</p>
@@ -247,7 +247,7 @@ export default function SoftwarePilatesGuidePage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
 
       <ClosingCta
         title="La tecnología debería adaptarse a tus clases, no al revés."
