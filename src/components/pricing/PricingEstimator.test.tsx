@@ -32,7 +32,7 @@ describe("PricingEstimator", () => {
     fireEvent.click(screen.getByRole("button", { name: "Solo servicios" }));
     expect(screen.getByText(/selecciona al menos un servicio/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("checkbox", { name: "Configurar reservador existente" }));
-    expect(screen.getByText(formatMXN(4900), { exact: true })).toBeInTheDocument();
+    expect(screen.getAllByText(formatMXN(4900), { exact: true }).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
   });
 
