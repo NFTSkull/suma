@@ -44,6 +44,7 @@ export default function PreciosPage() {
         <div className="flex flex-wrap items-center gap-4">
           <ButtonLink href="#planes" variant="light" size="lg" arrow>Explorar paquetes</ButtonLink>
           <ButtonLink href="#simulador" variant="link-light">Personalizar mi propuesta</ButtonLink>
+          <ButtonLink href="/showroom" variant="link-light">Probar una demo interactiva</ButtonLink>
         </div>
       </PageHero>
 
