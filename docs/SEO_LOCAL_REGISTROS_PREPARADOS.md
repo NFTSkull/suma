@@ -14,7 +14,7 @@
 | Google Business Profile | **Preparar ficha de empresa de servicios locales** (sin dirección visible) | SUMA visita clientes. Requiere una base física real y verificación. Confirmar que los desplazamientos se hacen en los municipios seleccionados. No crear/reclamar todavía. |
 | Bing Places | **Preparar ficha de servicios en domicilio del cliente** | Bing exige una dirección válida para verificar y algunas empresas pueden ocultarla. No crear/reclamar todavía. |
 | Apple Business / Apple Maps | **Posponer la ubicación** | El flujo de ubicación pide dirección verificable, datos asociados y gestión de ubicación. No usar domicilio no visitable como si fuera tienda. |
-| LinkedIn Empresa | **Optimizar la página correcta** | Verificar administración y titularidad; Grok trabaja el perfil personal por separado. No modificar perfil ajeno homónimo. |
+| LinkedIn Empresa | **No editar `/company/sumastudio/`** | Grok reportó que el propietario no tiene administración de esa página y encontró identidad visual/sector incompatibles. Titularidad NO confirmada; tratarla como posible homónimo. Preparar una página nueva solo con aprobación explícita del propietario. |
 | Clutch / Sortlist | **Preparar descripción; registrar después** | Priorizar 2–3 trabajos autorizados y reseñas auténticas. No inventar clientes, métricas ni referencias. |
 | GoodFirms / DesignRush | **Baja prioridad** | Primero resultados en Google/Bing, casos y reputación real. |
 
@@ -78,3 +78,27 @@ Reutilizar los mismos datos auténticos, una vez exista consistencia en la web y
 4. Comprobar seguimiento de conversiones, sin enviar mensajes de prueba a clientes ni contar clics como leads.
 5. Verificar indexación real de las 21 URLs en Search Console; importar propiedad a Bing Webmaster Tools solo con sesión/autorización de la cuenta.
 6. **No crear, reclamar ni publicar fichas locales** hasta una instrucción explícita posterior.
+
+
+## 7. Hallazgo de LinkedIn recibido del propietario (9 nov 2026, 20:54 Monterrey)
+
+Grok Bot reporta que el perfil personal del fundador ya fue actualizado para incluir SUMA STUDIO, CRM, asistentes con IA y Precalix. **No es una comprobación independiente de este documento**; no se modifica ese perfil desde GitHub.
+
+- La página `https://www.linkedin.com/company/sumastudio/` no muestra al fundador como administrador y exhibe un giro de producción multimedia y una identidad visual diferente. **No enlazarla en el schema `sameAs`, web, campañas ni fichas de negocios hasta verificar la titularidad.**
+- No crear una nueva página sin autorización. Cuando se autorice, buscar primero duplicados y seleccionar una URL pública diferenciada si el nombre simple ya está ocupado.
+- En el perfil personal eliminar la aptitud equivocada `Automatización de Marketing Silverpop Engage` usando Grok o edición manual; no afirmar que se eliminó todavía.
+- Recomendar el enlace de perfil personal hacia SUMA solo si el propietario quiere que sea su destino comercial principal; Precalix puede figurar como experiencia separada.
+
+### Borrador para eventual página oficial de empresa (NO publicada)
+
+**Nombre visual:** SUMA STUDIO. **Sector:** elegir en LinkedIn la categoría que corresponda mejor al desarrollo de software y servicios tecnológicos reales de la empresa. **Ubicación:** Monterrey, Nuevo León, México.
+
+**Eslogan:** Tecnología que hace fluir negocios de bienestar.
+
+**Acerca de:** SUMA STUDIO es un estudio creativo y tecnológico especializado en negocios wellness. Ayudamos a estudios de yoga y pilates, spas, centros fitness boutique y marcas de bienestar a integrar tecnología en sus operaciones y mejorar la experiencia de sus clientes. Diseñamos CRM personalizados, asistentes para WhatsApp, automatizaciones, aplicaciones y páginas web, además de conectar estrategias de publicidad digital con los procesos de seguimiento. Trabajamos en línea con empresas de México y realizamos visitas presenciales a clientes en Monterrey y su área metropolitana, previa cita. Evaluamos primero los procesos y herramientas existentes para proponer soluciones que realmente tengan sentido para cada negocio.
+
+**Especialidades:** CRM y reservas · Chatbots WhatsApp e IA · Desarrollo web y apps · Automatización de procesos · Marketing digital.
+
+**Enlace:** https://www.sumastudio.mx
+
+**Pendiente:** administración, logo, fecha de fundación, tamaño del equipo y cualquier información legal o comercial exigida por LinkedIn. No asumir que el perfil homónimo puede reclamarse.
