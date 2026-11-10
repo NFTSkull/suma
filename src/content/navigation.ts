@@ -39,7 +39,7 @@ export const mainNav: MainNavItem[] = [
     footer: { label: "Ver todas las industrias", href: "/industrias" },
   },
   { kind: "link", label: "Precios", href: "/precios" },
-  { kind: "link", label: "El estudio", href: "/nosotros" },
+  { kind: "link", label: "Showroom", href: "/showroom" },
   { kind: "link", label: "Contacto", href: "/contacto" },
 ];
 
@@ -51,6 +51,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
     links: [
       { label: "Inicio", href: "/" },
       { label: "Soluciones", href: "/soluciones" },
+      { label: "Showroom interactivo", href: "/showroom" },
       { label: "Cómo trabajamos", href: "/como-trabajamos" },
       { label: "Precios y paquetes", href: "/precios" },
       { label: "Guías prácticas", href: "/guias" },
@@ -68,6 +69,7 @@ export const legalLinks: NavLink[] = [{ label: "Aviso de privacidad", href: "/av
 export const allRoutes: string[] = [
   "/",
   "/soluciones",
+  "/showroom",
   "/servicios",
   ...services.map((s) => s.href),
   "/industrias",
