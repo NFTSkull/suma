@@ -1,13 +1,15 @@
 /**
- * CATÁLOGO ÚNICO DE PRECIOS DE SUMA STUDIO.
- * Montos base MXN antes de IVA; publicidad, WhatsApp API, licencias y terceros aparte.
- * Enfoque: captar clientes, atender consultas y convertirlas usando herramientas existentes.
+ * Precios SUMA STUDIO · Referencias MXN antes de IVA.
+ * Catálogo único para tarjetas, cotizador y mensajes WhatsApp.
+ * Las licencias, pauta, mensajería, IA y consumos externos NO están incluidos.
+ * Precio fijo de servicio para UNA empresa y UNA sede; no se cobra por asiento de SUMA.
+ * El software de terceros puede cobrar licencias por usuario, canal o mensaje.
  */
 export const pricingSettings = {
   currency: "MXN",
-  websiteMaintenanceMonthly: 990,
   adBudgets: [3000, 6000, 9000, 12000],
   defaultAdBudget: 6000,
+  websiteMaintenanceMonthly: 990,
 } as const;
 
 export const pricingPlans = [
@@ -15,64 +17,63 @@ export const pricingPlans = [
     id: "ads",
     number: "01",
     name: "SUMA Ads",
-    label: "Atraer nuevos clientes",
-    tagline: "Más personas descubren tus clases y servicios.",
-    audience: "Para negocios con web, WhatsApp o reservador que ya funcionan y quieren atraer nuevos clientes.",
+    label: "Más clientes",
+    tagline: "Publicidad que lleva a una conversación o reserva.",
+    audience: "Ya tienes WhatsApp, un reservador o una web; quieres que más personas conozcan tu negocio.",
     setup: 4900,
     monthly: 5900,
     featured: false,
     includes: [
-      "Diagnóstico de oferta, zona y canal de conversión",
-      "Gestión de una campaña activa en Meta Ads",
+      "Una campaña activa en Meta Ads",
       "Hasta dos creativos estáticos al mes",
-      "Anuncios hacia tu WhatsApp o sistema de reservas existente",
-      "Medición de consultas donde el canal lo permita",
-      "Optimización semanal y reporte mensual",
+      "Segmentación local y ruta a tu WhatsApp o reservador",
+      "Medición de consultas según posibilidades del canal",
+      "Optimización semanal e informe mensual",
     ],
-    boundaries: "No incluye inversión en anuncios, atención de mensajes, CRM, chatbot ni creación de página web. Una sede.",
-    action: "Quiero atraer clientes",
+    boundaries: "Una sede. Sin pauta incluida, CRM, atención de mensajes ni web nueva.",
+    action: "Elegir publicidad",
   },
   {
     id: "flow",
     number: "02",
     name: "SUMA Flow",
-    label: "Atender y dar seguimiento",
-    tagline: "Que cada consulta tenga un siguiente paso.",
-    audience: "Para negocios que ya reciben consultas y quieren responder, organizar y acompañar mejor a sus interesados.",
-    setup: 14900,
-    monthly: 4900,
-    featured: false,
+    label: "CRM + seguimiento",
+    tagline: "Organiza consultas, responsables y próximos pasos.",
+    audience: "Para negocios que ya reciben interesados y necesitan orden y automatización sin crear un software desde cero.",
+    setup: 9900,
+    monthly: 3900,
+    featured: true,
     includes: [
-      "Diagnóstico de procesos de una sede",
+      "Diagnóstico de un proceso comercial y una sede",
       "Configuración de un CRM o herramienta existente",
-      "Embudo de interesados y responsables de seguimiento",
-      "Hasta dos automatizaciones sencillas: avisos, recordatorios o seguimiento",
-      "Estructura de atención por WhatsApp con traspaso al equipo",
-      "Capacitación inicial y reporte mensual",
+      "Un embudo comercial, asignación y seguimiento de interesados",
+      "Hasta dos automatizaciones sencillas",
+      "Guía de respuesta por WhatsApp y transferencia al equipo",
+      "Capacitación inicial e informe mensual",
     ],
-    boundaries: "No incluye campañas, un CRM a medida, chatbot avanzado con IA ni reservas confirmadas sin integración autorizada.",
-    action: "Quiero mejorar atención",
+    boundaries: "SUMA no cobra extra por integrantes del equipo. Las licencias de software externo sí pueden cobrar por usuario. Sin bot IA avanzado, CRM propio ni integración no comprobada.",
+    action: "Elegir CRM + seguimiento",
   },
   {
     id: "growth",
     number: "03",
     name: "SUMA Growth",
-    label: "Captación + conversión",
-    tagline: "Atrae clientes y acompáñalos hasta su siguiente paso.",
-    audience: "Para estudios y spas que quieren campañas y seguimiento conectados, sin sustituir las plataformas que ya utilizan.",
-    setup: 24900,
-    monthly: 9900,
-    featured: true,
+    label: "Captar + convertir",
+    tagline: "Publicidad y seguimiento trabajando juntos.",
+    audience: "Para estudios y spas que buscan nuevos clientes y un proceso claro hasta su primera visita.",
+    setup: 19900,
+    monthly: 8900,
+    featured: false,
     includes: [
       "Alcance base de SUMA Flow para una sede",
-      "Gestión de hasta dos campañas activas en Meta Ads",
+      "Hasta dos campañas activas de Meta Ads",
       "Hasta cuatro creativos estáticos al mes",
-      "Landing de conversión o mejora de la ruta existente hacia reservas",
-      "Medición de consultas y seguimiento de oportunidades",
-      "Optimización semanal y reporte mensual",
+      "Optimización de la ruta a tu web o reservador existente",
+      "Medición de consultas y seguimiento por etapa",
+      "Optimización semanal e informe mensual",
     ],
-    boundaries: "No incluye inversión publicitaria, web corporativa completa, asistente avanzado con IA ni integraciones no verificadas.",
-    action: "Quiero crecer con SUMA",
+    boundaries: "No incluye pauta, landing nueva, chatbot IA, licencias externas ni desarrollos a medida. Una sede.",
+    action: "Elegir crecimiento",
   },
 ] as const;
 
@@ -80,42 +81,103 @@ export type PricingPlanId = (typeof pricingPlans)[number]["id"];
 export type PricingPlan = (typeof pricingPlans)[number];
 
 export const individualServices = [
-  { name: "Asistente de WhatsApp con IA", price: "Desde $19,900 + $4,900/mes", detail: "Atención frecuente y traspaso humano · sujeto a viabilidad de API y costos externos" },
-  { name: "Gestión de Meta Ads (SUMA Ads)", price: "$4,900 + $5,900/mes", detail: "Implementación + gestión · anuncios pagados aparte; no requiere web nueva" },
-  { name: "Configurar software de reservas existente", price: "$4,900", detail: "Pago único · una plataforma y una sede, sujeto a permisos y viabilidad" },
-  { name: "Landing page profesional", price: "$8,900", detail: "Pago único · presencia digital; mantenimiento opcional desde $990/mes" },
-  { name: "Sitio web corporativo", price: "Desde $18,900", detail: "4 a 6 páginas según contenidos y funciones" },
-  { name: "CRM desarrollado a medida", price: "Desde $49,900", detail: "Cuando configurar la herramienta existente no resuelve el proceso" },
-  { name: "Aplicación móvil a medida", price: "Desde $90,000", detail: "Requiere evaluación técnica y alcance específico" },
+  {
+    id: "meta-ads", name: "Gestión de Meta Ads", category: "Captación",
+    setup: 4900, monthly: 5900, from: false,
+    detail: "Una campaña, dos creativos estáticos/mes, medición y optimización. Pauta aparte.",
+  },
+  {
+    id: "google-ads", name: "Gestión de Google Ads", category: "Captación",
+    setup: 4900, monthly: 5900, from: true,
+    detail: "Una campaña de búsqueda, configuración y optimización. Inversión y terceros aparte; alcance por validar.",
+  },
+  {
+    id: "crm-gestionado", name: "CRM + seguimiento administrado", category: "Atención",
+    setup: 9900, monthly: 3900, from: false,
+    detail: "Configurar un CRM existente, un embudo y hasta dos automatizaciones. Licencias externas aparte.",
+  },
+  {
+    id: "chatbot-guiado", name: "Chatbot guiado (sin IA)", category: "Atención",
+    setup: 6900, monthly: 1490, from: true,
+    detail: "Preguntas frecuentes y transferencia al equipo, sujeto a viabilidad del canal y costos externos.",
+  },
+  {
+    id: "chatbot-ia", name: "Asistente de WhatsApp con IA", category: "Atención",
+    setup: 19900, monthly: 4900, from: true,
+    detail: "Atención con IA y escalamiento humano, sujeto a API oficial, integración y consumo externo.",
+  },
+  {
+    id: "reservas", name: "Configurar reservador existente", category: "Operación",
+    setup: 4900, monthly: 0, from: false,
+    detail: "Configuración inicial de una plataforma y una sede, sin desarrollo propio.",
+  },
+  {
+    id: "automatizacion", name: "Automatización puntual", category: "Operación",
+    setup: 6900, monthly: 0, from: true,
+    detail: "Un flujo definido de avisos, seguimiento o traspaso de datos. Herramientas aparte.",
+  },
+  {
+    id: "seo-local", name: "SEO local y presencia en búsquedas", category: "Presencia",
+    setup: 4900, monthly: 2490, from: true,
+    detail: "Revisión inicial, optimización local y seguimiento mensual. Sin garantía de posiciones.",
+  },
+  {
+    id: "landing", name: "Landing page profesional", category: "Presencia",
+    setup: 8900, monthly: 0, from: false,
+    detail: "Diseño móvil, formulario o WhatsApp y SEO técnico inicial. Mantenimiento opcional.",
+  },
+  {
+    id: "web", name: "Sitio web corporativo", category: "Presencia",
+    setup: 18900, monthly: 0, from: true,
+    detail: "De cuatro a seis páginas; diseño y funciones según alcance.",
+  },
+  {
+    id: "crm-medida", name: "CRM desarrollado a medida", category: "Desarrollo",
+    setup: 49900, monthly: 0, from: true,
+    detail: "Software propio según módulos. Sin tarifa SUMA por usuario interno; capacidad, seguridad, soporte e infraestructura se acuerdan. Mantenimiento opcional.",
+  },
+  {
+    id: "mantenimiento-crm", name: "Soporte mensual de CRM a medida", category: "Desarrollo",
+    setup: 0, monthly: 2990, from: true,
+    detail: "Seguimiento técnico y mantenimiento base sujeto a infraestructura, uso y alcance.",
+  },
+  {
+    id: "app", name: "Aplicación móvil a medida", category: "Desarrollo",
+    setup: 90000, monthly: 0, from: true,
+    detail: "Proyecto evaluado por funciones y plataformas; publicación en tiendas aparte.",
+  },
 ] as const;
+
+export type IndividualServiceId = (typeof individualServices)[number]["id"];
+export type IndividualService = (typeof individualServices)[number];
 
 export const pricingFaqs = [
   {
-    q: "¿Necesito una página web nueva para trabajar con SUMA?",
-    a: "No. SUMA Ads puede enviar interesados a tu WhatsApp o sistema de reservas existente. SUMA Flow trabaja con tu operación actual. En Growth revisamos si hace falta una landing o basta con mejorar la ruta de conversión que ya tienes.",
+    q: "¿SUMA cobra por cada usuario de mi equipo?",
+    a: "No añadimos un cargo propio por asiento en la configuración y el seguimiento de CRM de una misma empresa. Si tu CRM usa licencias externas, sus tarifas por usuario se presupuestan aparte. Un CRM desarrollado por SUMA puede cotizarse sin tarifa por usuario interno, con capacidad técnica y uso razonable acordados. Usuarios de equipo no significa mensajes, clientes ni operaciones ilimitadas.",
   },
   {
-    q: "¿Cuánto cuestan los tres planes?",
-    a: "SUMA Ads cuesta $4,900 de implementación y $5,900 al mes. SUMA Flow cuesta $14,900 de implementación y $4,900 al mes. SUMA Growth cuesta $24,900 de implementación y $9,900 al mes. Son precios base antes de IVA para una sede; implementación y mensualidad se cobran por separado.",
+    q: "¿Estoy contratando un software propio o un servicio administrado?",
+    a: "SUMA Flow configura y mejora una herramienta existente; no incluye una plataforma nueva de nuestra propiedad ni licencias. Si necesitas un CRM desarrollado para tu operación, lo cotizamos desde $49,900 de implementación y con soporte opcional desde $2,990/mes, según alcance.",
   },
   {
-    q: "¿Cuánto pago para comenzar?",
-    a: "El primer pago base es $10,800 en Ads, $19,800 en Flow y $34,800 en Growth, antes de IVA. La inversión publicitaria, licencias y servicios externos no están incluidos.",
+    q: "¿Cuánto cuesta cada paquete?",
+    a: "SUMA Ads: $4,900 de implementación y $5,900/mes. SUMA Flow: $9,900 de implementación y $3,900/mes. SUMA Growth: $19,900 de implementación y $8,900/mes. Precios base para una empresa y una sede, antes de IVA, con implementación y primera mensualidad cobradas por separado.",
   },
   {
-    q: "¿Pueden aprovechar Wellhub, TotalPass, Fitpass o mi reservador?",
-    a: "Sí podemos diseñar campañas y un recorrido hacia tus canales actuales sin sustituirlos. Leer datos de clientes, reservas o créditos desde esas plataformas depende de sus permisos, acuerdos e integraciones disponibles; no lo prometemos antes de validarlo.",
+    q: "¿Puedo contratar solo un servicio?",
+    a: "Sí. Puedes seleccionar anuncios, CRM administrado, chatbot, automatizaciones, SEO, web o desarrollo a medida. Los precios desde son mínimos orientativos; el alcance e integraciones se confirman antes de contratar.",
   },
   {
-    q: "¿SUMA Flow incluye un chatbot con inteligencia artificial?",
-    a: "Flow incluye estructura de atención y hasta dos automatizaciones sencillas, no un bot avanzado de IA. El asistente de WhatsApp con IA se ofrece por separado, sujeto a viabilidad de API y costos externos.",
+    q: "¿Mi negocio necesita página nueva o cambiar las reservas?",
+    a: "No. Podemos aprovechar WhatsApp y tu plataforma actual, incluso si usas Wellhub, TotalPass o Fitpass como canal comercial. Acceder a datos privados o automatizar reservas exige comprobar permisos, compatibilidad e integración; no ofrecemos esa función sin validarla.",
   },
   {
-    q: "¿El presupuesto de anuncios y las licencias están incluidos?",
-    a: "No. La pauta de Meta, licencias, hosting adicional, WhatsApp API y consumo de IA se pagan aparte, previa estimación. Growth incluye gestión de Meta Ads, no una gestión independiente de Google Ads.",
+    q: "¿Cuáles son los gastos que se pagan aparte?",
+    a: "Pauta de Meta o Google, licencias del software, acceso a WhatsApp API y tarifas de mensajes, consumo de IA, dominio, hosting adicional, pasarelas de pago y desarrollos fuera del alcance. Para más de una sede se prepara una propuesta ajustada.",
   },
   {
-    q: "¿Y si solo necesito publicidad, automatización o una web?",
-    a: "Puedes contratar servicios por separado. Primero revisamos tu objetivo: atraer clientes, atender consultas o recuperar oportunidades; después recomendamos el alcance mínimo que de verdad necesitas.",
+    q: "¿El chatbot de IA está incluido en Flow o Growth?",
+    a: "No. Los planes incluyen estructura de atención o automatizaciones sencillas según su ficha. Los chatbots se cotizan aparte: guiado desde $6,900 de implementación + $1,490/mes, o con IA desde $19,900 + $4,900/mes, más servicios externos.",
   },
 ] as const;
