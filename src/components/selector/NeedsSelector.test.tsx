@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SELECTOR_STORAGE_KEY } from "@/lib/recommend";
-import { site } from "@/content/site";
+import { whatsappUrlFor } from "@/lib/whatsapp";
 import { NeedsSelector } from "./NeedsSelector";
 
 vi.mock("next/link", () => import("@/test/next-link-mock"));
@@ -55,7 +55,9 @@ describe("NeedsSelector", () => {
     const cards = screen.getAllByRole("heading", { level: 4 });
     expect(cards.length).toBeGreaterThanOrEqual(1);
     expect(cards.length).toBeLessThanOrEqual(3);
-    expect(screen.getByRole("link", { name: /Conversemos por WhatsApp/ })).toHaveAttribute("href", site.contact.whatsappUrl);
+    const waLink = screen.getByRole("link", { name: /Conversemos por WhatsApp/ });
+    expect(waLink).toHaveAttribute("href", whatsappUrlFor({ industry: "Yoga, Pilates o Barre", challenge: "Recibo muchas consultas y no puedo responder todas" }));
+    expect(waLink.getAttribute("href")).toContain("/528114688882?text=");
     expect(screen.getByRole("link", { name: /Prefiero enviar el formulario/ })).toHaveAttribute("href", "/contacto");
   });
 
