@@ -7,6 +7,7 @@ type DL = Window & { dataLayer?: Record<string, unknown>[] };
 
 describe("PricingEstimator", () => {
   beforeEach(() => {
+    window.history.replaceState({}, "", "/precios");
     localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
     (window as DL).dataLayer = [];
   });
@@ -42,4 +43,13 @@ describe("PricingEstimator", () => {
     fireEvent.change(screen.getByLabelText("Número de sedes"), { target: { value: "3" } });
     expect(screen.getByText(/cotizaremos las demás/i)).toBeInTheDocument();
   });
+
+  it("entra al configurador con el servicio elegido desde la tarjeta", () => {
+    window.history.replaceState({}, "", "/precios?servicio=chatbot-ia#simulador");
+    render(<PricingEstimator />);
+    expect(screen.getByRole("button", { name: "Solo servicios" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" })).toBeChecked();
+    expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
+  });
+
 });
