@@ -41,9 +41,12 @@ export default function ServiciosPage() {
         title="Cinco maneras de hacer que tu negocio fluya."
         lead="Cada servicio resuelve algo concreto. Juntos, conectan la forma en que tus clientes te descubren, te preguntan, reservan y regresan."
       >
-        <ButtonLink href="/soluciones" variant="secondary">
-          No sé por dónde empezar
-        </ButtonLink>
+        <div className="flex flex-wrap items-center gap-4">
+          <ButtonLink href="/soluciones" variant="secondary">
+            No sé por dónde empezar
+          </ButtonLink>
+          <ButtonLink href="/precios" variant="link">Ver precios y paquetes</ButtonLink>
+        </div>
       </PageHero>
 
       <section aria-label="Lista de servicios" className="bg-suma-cream pb-24">
