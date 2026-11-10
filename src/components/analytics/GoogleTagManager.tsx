@@ -16,9 +16,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
  * descarga gtm.js. No hay `<noscript>`: sin JavaScript no se puede pedir
  * consentimiento, así que tampoco se mide.
  */
-export function GoogleTagManager({ id }: { id: string }) {
+const productionHosts = ["www.sumastudio.mx", "sumastudio.mx"] as const;
+
+/**
+ * GA4 no debe mezclar visitas de localhost ni previews de Vercel con usuarios reales.
+ * `allowedHosts` admite una lista explícita en tests y en futuras instalaciones.
+ */
+export function GoogleTagManager({
+  id,
+  allowedHosts = productionHosts,
+}: {
+  id: string;
+  allowedHosts?: readonly string[];
+}) {
   const consent = useAnalyticsConsent();
-  if (consent !== "granted") return null;
+  if (consent !== "granted" || typeof window === "undefined" || !allowedHosts.includes(window.location.hostname)) return null;
   return (
     <Script id="google-tag-manager" strategy="afterInteractive">
       {gtmSnippet(id)}

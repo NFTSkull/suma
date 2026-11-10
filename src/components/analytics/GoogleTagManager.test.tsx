@@ -39,14 +39,23 @@ describe("Google Tag Manager", () => {
     expect(loaded(container)).toBeNull();
   });
 
+  it("no carga GTM en localhost o previews aunque exista consentimiento", () => {
+    localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify({ v: 1, analytics: "granted" }));
+    const { container } = render(<GoogleTagManager id={site.gtmId} />);
+    expect(loaded(container)).toBeNull();
+
+    const preview = render(<GoogleTagManager id={site.gtmId} allowedHosts={["other-preview.vercel.app"]} />);
+    expect(loaded(preview.container)).toBeNull();
+  });
+
   it("se carga si ya había aceptado (páginas posteriores) y al aceptar en esta visita", () => {
     localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify({ v: 1, analytics: "granted" }));
-    const first = render(<GoogleTagManager id={site.gtmId} />);
+    const first = render(<GoogleTagManager id={site.gtmId} allowedHosts={[window.location.hostname]} />);
     expect(loaded(first.container)).not.toBeNull();
     first.unmount();
 
     localStorage.clear();
-    const { container } = render(<GoogleTagManager id={site.gtmId} />);
+    const { container } = render(<GoogleTagManager id={site.gtmId} allowedHosts={[window.location.hostname]} />);
     expect(loaded(container)).toBeNull();
     act(() => saveAnalyticsConsent("granted"));
     expect(loaded(container)).not.toBeNull();
