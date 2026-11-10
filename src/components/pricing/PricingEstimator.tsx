@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   individualServices,
   pricingPlans,
@@ -11,15 +11,36 @@ import {
 import { track } from "@/lib/analytics";
 import { estimatePricing, formatMXN, pricingWhatsAppHref, type PricingSelection } from "@/lib/pricing";
 
+const subscribeToLocation = (onChange: () => void) => {
+  window.addEventListener("popstate", onChange);
+  window.addEventListener("hashchange", onChange);
+  return () => {
+    window.removeEventListener("popstate", onChange);
+    window.removeEventListener("hashchange", onChange);
+  };
+};
+const currentSearch = () => window.location.search;
+const serverSearch = () => "";
+
 const periods = [1, 3, 6, 12];
 const categories = ["Captación", "Atención", "Operación", "Presencia", "Desarrollo"];
 const selectStyle = "mt-2 min-h-12 w-full rounded-xl border border-suma-cream/30 bg-suma-navy px-3 text-base text-suma-cream focus-visible:outline-suma-orange";
 const optionButton = "min-h-12 rounded-xl border px-4 py-3 text-sm font-bold transition-colors";
 
 export function PricingEstimator() {
-  const [mode, setMode] = useState<"package" | "services">("package");
-  const [planId, setPlanId] = useState<PricingPlanId>("flow");
-  const [serviceIds, setServiceIds] = useState<IndividualServiceId[]>([]);
+  const search = useSyncExternalStore(subscribeToLocation, currentSearch, serverSearch);
+  const params = new URLSearchParams(search);
+  const requestedPlan = params.get("plan");
+  const requestedService = params.get("servicio");
+  const routePlan = pricingPlans.find((p) => p.id === requestedPlan)?.id ?? "flow";
+  const routeService = individualServices.find((s) => s.id === requestedService)?.id;
+
+  const [manualMode, setManualMode] = useState<"package" | "services" | null>(null);
+  const [manualPlanId, setManualPlanId] = useState<PricingPlanId | null>(null);
+  const [manualServiceIds, setManualServiceIds] = useState<IndividualServiceId[] | null>(null);
+  const mode = manualMode ?? (routeService ? "services" : "package");
+  const planId = manualPlanId ?? routePlan;
+  const serviceIds = manualServiceIds ?? (routeService ? [routeService] : []);
   const [months, setMonths] = useState(3);
   const [adBudget, setAdBudget] = useState<number>(pricingSettings.defaultAdBudget);
   const [locations, setLocations] = useState(1);
@@ -28,19 +49,6 @@ export function PricingEstimator() {
   const [goal, setGoal] = useState("Atraer más clientes");
   const [platform, setPlatform] = useState("WhatsApp");
   const [notes, setNotes] = useState("");
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const selectedPlan = params.get("plan");
-    const selectedService = params.get("servicio");
-    if (selectedPlan && pricingPlans.some((p) => p.id === selectedPlan)) {
-      setPlanId(selectedPlan as PricingPlanId);
-    }
-    if (selectedService && individualServices.some((s) => s.id === selectedService)) {
-      setMode("services");
-      setServiceIds([selectedService as IndividualServiceId]);
-    }
-  }, []);
 
   const selection: PricingSelection = {
     mode, planId, serviceIds, months, adBudget, locations, teamUsers,
@@ -52,9 +60,11 @@ export function PricingEstimator() {
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
     : [];
   const toggleService = (id: IndividualServiceId, checked: boolean) =>
-    setServiceIds((previous) => checked
-      ? previous.includes(id) ? previous : [...previous, id]
-      : previous.filter((entry) => entry !== id));
+    setManualServiceIds((previous) => {
+      const current = previous ?? (routeService ? [routeService] : []);
+      return checked ? (current.includes(id) ? current : [...current, id])
+        : current.filter((entry) => entry !== id);
+    });
 
   return (
     <div className="grid gap-8 rounded-[2rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-9 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 lg:p-12">
@@ -68,11 +78,11 @@ export function PricingEstimator() {
         <fieldset className="mt-8">
           <legend className="mb-3 text-sm font-bold">1. ¿Cómo prefieres contratar?</legend>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" aria-pressed={mode === "package"} onClick={() => setMode("package")}
+            <button type="button" aria-pressed={mode === "package"} onClick={() => setManualMode("package")}
               className={optionButton + (mode === "package" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
               Elegir un paquete
             </button>
-            <button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}
+            <button type="button" aria-pressed={mode === "services"} onClick={() => setManualMode("services")}
               className={optionButton + (mode === "services" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
               Solo servicios
             </button>
@@ -86,7 +96,7 @@ export function PricingEstimator() {
               {pricingPlans.map((plan) => (
                 <button key={plan.id} type="button" aria-pressed={planId === plan.id}
                   onClick={() => {
-                    setPlanId(plan.id);
+                    setManualPlanId(plan.id);
                     track({ event: "pricing_plan_selected", plan: plan.id });
                   }}
                   className={optionButton + (planId === plan.id ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
