@@ -18,6 +18,13 @@ export const metadata: Metadata = buildMetadata(seo);
 
 const resources = [
   {
+    eyebrow: "Pilates · WhatsApp · IA",
+    title: "Chatbot para estudios de pilates: siete pruebas antes de automatizar",
+    text: "Cómo distinguir preguntas de reservas reales y comprobar cupos, membresías y atención humana antes de contratar un asistente.",
+    href: "/guias/chatbot-whatsapp-pilates",
+    questions: ["Cupo real y reformers", "Reservas por WhatsApp", "Atención humana"],
+  },
+  {
     eyebrow: "Pilates · Reformer · Barre",
     title: "Software para estudios de pilates: qué elegir antes de contratar",
     text: "Cuándo conviene una plataforma de reservas, cómo evaluar paquetes y reformers y en qué casos integrar herramientas o desarrollar un CRM propio.",

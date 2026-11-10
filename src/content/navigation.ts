@@ -76,6 +76,7 @@ export const allRoutes: string[] = [
   "/guias",
   "/guias/software-para-estudios-de-pilates",
   "/guias/automatizar-reservas-spa",
+  "/guias/chatbot-whatsapp-pilates",
   "/aviso-de-privacidad",
 ];
 
