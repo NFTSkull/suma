@@ -94,7 +94,7 @@ export function ShowroomImpacto({ selection, quote }: Props) {
             <p className="mt-3 text-sm leading-relaxed text-suma-cream/75 md:text-base">Simula ingresos, horas recuperables y punto de equilibrio. Los números cambian contigo, sin promesas de resultados.</p>
           </div>
           <span className="w-fit shrink-0 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold">
-            {userData ? "Tus datos · sin guardar" : "Ejemplo ilustrativo · editable"}
+            {userData ? "Datos editados · revisa supuestos" : "Ejemplo ilustrativo · editable"}
           </span>
         </div>
       </div>
@@ -167,6 +167,11 @@ export function ShowroomImpacto({ selection, quote }: Props) {
               <strong>Importante:</strong> esta simulación calcula una oportunidad de recuperar consultas, no una mejora automática por contratar publicidad, SEO o una web. Para trabajar ese escenario hace falta diseñar atención y seguimiento.
             </div>
           )}
+
+          <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">
+            Referencia de inversión: {quote.mode === "package" ? quote.plan.name : (quote.services.map((service) => service.name).join(", ") || "sin módulos seleccionados")}.
+            {" "}<a href="#showroom-cotizar" className="font-bold underline decoration-suma-orange underline-offset-4">Modificar módulos y periodo ↓</a>
+          </p>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-suma-line bg-white p-4">
