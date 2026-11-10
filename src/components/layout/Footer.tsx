@@ -62,6 +62,20 @@ export function Footer() {
               </ul>
             )}
 
+            {site.social.length > 0 && (
+              <nav aria-label="Redes sociales de SUMA STUDIO" className="mt-6">
+                <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+                  {site.social.map((social) => (
+                    <li key={social.href}>
+                      <a href={social.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center font-semibold underline decoration-suma-orange underline-offset-4">
+                        {social.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+
             <ButtonLink href={primaryCta.href} variant="accent" className="mt-8" arrow target="_blank" rel="noopener noreferrer">
               {primaryCta.label}
             </ButtonLink>
