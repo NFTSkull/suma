@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ButtonLink } from "@/components/ui/Button";
-import { site } from "@/content/site";
 import { businessOptions, challengeOptions, type BusinessId, type ChallengeId } from "@/content/selector-rules";
 import { serviceBySlug, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
 import { track } from "@/lib/analytics";
 import { recommend, SELECTOR_STORAGE_KEY, type SelectorContext } from "@/lib/recommend";
+import { whatsappUrlFor } from "@/lib/whatsapp";
 
 type Step = 1 | 2 | 3;
 
@@ -210,7 +210,10 @@ export function NeedsSelector() {
             </ul>
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer" onClick={saveContext}>
+              <ButtonLink href={whatsappUrlFor({
+                industry: businessOptions.find((b) => b.id === business)?.label,
+                challenge: challengeOptions.find((c) => c.id === challenge)?.label,
+              })} size="lg" arrow target="_blank" rel="noopener noreferrer" onClick={saveContext}>
                 Conversemos por WhatsApp
               </ButtonLink>
               <ButtonLink href="/contacto" variant="link" onClick={saveContext}>
