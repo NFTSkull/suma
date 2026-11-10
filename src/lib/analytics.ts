@@ -1,3 +1,4 @@
+import type { PricingPlanId } from "@/content/pricing";
 import type { ServiceSlug } from "@/types/content";
 
 /**
@@ -21,6 +22,8 @@ export type AnalyticsEvent =
       error_type: "not_configured" | "rate_limited" | "validation" | "delivery_failed" | "unconfirmed" | "server_error" | "network";
     }
   | { event: "contact_click"; contact_method: "email" | "whatsapp" | "phone" }
+  | { event: "pricing_plan_selected"; plan: PricingPlanId }
+  | { event: "pricing_cta_click"; plan: PricingPlanId; source: "card" | "estimator" }
   | { event: "service_cta_click"; service: ServiceSlug; cta_location: "hero" | "closing" }
   | {
       event: "needs_selector_completed";
