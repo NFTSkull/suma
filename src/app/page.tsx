@@ -122,6 +122,36 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Recurso práctico: conecta la home con una búsqueda comercial específica. */}
+      <section aria-labelledby="guia-pilates-title" className="bg-suma-cream-soft py-16 md:py-24">
+        <div className="container-suma grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <p className="text-eyebrow text-suma-orange-ink">Guía para estudios de bienestar</p>
+            <h2 id="guia-pilates-title" className="text-display-md mt-4 max-w-3xl">
+              ¿Qué software necesita realmente un estudio de pilates?
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-suma-navy/75">
+              Agenda, reformers, paquetes y alumnos: descubre cuándo te conviene una plataforma de reservas,
+              conectar herramientas existentes o crear un CRM a medida.
+            </p>
+            <div className="mt-8">
+              <ButtonLink href="/guias/software-para-estudios-de-pilates" variant="secondary" arrow>
+                Leer la guía de software para pilates
+              </ButtonLink>
+            </div>
+          </div>
+          <div className="rounded-[2rem] bg-suma-cream p-8 shadow-soft md:p-10">
+            <p className="text-eyebrow text-suma-purple">Lo que vas a encontrar</p>
+            <ul className="mt-6 space-y-4 text-lg text-suma-navy/85">
+              <li>✓ Seis funciones clave para evaluar.</li>
+              <li>✓ Cuándo usar reservas, integraciones o CRM.</li>
+              <li>✓ Un ejemplo de cancelación y lista de espera.</li>
+              <li>✓ Qué costos y condiciones revisar.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       <ImpactBlock />
       <ClosingCta />
       <JsonLd
