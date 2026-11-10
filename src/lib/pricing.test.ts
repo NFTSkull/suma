@@ -70,7 +70,7 @@ describe("precios configurables SUMA", () => {
     expect(message).toContain("25 integrantes");
     expect(message).toContain("2.");
     expect(message).toContain(formatMXN(19900));
-    expect(message).toContain("aparte");
+    expect(message).toContain("sin IVA, licencias de terceros");
     expect(message).not.toMatch(/RFC|NSS/i);
   });
 });
