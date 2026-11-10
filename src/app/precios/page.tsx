@@ -184,10 +184,10 @@ export default function PreciosPage() {
                 <h3 className="font-display text-xl font-bold">{service.name}</h3>
                 <div className="mt-6">
                   <p className="font-display text-xl font-extrabold text-suma-purple">
-                    {service.from ? "Desde " : ""}{formatMXN(service.setup)}
+                    {service.from ? "Desde " : ""}{formatMXN(service.setup || service.monthly)}
                   </p>
                   <p className="mt-1 text-sm font-semibold text-suma-navy">
-                    {service.monthly ? "+ " + formatMXN(service.monthly) + "/mes" : service.setup ? "Pago único" : "Servicio mensual"}
+                    {service.setup === 0 ? "/mes · sin implementación base" : service.monthly ? "+ " + formatMXN(service.monthly) + "/mes" : "Pago único"}
                   </p>
                   <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">{service.detail}</p>
                   <a href="#simulador" className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-2 underline-offset-4">
