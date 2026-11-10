@@ -11,6 +11,7 @@ vi.mock("next/link", () => import("@/test/next-link-mock"));
 describe("NeedsSelector", () => {
   beforeEach(() => {
     sessionStorage.clear();
+    localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
     (window as Window & { dataLayer?: unknown[] }).dataLayer = [];
   });
 

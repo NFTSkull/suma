@@ -120,6 +120,7 @@ describe("ContactForm · analítica", () => {
   const personal = ["Ana López", "Estudio Flor", "ana@ejemplo.mx", "81 1234 5678", "8112345678"];
 
   beforeEach(() => {
+    localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
     (window as DL).dataLayer = [];
   });
   it("envía generate_lead una sola vez cuando el backend confirma la entrega, sin datos personales", async () => {

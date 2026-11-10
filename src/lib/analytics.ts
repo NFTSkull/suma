@@ -1,5 +1,6 @@
 import type { PricingPlanId } from "@/content/pricing";
 import type { ServiceSlug } from "@/types/content";
+import { readAnalyticsConsent } from "@/lib/consent";
 
 /**
  * Eventos de conversión para GA4 vía Google Tag Manager (`dataLayer`).
@@ -35,7 +36,9 @@ export type AnalyticsEvent =
 type DataLayerWindow = Window & { dataLayer?: unknown[] };
 
 export function track(payload: AnalyticsEvent): void {
-  if (typeof window === "undefined") return;
+  // No almacenar eventos previos a la aceptación. GTM se carga después
+  // del consentimiento y procesaría retroactivamente la cola de dataLayer.
+  if (typeof window === "undefined" || readAnalyticsConsent() !== "granted") return;
   const w = window as DataLayerWindow;
   w.dataLayer = w.dataLayer || [];
   w.dataLayer.push(payload);

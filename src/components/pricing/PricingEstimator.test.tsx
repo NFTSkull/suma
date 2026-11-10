@@ -7,6 +7,7 @@ type DL = Window & { dataLayer?: Record<string, unknown>[] };
 
 describe("PricingEstimator", () => {
   beforeEach(() => {
+    localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
     (window as DL).dataLayer = [];
   });
 
