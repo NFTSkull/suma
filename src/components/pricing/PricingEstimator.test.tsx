@@ -29,14 +29,12 @@ describe("PricingEstimator", () => {
     expect(screen.getByRole("link", { name: /revisar mi propuesta por WhatsApp/i })).toHaveAttribute("data-pricing-source", "estimator");
   });
 
-  it("permite Start sin mantenimiento y añadirlo de forma opcional", () => {
+  it("permite Ads sin exigir web, con presupuesto publicitario externo", () => {
     render(<PricingEstimator />);
-    fireEvent.click(screen.getByRole("button", { name: "SUMA Start" }));
-    const checkbox = screen.getByRole("checkbox", { name: /agregar mantenimiento opcional/i });
-    expect(checkbox).not.toBeChecked();
-    fireEvent.click(checkbox);
-    expect(checkbox).toBeChecked();
-    expect(screen.getByText(formatMXN(9890))).toBeInTheDocument();
-    expect((window as DL).dataLayer).toContainEqual({ event: "pricing_plan_selected", plan: "start" });
+    fireEvent.click(screen.getByRole("button", { name: "SUMA Ads" }));
+    expect(screen.getByText(formatMXN(10800))).toBeInTheDocument();
+    expect(screen.getByText(formatMXN(6000), { exact: false })).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    expect((window as DL).dataLayer).toContainEqual({ event: "pricing_plan_selected", plan: "ads" });
   });
 });
