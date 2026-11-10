@@ -113,7 +113,7 @@ export default function NosotrosPage() {
               {site.location.label}
             </h2>
           </div>
-          <p className="max-w-md text-lg text-suma-navy/75">Trabajamos de forma remota con negocios de bienestar en cualquier ciudad del país.</p>
+          <p className="max-w-md text-lg text-suma-navy/75">Atendemos en línea a negocios de bienestar en todo México y también realizamos visitas presenciales a clientes en Monterrey y su área metropolitana, previa cita.</p>
         </div>
       </section>
 
