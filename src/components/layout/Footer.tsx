@@ -38,16 +38,31 @@ export function Footer() {
                   </li>
                 )}
                 {whatsapp && (
-                  <li>
-                    <a href={`https://wa.me/${whatsapp}`} className="underline decoration-suma-orange underline-offset-4">
-                      WhatsApp
-                    </a>
-                  </li>
+                  <>
+                    <li>
+                      <a
+                        href={site.contact.whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-10 items-center underline decoration-suma-orange underline-offset-4"
+                      >
+                        WhatsApp · {site.contact.phoneDisplay}
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href={`tel:${site.contact.phoneE164}`}
+                        className="inline-flex min-h-10 items-center underline decoration-suma-orange underline-offset-4"
+                      >
+                        Llamar al {site.contact.phoneDisplay}
+                      </a>
+                    </li>
+                  </>
                 )}
               </ul>
             )}
 
-            <ButtonLink href={primaryCta.href} variant="accent" className="mt-8" arrow>
+            <ButtonLink href={primaryCta.href} variant="accent" className="mt-8" arrow target="_blank" rel="noopener noreferrer">
               {primaryCta.label}
             </ButtonLink>
           </div>
