@@ -19,7 +19,10 @@ const seo = {
     "sistema de membresías pilates",
   ],
 };
-const crumbs = [{ name: "Software para estudios de pilates", path }];
+const crumbs = [
+  { name: "Guías", path: "/guias" },
+  { name: "Software para estudios de pilates", path },
+];
 
 export const metadata: Metadata = buildMetadata(seo);
 
