@@ -101,7 +101,7 @@ export function PricingEstimator() {
                       <span className="text-sm">
                         <strong className="block leading-snug">{s.name}</strong>
                         <span className="mt-1 block text-xs text-suma-cream/70">
-                          {s.from ? "Desde " : ""}{formatMXN(s.setup)} inicial{s.monthly ? " + " + formatMXN(s.monthly) + "/mes" : " · pago único"}
+                          {s.from ? "Desde " : ""}{formatMXN(s.setup || s.monthly)}{s.setup === 0 ? "/mes" : s.monthly ? " inicial + " + formatMXN(s.monthly) + "/mes" : " · pago único"}
                         </span>
                       </span>
                     </label>
