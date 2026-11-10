@@ -42,6 +42,11 @@ export function ShowroomImpacto({ selection, quote }: Props) {
   const [scenario, setScenario] = useState<ImpactScenario>("base");
   const outcome = calculateShowroomImpact(inputs, quote, scenario);
   const comparable = !quote.isEmpty;
+  const followupServices = ["crm-gestionado", "crm-medida", "chatbot-guiado", "chatbot-ia", "automatizacion"];
+  const hasFollowupScope =
+    (selection.mode === "package" && (selection.planId === "flow" || selection.planId === "growth")) ||
+    selection.serviceIds.some((service) => followupServices.includes(service));
+  const estimatedFirstInvoiceWithVat = quote.firstPaymentSuma * 1.16;
   const good = outcome.monthlyNet >= 0;
   const recurringCovered = comparable && outcome.marginContribution >= outcome.costMonthly;
   const feeLabel = quote.hasAds ? "SUMA + pauta" : "SUMA";
@@ -157,6 +162,12 @@ export function ShowroomImpacto({ selection, quote }: Props) {
             </div>
           </div>
 
+          {!hasFollowupScope && (
+            <div className="mt-4 rounded-xl border border-suma-orange/40 bg-suma-orange/10 p-4 text-sm leading-relaxed text-suma-navy">
+              <strong>Importante:</strong> esta simulación calcula una oportunidad de recuperar consultas, no una mejora automática por contratar publicidad, SEO o una web. Para trabajar ese escenario hace falta diseñar atención y seguimiento.
+            </div>
+          )}
+
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-suma-line bg-white p-4">
               <p className="text-xs font-semibold text-suma-navy/60">Diferencia mensual estimada</p>
@@ -168,6 +179,21 @@ export function ShowroomImpacto({ selection, quote }: Props) {
               <p className="mt-1 font-display text-2xl font-extrabold text-suma-navy tabular-nums">{formatDecimal(outcome.hoursReleased)} h</p>
               <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">Valor del tiempo: {formatMXN(outcome.timeValue)}. No se suma como ahorro en efectivo.</p>
             </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-suma-line bg-white p-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">La inversión, sin sorpresas</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <p className="text-xs text-suma-navy/60">Primera factura SUMA con IVA general del 16%, si aplica</p>
+                <p className="mt-1 font-display text-xl font-extrabold tabular-nums text-suma-navy">{formatMXN(estimatedFirstInvoiceWithVat)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-suma-navy/60">Balance estimado en {outcome.months} {outcome.months === 1 ? "mes" : "meses"}, antes de IVA</p>
+                <p className={"mt-1 font-display text-xl font-extrabold tabular-nums " + (outcome.netOverPeriod >= 0 ? "text-emerald-700" : "text-suma-orange-ink")}>{formatMXN(outcome.netOverPeriod)}</p>
+              </div>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-suma-navy/60">El balance resta implementación, mensualidad y pauta, pero excluye IVA, consumos y licencias externos, así como otros costos no informados. El IVA mostrado es una referencia de desembolso, no necesariamente un costo económico definitivo ni un cálculo fiscal personalizado.</p>
           </div>
 
           {comparable ? (
@@ -183,6 +209,7 @@ export function ShowroomImpacto({ selection, quote }: Props) {
                     ? "No hay costo de implementación en esta selección."
                     : "La implementación se recuperaría aproximadamente en " + outcome.paybackMonths + " meses si ese excedente se mantiene."}
               </p>
+              <p className="mt-2 text-xs text-suma-navy/65">El primer mes requeriría {outcome.clientsToCoverFirstMonth === null ? "un cálculo individual por falta de margen positivo" : outcome.clientsToCoverFirstMonth + " clientes nuevos para cubrir también la implementación"}.</p>
               <p className="mt-2 text-xs text-suma-navy/65">Resultado orientativo; no considera licencias ni consumos externos. {quote.isStartingPrice ? "El presupuesto de SUMA parte de un mínimo sujeto a alcance." : ""}</p>
             </div>
           ) : (
@@ -199,6 +226,7 @@ export function ShowroomImpacto({ selection, quote }: Props) {
               <p><strong>Ingresos:</strong> clientes adicionales × ingreso de la primera compra.</p>
               <p><strong>Contribución:</strong> ingresos × margen. Se resta mensualidad SUMA y pauta, pero no se descuentan impuestos, licencias, WhatsApp, IA ni infraestructura externa.</p>
               <p><strong>Horas:</strong> tareas × minutos ahorrables ÷ 60. El valor del tiempo se presenta aparte y no se trata como ahorro monetario automático.</p>
+              <p><strong>Crecimiento porcentual:</strong> compara nuevos clientes del escenario con los clientes actuales modelados a partir de consultas que sí se atienden y la misma tasa de conversión; no es una cifra histórica comprobada.</p>
               <p><strong>Escenarios:</strong> conservador aplica 50%, base 100% y optimista 125% sobre la recuperación que tú indicas. Estos factores son ejemplos de sensibilidad, no datos estadísticos.</p>
               <p><strong>Precios:</strong> catálogo oficial SUMA, sin descuentos y antes de IVA. Implementación {formatMXN(outcome.setup)}; mensualidad {formatMXN(quote.monthlySuma)}; pauta {formatMXN(quote.monthlyAds)}.</p>
               {outcome.capacityBound && <p><strong>Capacidad:</strong> tu límite de cupos restringió la estimación de nuevos clientes.</p>}
@@ -223,6 +251,7 @@ export function ShowroomImpacto({ selection, quote }: Props) {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold">
             <a href="https://hbr.org/2011/03/the-short-life-of-online-sales-leads" target="_blank" rel="noopener noreferrer" className="underline decoration-suma-orange underline-offset-4">Respuesta a prospectos · HBR 2011 ↗</a>
+            <a href="https://wwwmatnp.sat.gob.mx/articulo/19848/articulo-1" target="_blank" rel="noopener noreferrer" className="underline decoration-suma-orange underline-offset-4">Tasa general IVA · SAT ↗</a>
             <a href="https://www.mindbodyonline.com/business/education/research-reports/2025-state-industry-report" target="_blank" rel="noopener noreferrer" className="underline decoration-suma-orange underline-offset-4">Retención wellness · Mindbody 2025 ↗</a>
           </div>
         </div>
