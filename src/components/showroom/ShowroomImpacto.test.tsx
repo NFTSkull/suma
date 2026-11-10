@@ -26,7 +26,7 @@ describe("ShowroomImpacto · interacción", () => {
   it("se actualiza al cambiar consultas y jamás afirma que los datos se guardan", () => {
     render(<ShowroomImpacto selection={selection} quote={showroomEstimate(selection)} />);
     fireEvent.change(screen.getByLabelText("Consultas nuevas al mes"), { target: { value: "0" } });
-    expect(screen.getByText(/Tus datos · sin guardar/)).toBeInTheDocument();
+    expect(screen.getByText(/Datos editados · revisa supuestos/)).toBeInTheDocument();
     expect(screen.getByText(/esta simulación se calcula en tu navegador/)).toBeInTheDocument();
     expect(screen.getByText(/no se cubre el costo mensual/)).toBeInTheDocument();
   });
