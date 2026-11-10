@@ -67,3 +67,23 @@
 **Compatibilidad con la configuración de Resend ya en producción.** El formulario empezó a funcionar en `main` con Resend antes de fusionar esta rama, así que la validación nueva no puede ser más estricta que lo que acepta Resend: la clave solo se exige con prefijo `re_` (sin otro patrón), el remitente puede ir con o sin nombre visible y el destinatario admite varios correos separados por comas. Se comprobó en Vercel (solo nombres y comentarios, sin descifrar) que existen las tres variables en Production y en DNS que `sumastudio.mx` tiene DKIM, SPF/MX en `send.` y DMARC; con eso la rama no cambia el comportamiento de entrega, solo cómo se confirma.
 
 **Consentimiento opt-in con GTM bloqueado.** Se pasó de exclusión voluntaria a consentimiento previo en todas las regiones. En lugar de cargar GTM con `analytics_storage: denied` (que con Consent Mode avanzado aún permite pings sin cookies), `GoogleTagManager` no renderiza el fragmento hasta que hay aceptación: sin permiso no se descarga `gtm.js`. Al aceptar se envía `consent update` y en el mismo ciclo se monta el script, así GTM arranca ya con `granted`; en visitas posteriores el default `beforeInteractive` lee la elección guardada. Se quitó el `<noscript>` porque sin JavaScript no se puede pedir permiso. Banner, footer y GTM comparten un almacén (`useSyncExternalStore` con evento propio + `storage`), con respaldo en memoria si `localStorage` no está disponible; en el servidor el estado es `pending` para no renderizar el banner antes de hidratar (sin parpadeo ni desajuste). Botones con el mismo peso visual y sin casillas premarcadas. El banner se ensanchó a 30rem en escritorio para que "Aceptar estadísticas" quepa en una línea. Se revisó el contenedor público: tiene la etiqueta de GA4 `G-1WSGMR965K` pero no activadores para los eventos personalizados; eso queda como configuración de GTM. El aviso de privacidad describe solo servicios comprobables y marca como pendiente todo dato legal; no se declara aprobado.
+
+## 2026-11-10 — Pulido de SUMA Vision Studio (PR #21)
+
+**Evaluación como dueña de un estudio de Pilates.** El objetivo era que en menos de un minuto se entienda qué es, se pueda empezar y se llegue a los números para decidir. Lo que lo impedía: pasos con nombres distintos en el hero y en las secciones, la tranquilidad ("sin registro, sin pagos, datos ficticios") repetida unas cinco veces, la vista previa a ~700 px de sus controles en móvil, un simulador de 3,200 px con el periodo lejos del resultado (mostraba "se paga sola" y un balance negativo sin explicar por qué) y una propuesta sin desglose ni pasos de implementación.
+
+**Un solo periodo.** El simulador y la propuesta comparten `months` (el simulador avisa con `onMonthsChange`); antes podían mostrar periodos distintos y contradecirse.
+
+**Origen de cada dato.** Se marca por campo ("Ejemplo" hasta que la persona lo cambia, después "Tu dato") en lugar de un aviso general, para que siempre se distinga dato real, ejemplo, supuesto y resultado no garantizado. La fórmula de clientes nuevos se muestra con los valores reales del cálculo.
+
+**Menos opciones a la vista, no menos opciones.** Los 13 módulos y las 9 demos siguen disponibles; se muestran primero los recomendados para el objetivo elegido. La herramienta actual se movió a la propuesta porque solo afecta al mensaje de WhatsApp.
+
+**WhatsApp del simulador.** Usaba la intención de diagnóstico y metía el resumen dentro de `notes`, que se recorta a 180 caracteres y pisaba lo que la persona había escrito. Ahora hay una intención `impact` y un campo `impactSummary` aparte; las notas se conservan.
+
+**Selectores en 360 px.** Tres columnas no caben con "12 meses" a 16 px, y bajar la fuente haría que iOS amplíe la pantalla al tocar el selector; en móvil quedan Equipo y Sedes en dos columnas y Periodo a lo ancho.
+
+**Columna fija en escritorio.** Los datos quedan a la vista mientras se lee el resultado. La sección usaba `overflow-hidden` para recortar las esquinas, lo que convierte al contenedor en caja de scroll y anula `position: sticky`; `overflow-clip` recorta igual sin ese efecto.
+
+**Hero compartido intacto.** `PageHero` lo usan 12 páginas; en `/showroom` solo se cambió el `accent` a morado.
+
+**Build local.** En esta Mac `next build` con Turbopack falla al resolver `next/font/google` ("queries have exactly one entry") también en el código base sin cambios; CI (`verify`) y Vercel compilan bien. Las capturas se tomaron con `next dev` (Turbopack), que aplica los mismos estilos; un build con webpack no sirve porque Tailwind solo está configurado como loader de Turbopack.

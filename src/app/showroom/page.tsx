@@ -7,7 +7,7 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
-  title: "SUMA Vision Studio: prueba, personaliza y estima tu impacto | SUMA STUDIO",
+  title: "SUMA Vision Studio: demo, impacto y precio",
   description: "Experimenta CRM, chatbots y reservas con tu marca. Simula ingresos potenciales, tiempo recuperable, inversión y punto de equilibrio con supuestos transparentes.",
   path: "/showroom",
   keywords: [
@@ -18,71 +18,51 @@ const seo = {
 const crumbs = [{ name: "Showroom", path: "/showroom" }];
 export const metadata: Metadata = buildMetadata(seo);
 
+const steps = [
+  { href: "#showroom-construir", number: "01", title: "Personaliza", text: "Tu nombre y estilo en la demo" },
+  { href: "#showroom-explorar", number: "02", title: "Pruébalo", text: "Demo interactiva de cada servicio" },
+  { href: "#showroom-impacto", number: "03", title: "Calcula", text: "¿Te conviene? Con tus números" },
+  { href: "#showroom-cotizar", number: "04", title: "Tu propuesta", text: "Precio, qué incluye y WhatsApp" },
+];
+
 export default function ShowroomPage() {
   return (
     <>
       <PageHero
         eyebrow="SUMA VISION STUDIO · Interactivo"
-        accent="orange"
+        accent="purple"
         dark
         crumbs={crumbs}
         title={<>Tu idea, <span className="text-suma-orange">a la vista.</span></>}
-        lead="Prueba cómo podría funcionar tu negocio, descubre oportunidades de crecimiento y compara tu inversión con resultados hipotéticos transparentes. Sin registro ni compromiso."
+        lead="En cuatro pasos ves cómo funcionaría SUMA en tu negocio, calculas si la inversión te conviene y armas tu propuesta con precios reales. Sin registro ni compromiso."
       >
-        <div className="flex flex-wrap gap-3">
-          <ButtonLink href="#showroom-construir" variant="light" size="lg" arrow>Diseñar mi experiencia</ButtonLink>
+        <ol aria-label="Cómo funciona" className="grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-4">
+          {steps.map((step) => (
+            <li key={step.href}>
+              <a href={step.href}
+                className="flex h-full flex-col rounded-2xl border border-white/20 bg-white/5 p-3 transition-colors hover:border-suma-orange focus-visible:outline-2 focus-visible:outline-suma-orange md:p-4">
+                <span className="font-display text-sm font-extrabold text-suma-orange">{step.number}</span>
+                <span className="mt-1 font-display text-base font-bold text-suma-cream">{step.title}</span>
+                <span className="mt-1 text-xs leading-snug text-suma-cream/65">{step.text}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <ButtonLink href="#showroom-construir" variant="light" size="lg" arrow>Empezar</ButtonLink>
           <ButtonLink href="/precios" variant="link-light">Ver precios base</ButtonLink>
         </div>
       </PageHero>
 
-      <section id="showroom-construir" aria-label="Showroom personalizado" className="scroll-mt-24 bg-suma-cream py-14 md:py-20">
+      <section aria-label="Showroom personalizado" className="bg-suma-cream py-12 md:py-16">
         <div className="container-suma">
-          <div className="mb-10 flex flex-wrap items-center justify-between gap-5">
-            <p className="max-w-xl text-sm text-suma-navy/70">
-              No necesitas conocimientos técnicos. Cambia el nombre de tu negocio, explora las pantallas, combina lo que sí te sirve y envíanos tu idea preparada.
-            </p>
-            <nav aria-label="Etapas de la experiencia" className="flex max-w-full gap-2 overflow-x-auto pb-2">
-              {[
-                { href: "#showroom-construir", text: "01 · Tu negocio" },
-                { href: "#showroom-explorar", text: "02 · Pruébalo" },
-                { href: "#showroom-impacto", text: "03 · Tu potencial" },
-                { href: "#showroom-cotizar", text: "04 · Tu propuesta" },
-              ].map((step) => (
-                <a key={step.href} href={step.href}
-                  className="shrink-0 rounded-full border border-suma-line bg-white px-4 py-2.5 text-xs font-bold text-suma-navy transition-colors hover:border-suma-orange hover:text-suma-orange-ink focus-visible:outline-2 focus-visible:outline-suma-orange">
-                  {step.text}
-                </a>
-              ))}
-            </nav>
-          </div>
           <ShowroomBuilder />
-        </div>
-      </section>
-
-      <section aria-labelledby="showroom-limites-title" className="bg-suma-cream-soft py-16 md:py-20">
-        <div className="container-suma grid gap-8 md:grid-cols-3">
-          <div>
-            <p className="text-eyebrow text-suma-orange-ink">Sin compromiso</p>
-            <h2 id="showroom-limites-title" className="mt-3 font-display text-2xl font-extrabold">Explora primero. Decide después.</h2>
-          </div>
-          <div className="rounded-2xl border border-suma-line bg-white p-6">
-            <h3 className="font-display text-xl font-bold">Nada se conecta por sorpresa</h3>
-            <p className="mt-3 text-sm leading-relaxed text-suma-navy/70">
-              Las demos usan información ficticia. Para integrar WhatsApp, reservas o sistemas de terceros revisamos permisos y viabilidad primero.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-suma-line bg-white p-6">
-            <h3 className="font-display text-xl font-bold">Un precio que se puede conversar</h3>
-            <p className="mt-3 text-sm leading-relaxed text-suma-navy/70">
-              Los importes provienen del catálogo de SUMA y son orientativos. Puedes pedir un ajuste de alcance a tu presupuesto o solicitar un diagnóstico.
-            </p>
-          </div>
         </div>
       </section>
 
       <ClosingCta
         title="¿Tu proyecto necesita algo más especial?"
-        text="Puedes enviarnos tu configuración por WhatsApp y solicitar una sesión de diagnóstico. Te diremos qué módulos son factibles y cuál sería la propuesta real."
+        text="Envíanos tu configuración por WhatsApp o pide una sesión de diagnóstico. Te diremos qué es factible y cuál sería la propuesta real."
         secondary={{ label: "Consultar precios y paquetes", href: "/precios" }}
       />
       <JsonLd data={pageGraph({ path: seo.path, name: seo.title, description: seo.description, crumbs })} />

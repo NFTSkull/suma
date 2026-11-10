@@ -69,4 +69,13 @@ describe("Showroom SUMA", () => {
     expect(text).toContain("validemos alcance");
     expect(text).not.toMatch(/cita confirmada/i);
   });
+  it("la revisión de impacto lleva la simulación aparte de las notas y nombra bien el periodo", () => {
+    const longNotes = "x".repeat(170);
+    const summary = "Simulación base (supuestos por validar): diferencia de +$1,932/mes.";
+    const text = decodeURIComponent(showroomWhatsAppHref({ ...initial, months: 6, notes: longNotes, impactSummary: summary }, "impact").split("?text=")[1]);
+    expect(text).toContain("Quiero revisar con SUMA mi simulación de impacto");
+    expect(text).toContain(summary);
+    expect(text).toContain("Periodo de referencia: 6 meses.");
+    expect(decodeURIComponent(showroomWhatsAppHref(initial, "quote").split("?text=")[1])).toContain("Periodo de referencia: 1 mes.");
+  });
 });

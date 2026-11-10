@@ -2,6 +2,16 @@
 
 ## [Sin publicar]
 
+### SUMA Vision Studio (`/showroom`): pulido de experiencia (PR #21)
+- **Hero**: explica en una frase qué se obtiene y muestra los cuatro pasos con el mismo nombre que usan después las secciones (Personaliza, Pruébalo, Calcula, Tu propuesta). Se quitaron la barra de chips, el texto intermedio y la sección de límites que repetían lo mismo. Acento morado para que "a la vista" no quede naranja sobre naranja en móvil. Title SEO sin la marca duplicada.
+- **Personaliza**: solo nombre, giro y estilo; la herramienta actual pasó a la propuesta.
+- **Pruébalo**: en móvil la vista previa aparece justo después de los controles; el estado "incluido" es una etiqueta verde ("Ya está en tu propuesta") en lugar de un botón que parecía deshabilitado.
+- **Calcula**: cada dato indica si es "Ejemplo" o "Tu dato", con leyenda Ejemplo / Tu dato / Supuesto / Resultado no garantizado y "Volver al ejemplo". Cálculo mensual en cascada (clientes nuevos → ingresos → margen → mensualidad → diferencia) con la fórmula visible. Escenario y periodo junto al resultado; el periodo se comparte con la propuesta. Supuestos avanzados plegados. Columna de datos fija en escritorio. Corregido el mensaje de recuperación cuando la selección no tiene implementación. El IVA pasó a la propuesta.
+- **Tu propuesta**: módulos recomendados para el objetivo elegido (el resto bajo "Ver los 13 módulos"), detalle de cada módulo marcado, desglose de lo elegido, "Qué incluye" del paquete, implementación, mensualidad, primer pago con IVA y total del periodo. Bloque "Así sería la implementación" con los cuatro pasos del proceso.
+- **WhatsApp**: la revisión del simulador usa su propio asunto y envía la simulación completa (diferencia mensual y balance del periodo) aparte de las notas del cliente, que ya no se sobrescriben ni se recortan. "1 mes / N meses" en lugar de "mes(es)".
+- Sin cambios en precios, catálogo, integraciones ni pagos.
+- Pruebas: 199.
+
 ### Consentimiento opt-in y aviso de privacidad
 - `ANALYTICS_DEFAULT = "denied"` en todas las regiones; `ad_storage`, `ad_user_data` y `ad_personalization` siempre `denied`.
 - GTM ya no se carga sin consentimiento: `gtm.js` solo se descarga tras "Aceptar estadísticas" (primero `consent update`, después GTM) y en visitas posteriores si la aceptación está guardada. Se retiró el `<noscript>` de GTM.

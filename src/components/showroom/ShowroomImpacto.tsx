@@ -4,41 +4,54 @@ import { useState } from "react";
 import { formatMXN } from "@/lib/pricing";
 import { calculateShowroomImpact, impactSample, impactScenarios, type ImpactInputs, type ImpactScenario } from "@/lib/showroom-impact";
 import { showroomWhatsAppHref, type ShowroomSelection, type showroomEstimate } from "@/lib/showroom";
+import { cn } from "@/lib/cn";
 
 type Props = {
   selection: ShowroomSelection;
   quote: ReturnType<typeof showroomEstimate>;
+  /** Periodo compartido con la propuesta: cambiarlo aquí también cambia el cotizador. */
+  onMonthsChange?: (months: number) => void;
 };
 
 const inputStyle = "mt-2 h-12 w-full min-w-0 rounded-xl border border-suma-line bg-white px-3 text-base font-semibold text-suma-navy outline-offset-2 focus-visible:outline-2 focus-visible:outline-suma-orange";
-const smallButton = "min-h-12 rounded-full border px-4 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-suma-orange";
+const pill = "min-h-11 min-w-0 rounded-full border px-1.5 text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-suma-orange sm:px-3 sm:text-sm";
 const formatDecimal = (number: number, max = 1) => new Intl.NumberFormat("es-MX", { maximumFractionDigits: max }).format(number);
+const PERIODS = [1, 3, 6, 12] as const;
 
-const formFields: Array<{
-  key: keyof ImpactInputs;
-  label: string;
-  hint: string;
-  max: number;
-  step?: number;
-}> = [
-  { key: "leadsPerMonth", label: "Consultas nuevas al mes", hint: "Mensajes o prospectos únicos, no seguidores.", max: 1000000 },
-  { key: "unansweredPct", label: "¿Qué % queda sin atender?", hint: "Aproximación de consultas que no reciben seguimiento.", max: 100 },
-  { key: "revenuePerClient", label: "Ingreso por cliente nuevo", hint: "Solo la primera compra, sin asumir pagos futuros.", max: 100000000 },
-  { key: "contributionMarginPct", label: "Margen de contribución (%)", hint: "Después de los costos variables del servicio.", max: 100 },
+type Field = { key: keyof ImpactInputs; label: string; hint: string; max: number; suffix?: string };
+
+const formFields: Field[] = [
+  { key: "leadsPerMonth", label: "Consultas nuevas al mes", hint: "Mensajes o interesados únicos, no seguidores.", max: 1000000 },
+  { key: "unansweredPct", label: "% que queda sin respuesta o seguimiento", hint: "Tu mejor estimación.", max: 100, suffix: "%" },
+  { key: "revenuePerClient", label: "Ingreso por cliente nuevo (MXN)", hint: "Solo la primera compra, sin contar pagos futuros.", max: 100000000 },
+  { key: "contributionMarginPct", label: "Margen que te queda (%)", hint: "Lo que queda tras costos variables (instructor, insumos).", max: 100, suffix: "%" },
 ];
 
-const advancedFields: typeof formFields = [
-  { key: "recoveryPct", label: "Consultas sin atender que recuperarías (%)", hint: "Hipótesis propia. No es un promedio de mercado.", max: 100 },
-  { key: "conversionPct", label: "De las recuperadas, ¿cuántas comprarían (%)?", hint: "Usa tu tasa real si la conoces.", max: 100 },
-  { key: "capacity", label: "Cupos adicionales disponibles al mes", hint: "Limita ventas estimadas a tu capacidad operativa.", max: 1000000 },
-  { key: "manualTasksPerMonth", label: "Tareas repetitivas al mes", hint: "Ejemplo: respuestas, recordatorios o seguimiento.", max: 1000000 },
-  { key: "minutesSavedPerTask", label: "Minutos recuperables por tarea", hint: "Se valida con medición antes y después.", max: 1440 },
-  { key: "hourlyCost", label: "Costo estimado por hora (MXN)", hint: "Para valorar tiempo; no equivale a ahorro de nómina.", max: 1000000 },
+const advancedFields: Field[] = [
+  { key: "recoveryPct", label: "Consultas sin respuesta que recuperarías (%)", hint: "Hipótesis propia, no un promedio de mercado.", max: 100, suffix: "%" },
+  { key: "conversionPct", label: "De las recuperadas, cuántas compran (%)", hint: "Usa tu tasa real si la conoces.", max: 100, suffix: "%" },
+  { key: "capacity", label: "Lugares libres para clientes nuevos al mes", hint: "Limita la estimación a lo que puedes atender.", max: 1000000 },
+  { key: "manualTasksPerMonth", label: "Tareas repetitivas al mes", hint: "Respuestas, recordatorios o seguimientos.", max: 1000000 },
+  { key: "minutesSavedPerTask", label: "Minutos que ahorrarías por tarea", hint: "Se valida midiendo antes y después.", max: 1440 },
+  { key: "hourlyCost", label: "Valor de una hora de tu equipo (MXN)", hint: "Sirve para valorar el tiempo; no es ahorro de nómina.", max: 1000000 },
 ];
 
-export function ShowroomImpacto({ selection, quote }: Props) {
+function OriginTag({ edited }: { edited: boolean }) {
+  return (
+    <span
+      className={cn(
+        "shrink-0 rounded-full px-2 py-0.5 text-[0.68rem] font-bold uppercase tracking-wide",
+        edited ? "bg-emerald-100 text-emerald-800" : "bg-suma-cream-deep text-suma-navy/70",
+      )}
+    >
+      {edited ? "Tu dato" : "Ejemplo"}
+    </span>
+  );
+}
+
+export function ShowroomImpacto({ selection, quote, onMonthsChange }: Props) {
   const [inputs, setInputs] = useState<ImpactInputs>(impactSample);
-  const [userData, setUserData] = useState(false);
+  const [edited, setEdited] = useState<ReadonlySet<keyof ImpactInputs>>(new Set());
   const [scenario, setScenario] = useState<ImpactScenario>("base");
   const outcome = calculateShowroomImpact(inputs, quote, scenario);
   const comparable = !quote.isEmpty;
@@ -46,35 +59,42 @@ export function ShowroomImpacto({ selection, quote }: Props) {
   const hasFollowupScope =
     (selection.mode === "package" && (selection.planId === "flow" || selection.planId === "growth")) ||
     selection.serviceIds.some((service) => followupServices.includes(service));
-  const estimatedFirstInvoiceWithVat = quote.firstPaymentSuma * 1.16;
-  const good = outcome.monthlyNet >= 0;
   const recurringCovered = comparable && outcome.marginContribution >= outcome.costMonthly;
-  const feeLabel = quote.hasAds ? "SUMA + pauta" : "SUMA";
-  const shareSummary = "Escenario " + impactScenarios[scenario].label.toLowerCase() +
-    ": " + formatDecimal(outcome.additionalClients) + " clientes nuevos/mes; " +
-    formatMXN(outcome.addedRevenue) + " ingresos brutos/mes; " +
-    formatMXN(outcome.marginContribution) + " contribución/mes; " +
-    formatMXN(outcome.costMonthly) + " gasto mensual SUMA/pauta. Deseo validar supuestos.";
-  const shareHref = showroomWhatsAppHref({
-    ...selection,
-    notes: shareSummary,
-  }, "diagnostic");
+  const feeLabel = quote.hasAds ? "Mensualidad SUMA + pauta" : "Mensualidad SUMA";
+  const recoveryRate = Math.min(100, inputs.recoveryPct * impactScenarios[scenario].factor);
+  const editedBasics = formFields.filter((field) => edited.has(field.key)).length;
+
+  const signed = (value: number) => (value >= 0 ? "+" : "") + formatMXN(value);
+  const periodLabel = outcome.months === 1 ? "1 mes" : outcome.months + " meses";
+  const shareSummary = "Simulación " + impactScenarios[scenario].label.toLowerCase() + " (supuestos por validar): " +
+    formatDecimal(outcome.additionalClients) + " clientes nuevos/mes, " + formatMXN(outcome.addedRevenue) + " de ingresos, " +
+    formatMXN(outcome.marginContribution) + " de margen; " + feeLabel + " " + formatMXN(outcome.costMonthly) +
+    "; diferencia de " + signed(outcome.monthlyNet) + "/mes; balance en " + periodLabel + " tras implementación: " +
+    signed(outcome.netOverPeriod) + ".";
+  const shareHref = showroomWhatsAppHref({ ...selection, impactSummary: shareSummary }, "impact");
 
   const update = (key: keyof ImpactInputs, value: number) => {
-    setUserData(true);
+    setEdited((prev) => new Set(prev).add(key));
     setInputs((prev) => ({ ...prev, [key]: Number.isFinite(value) ? value : 0 }));
   };
+  const restore = () => {
+    setInputs(impactSample);
+    setEdited(new Set());
+    setScenario("base");
+  };
 
-  const fields = (items: typeof formFields) => items.map((item) => (
+  const fields = (items: Field[]) => items.map((item) => (
     <div key={item.key}>
-      <label htmlFor={"impact-" + item.key} className="block text-sm font-bold text-suma-navy">{item.label}</label>
+      <div className="flex items-start justify-between gap-2">
+        <label htmlFor={"impact-" + item.key} className="text-sm font-bold text-suma-navy">{item.label}</label>
+        <OriginTag edited={edited.has(item.key)} />
+      </div>
       <input
         id={"impact-" + item.key}
         type="number"
         inputMode="decimal"
         min={0}
         max={item.max}
-        step={item.step ?? 1}
         value={inputs[item.key]}
         onChange={(event) => update(item.key, Number(event.target.value))}
         className={inputStyle}
@@ -83,158 +103,190 @@ export function ShowroomImpacto({ selection, quote }: Props) {
     </div>
   ));
 
+  const paybackText = outcome.setup === 0
+    ? "Esta selección no tiene costo de implementación."
+    : outcome.paybackMonths === null
+      ? "Con estos supuestos la implementación no se recupera."
+      : "La implementación se recuperaría en ~" + outcome.paybackMonths + (outcome.paybackMonths === 1 ? " mes" : " meses") + " si el resultado se mantiene.";
+
   return (
-    <section id="showroom-impacto" aria-labelledby="showroom-impact-title" className="scroll-mt-24 overflow-hidden rounded-[2rem] border border-suma-line bg-suma-cream-soft shadow-soft">
+    <section id="showroom-impacto" aria-labelledby="showroom-impact-title" className="scroll-mt-24 overflow-clip rounded-[2rem] border border-suma-line bg-suma-cream-soft shadow-soft">
       <div className="relative overflow-hidden bg-suma-navy px-5 py-8 text-suma-cream md:px-9 md:py-10">
         <span aria-hidden="true" className="pointer-events-none absolute -right-20 -top-36 size-80 rounded-full bg-suma-orange/15 blur-2xl" />
-        <div className="relative flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="relative flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div className="max-w-2xl">
-            <p className="text-eyebrow text-suma-orange">03 · Tu crecimiento, con números</p>
+            <p className="text-eyebrow text-suma-orange">03 · Calcula si te conviene</p>
             <h2 id="showroom-impact-title" className="mt-3 font-display text-3xl font-extrabold tracking-tight md:text-4xl">¿Qué tendría que pasar para que esta inversión te convenga?</h2>
-            <p className="mt-3 text-sm leading-relaxed text-suma-cream/75 md:text-base">Simula ingresos, horas recuperables y punto de equilibrio. Los números cambian contigo, sin promesas de resultados.</p>
+            <p className="mt-3 text-sm leading-relaxed text-suma-cream/75 md:text-base">Cambia los datos por los de tu negocio y mira el cálculo paso a paso. Es una simulación, no una promesa de resultados.</p>
           </div>
-          <span className="w-fit shrink-0 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold">
-            {userData ? "Datos editados · revisa supuestos" : "Ejemplo ilustrativo · editable"}
-          </span>
+          <ul aria-label="Cómo leer esta simulación" className="flex flex-wrap gap-2 text-[0.7rem] font-bold uppercase tracking-wide md:max-w-[15rem] md:justify-end">
+            <li className="rounded-full bg-suma-cream-deep px-2.5 py-1 text-suma-navy/80">Ejemplo</li>
+            <li className="rounded-full bg-emerald-100 px-2.5 py-1 text-emerald-800">Tu dato</li>
+            <li className="rounded-full bg-suma-purple/30 px-2.5 py-1 text-suma-cream">Supuesto</li>
+            <li className="rounded-full border border-white/30 px-2.5 py-1 text-suma-cream">Resultado no garantizado</li>
+          </ul>
         </div>
       </div>
 
-      <div className="grid gap-0 xl:grid-cols-[0.92fr_1.08fr]">
+      <div className="grid gap-0 xl:grid-cols-[0.9fr_1.1fr]">
         <div className="border-b border-suma-line p-5 md:p-8 xl:border-b-0 xl:border-r">
+          {/* En escritorio los datos acompañan al resultado mientras se hace scroll. */}
+          <div className="xl:sticky xl:top-24">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h3 className="font-display text-xl font-extrabold text-suma-navy">Hablemos de tu negocio</h3>
-              <p className="mt-2 text-sm text-suma-navy/65">Si no conoces algún dato, conserva el ejemplo y úsalo solo para explorar.</p>
+              <h3 className="font-display text-xl font-extrabold text-suma-navy">1. Tus números</h3>
+              <p className="mt-1 text-sm text-suma-navy/65" aria-live="polite">
+                {editedBasics === 0 ? "Partimos de un estudio de ejemplo. Cambia lo que sepas." : "Usando " + editedBasics + " de 4 datos tuyos."}
+              </p>
             </div>
-            <button type="button" onClick={() => { setInputs(impactSample); setUserData(false); setScenario("base"); }}
-              className="min-h-10 rounded-full border border-suma-line bg-white px-3 text-xs font-bold text-suma-navy hover:border-suma-orange">
-              Restaurar ejemplo
-            </button>
+            {edited.size > 0 && (
+              <button type="button" onClick={restore}
+                className="min-h-10 rounded-full border border-suma-line bg-white px-3 text-xs font-bold text-suma-navy hover:border-suma-orange">
+                Volver al ejemplo
+              </button>
+            )}
           </div>
           <div className="mt-6 grid gap-x-4 gap-y-5 sm:grid-cols-2">{fields(formFields)}</div>
           <details className="group mt-7 rounded-2xl border border-suma-line bg-white p-4 md:p-5">
             <summary className="cursor-pointer list-item text-sm font-bold text-suma-navy">
-              Afinar el cálculo y el ahorro de tiempo
+              Supuestos avanzados y ahorro de tiempo
             </summary>
-            <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">Solo si quieres más precisión. Personaliza tasas de recuperación, capacidad y tiempo dedicado a tareas.</p>
+            <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">Opcional. Si no los cambias, se usan los del ejemplo.</p>
             <div className="mt-5 grid gap-x-4 gap-y-5 sm:grid-cols-2">{fields(advancedFields)}</div>
           </details>
           <p className="mt-5 text-xs leading-relaxed text-suma-navy/65">
-            Privacidad: esta simulación se calcula en tu navegador, no se guarda ni conecta con tus herramientas. Si compartes tu evaluación por WhatsApp, abrirás un mensaje editable.
+            Privacidad: se calcula en tu navegador y no se guarda. Solo si pulsas el botón de WhatsApp se prepara un mensaje editable.
           </p>
+          </div>
         </div>
 
         <div className="p-5 md:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="font-display text-xl font-extrabold text-suma-navy">2. El resultado</h3>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <h3 className="font-display text-xl font-extrabold text-suma-navy">Tu escenario</h3>
-              <p className="mt-1 text-xs text-suma-navy/60">Sensibilidad ilustrativa, no probabilidades validadas.</p>
+              <p className="flex items-center gap-2 text-xs font-bold text-suma-navy/70">
+                Escenario <span className="rounded-full bg-suma-purple/10 px-2 py-0.5 text-[0.68rem] uppercase tracking-wide text-suma-purple">Supuesto</span>
+              </p>
+              <div role="group" aria-label="Escenario de impacto" className="mt-2 grid grid-cols-3 gap-1 rounded-full bg-suma-cream-deep p-1">
+                {(Object.keys(impactScenarios) as ImpactScenario[]).map((id) => (
+                  <button key={id} type="button" aria-pressed={scenario === id} onClick={() => setScenario(id)}
+                    className={pill + (scenario === id ? " border-suma-navy bg-suma-navy text-white" : " border-transparent text-suma-navy hover:bg-white")}>
+                    {impactScenarios[id].label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-suma-navy/70">Periodo a evaluar</p>
+              <div role="group" aria-label="Periodo a evaluar" className="mt-2 grid grid-cols-4 gap-1 rounded-full bg-suma-cream-deep p-1">
+                {PERIODS.map((m) => (
+                  <button key={m} type="button" aria-pressed={outcome.months === m} onClick={() => onMonthsChange?.(m)}
+                    className={pill + (outcome.months === m ? " border-suma-navy bg-suma-navy text-white" : " border-transparent text-suma-navy hover:bg-white")}>
+                    {m === 12 ? "12 m" : m + " m"}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-          <div role="group" aria-label="Escenario de impacto" className="mt-4 grid grid-cols-3 gap-1.5 rounded-2xl bg-suma-cream-deep p-1.5">
-            {(Object.keys(impactScenarios) as ImpactScenario[]).map((id) => (
-              <button key={id} type="button" aria-pressed={scenario === id} onClick={() => setScenario(id)}
-                className={smallButton + (scenario === id ? " border-suma-navy bg-suma-navy text-white" : " border-transparent bg-transparent text-suma-navy hover:bg-white")}>
-                {impactScenarios[id].label}
-              </button>
-            ))}
-          </div>
-          <p className="mt-2 text-xs leading-relaxed text-suma-navy/60">
-            Recuperación de interesados: {formatDecimal(Math.min(100, inputs.recoveryPct * impactScenarios[scenario].factor))}% del grupo no atendido.
-          </p>
 
           <div aria-live="polite" className="mt-5 rounded-[1.5rem] bg-suma-navy p-5 text-suma-cream md:p-7">
-            <p className="text-xs font-bold uppercase tracking-widest text-suma-orange">Ingresos brutos potenciales · por mes</p>
-            <p className="mt-2 font-display text-[clamp(2.2rem,5vw,3.6rem)] font-extrabold leading-none tabular-nums">{formatMXN(outcome.addedRevenue)}</p>
-            <p className="mt-3 text-sm text-suma-cream/70">
-              {formatDecimal(outcome.additionalClients)} clientes nuevos adicionales en este escenario
-              {outcome.growthPct !== null ? " · +" + formatDecimal(outcome.growthPct) + "% sobre clientes actuales estimados" : ""}.
-            </p>
-            <div className="mt-6 grid gap-3 border-t border-white/20 pt-5 sm:grid-cols-2">
-              <div>
-                <p className="text-xs text-suma-cream/60">Contribución tras costos variables</p>
-                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatMXN(outcome.marginContribution)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-suma-cream/60">Inversión mensual {feeLabel}</p>
-                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatMXN(outcome.costMonthly)}</p>
-              </div>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-bold uppercase tracking-widest text-suma-orange">Cálculo mensual paso a paso</p>
+              <span className="rounded-full border border-white/30 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-wide">No garantizado</span>
             </div>
+            <dl className="mt-4 divide-y divide-white/15 text-sm">
+              <div className="flex items-baseline justify-between gap-4 py-3">
+                <dt>
+                  <span className="block font-bold">Clientes nuevos</span>
+                  <span className="block text-xs text-suma-cream/60">
+                    {formatDecimal(outcome.missed)} sin respuesta × {formatDecimal(recoveryRate)}% recuperadas × {formatDecimal(inputs.conversionPct)}% compran
+                    {outcome.capacityBound ? " · limitado por tus lugares libres" : ""}
+                  </span>
+                </dt>
+                <dd className="font-display text-xl font-extrabold tabular-nums">{formatDecimal(outcome.additionalClients)}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 py-3">
+                <dt>
+                  <span className="block font-bold">Ingresos adicionales</span>
+                  <span className="block text-xs text-suma-cream/60">× {formatMXN(inputs.revenuePerClient)} por cliente</span>
+                </dt>
+                <dd className="font-display text-xl font-extrabold tabular-nums">{formatMXN(outcome.addedRevenue)}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 py-3">
+                <dt>
+                  <span className="block font-bold">Lo que te queda</span>
+                  <span className="block text-xs text-suma-cream/60">{formatDecimal(inputs.contributionMarginPct)}% de margen tras costos variables</span>
+                </dt>
+                <dd className="font-display text-xl font-extrabold tabular-nums">{formatMXN(outcome.marginContribution)}</dd>
+              </div>
+              {comparable && (
+                <div className="flex items-baseline justify-between gap-4 py-3">
+                  <dt><span className="block font-bold">− {feeLabel}</span></dt>
+                  <dd className="font-display text-xl font-extrabold tabular-nums">−{formatMXN(outcome.costMonthly)}</dd>
+                </div>
+              )}
+            </dl>
+            {comparable ? (
+              <div className="mt-2 flex items-baseline justify-between gap-4 border-t-2 border-white/40 pt-4">
+                <p className="font-bold">= Diferencia al mes</p>
+                <p className={cn("font-display text-[clamp(2rem,5vw,2.8rem)] font-extrabold leading-none tabular-nums", recurringCovered ? "text-emerald-300" : "text-suma-orange")}>
+                  {outcome.monthlyNet >= 0 ? "+" : ""}{formatMXN(outcome.monthlyNet)}
+                </p>
+              </div>
+            ) : (
+              <p className="mt-3 rounded-xl border border-white/20 p-3 text-sm">Elige al menos un módulo en el paso 4 para restar la inversión de SUMA.</p>
+            )}
           </div>
+
+          {comparable && (
+            <div className={cn("mt-4 rounded-2xl border p-5", recurringCovered ? "border-emerald-200 bg-emerald-50" : "border-suma-orange/35 bg-suma-orange/10")}>
+              <p className="text-sm font-extrabold text-suma-navy">
+                {recurringCovered ? "Con estos supuestos, la mensualidad se paga sola." : "Con estos supuestos, todavía no se cubre la mensualidad."}
+              </p>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-suma-navy/80">
+                <li>
+                  <strong>Punto de equilibrio:</strong>{" "}
+                  {outcome.clientsToCoverMonthly === null
+                    ? "no se puede calcular con un margen de 0%."
+                    : outcome.clientsToCoverMonthly + " clientes nuevos al mes cubren la mensualidad"
+                      + (outcome.setup > 0 && outcome.clientsToCoverFirstMonth !== null ? " (" + outcome.clientsToCoverFirstMonth + " el primer mes, si también cubres la implementación)." : ".")}
+                </li>
+                <li><strong>Implementación ({formatMXN(outcome.setup)}):</strong> {paybackText}</li>
+                <li>
+                  <strong>Balance en {outcome.months} {outcome.months === 1 ? "mes" : "meses"}:</strong>{" "}
+                  <span className={cn("font-bold tabular-nums", outcome.netOverPeriod >= 0 ? "text-emerald-700" : "text-suma-orange-ink")}>
+                    {outcome.netOverPeriod >= 0 ? "+" : ""}{formatMXN(outcome.netOverPeriod)}
+                  </span>{" "}
+                  ya restando la implementación{outcome.months === 1 && outcome.setup > 0 ? "; prueba 6 o 12 meses para ver la recuperación." : "."}
+                </li>
+              </ul>
+            </div>
+          )}
 
           {!hasFollowupScope && (
             <div className="mt-4 rounded-xl border border-suma-orange/40 bg-suma-orange/10 p-4 text-sm leading-relaxed text-suma-navy">
-              <strong>Importante:</strong> esta simulación calcula una oportunidad de recuperar consultas, no una mejora automática por contratar publicidad, SEO o una web. Para trabajar ese escenario hace falta diseñar atención y seguimiento.
+              <strong>Importante:</strong> el cálculo supone que alguien atiende y da seguimiento a esas consultas. Publicidad, SEO o una web por sí solos no lo hacen; para eso suma CRM, chatbot o automatización.
             </div>
           )}
 
-          <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">
-            Referencia de inversión: {quote.mode === "package" ? quote.plan.name : (quote.services.map((service) => service.name).join(", ") || "sin módulos seleccionados")}.
-            {" "}<a href="#showroom-cotizar" className="font-bold underline decoration-suma-orange underline-offset-4">Modificar módulos y periodo ↓</a>
-          </p>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-suma-line bg-white p-4">
-              <p className="text-xs font-semibold text-suma-navy/60">Diferencia mensual estimada</p>
-              <p className={"mt-1 font-display text-2xl font-extrabold tabular-nums " + (good ? "text-emerald-700" : "text-suma-orange-ink")}>{formatMXN(outcome.monthlyNet)}</p>
-              <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">Después de SUMA y pauta; antes de inversión inicial, IVA y costos externos no estimados.</p>
-            </div>
-            <div className="rounded-2xl border border-suma-line bg-white p-4">
-              <p className="text-xs font-semibold text-suma-navy/60">Horas de trabajo recuperables/mes</p>
-              <p className="mt-1 font-display text-2xl font-extrabold text-suma-navy tabular-nums">{formatDecimal(outcome.hoursReleased)} h</p>
-              <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">Valor del tiempo: {formatMXN(outcome.timeValue)}. No se suma como ahorro en efectivo.</p>
-            </div>
+          <div className="mt-4 flex items-start gap-3 rounded-2xl border border-suma-line bg-white p-4">
+            <span aria-hidden="true" className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full bg-suma-purple/10 text-base">⏱</span>
+            <p className="text-sm leading-relaxed text-suma-navy/80">
+              <strong className="text-suma-navy">{formatDecimal(outcome.hoursReleased)} horas al mes</strong> de trabajo repetitivo recuperables
+              ({formatDecimal(inputs.manualTasksPerMonth, 0)} tareas × {formatDecimal(inputs.minutesSavedPerTask)} min). Valen ~{formatMXN(outcome.timeValue)}, pero no se suman como ahorro en efectivo.
+            </p>
           </div>
-
-          <div className="mt-4 rounded-2xl border border-suma-line bg-white p-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">La inversión, sin sorpresas</p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <div>
-                <p className="text-xs text-suma-navy/60">Primera factura SUMA con IVA general del 16%, si aplica</p>
-                <p className="mt-1 font-display text-xl font-extrabold tabular-nums text-suma-navy">{formatMXN(estimatedFirstInvoiceWithVat)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-suma-navy/60">Balance estimado en {outcome.months} {outcome.months === 1 ? "mes" : "meses"}, antes de IVA</p>
-                <p className={"mt-1 font-display text-xl font-extrabold tabular-nums " + (outcome.netOverPeriod >= 0 ? "text-emerald-700" : "text-suma-orange-ink")}>{formatMXN(outcome.netOverPeriod)}</p>
-              </div>
-            </div>
-            <p className="mt-2 text-xs leading-relaxed text-suma-navy/60">El balance resta implementación, mensualidad y pauta, pero excluye IVA, consumos y licencias externos, así como otros costos no informados. El IVA mostrado es una referencia de desembolso, no necesariamente un costo económico definitivo ni un cálculo fiscal personalizado.</p>
-          </div>
-
-          {comparable ? (
-            <div className={"mt-4 rounded-2xl border p-5 " + (recurringCovered ? "border-emerald-200 bg-emerald-50" : "border-suma-orange/35 bg-suma-orange/10")}>
-              <p className="text-sm font-extrabold text-suma-navy">{recurringCovered ? "Este escenario cubre el costo mensual estimado" : "Con estos supuestos, todavía no se cubre el costo mensual"}</p>
-              <p className="mt-2 text-sm leading-relaxed text-suma-navy/80">
-                {outcome.clientsToCoverMonthly === null
-                  ? "No es posible calcular el equilibrio con el margen y ticket indicados."
-                  : "Para cubrir el gasto mensual se necesitarían " + outcome.clientsToCoverMonthly + " clientes adicionales, considerando el margen que indicaste."}
-                {" "}{outcome.paybackMonths === null
-                  ? "La implementación no se recuperaría con el excedente mensual de este escenario."
-                  : outcome.paybackMonths === 0
-                    ? "No hay costo de implementación en esta selección."
-                    : "La implementación se recuperaría aproximadamente en " + outcome.paybackMonths + " meses si ese excedente se mantiene."}
-              </p>
-              <p className="mt-2 text-xs text-suma-navy/65">El primer mes requeriría {outcome.clientsToCoverFirstMonth === null ? "un cálculo individual por falta de margen positivo" : outcome.clientsToCoverFirstMonth + " clientes nuevos para cubrir también la implementación"}.</p>
-              <p className="mt-2 text-xs text-suma-navy/65">Resultado orientativo; no considera licencias ni consumos externos. {quote.isStartingPrice ? "El presupuesto de SUMA parte de un mínimo sujeto a alcance." : ""}</p>
-            </div>
-          ) : (
-            <div className="mt-4 rounded-2xl border border-suma-line bg-white p-4 text-sm text-suma-navy/75">
-              Elige al menos un servicio más abajo para comparar la oportunidad con la inversión de SUMA.
-            </div>
-          )}
 
           <details className="mt-4 rounded-2xl border border-suma-line bg-white p-4">
-            <summary className="cursor-pointer text-sm font-bold text-suma-navy">¿De dónde salen estos números?</summary>
+            <summary className="cursor-pointer text-sm font-bold text-suma-navy">Cómo se calcula y qué no incluye</summary>
             <div className="mt-4 space-y-2 text-xs leading-relaxed text-suma-navy/75">
-              <p><strong>Consultas no atendidas:</strong> consultas al mes × porcentaje sin atención.</p>
-              <p><strong>Clientes adicionales:</strong> consultas no atendidas × recuperación hipotética × conversión, limitado por cupos disponibles.</p>
-              <p><strong>Ingresos:</strong> clientes adicionales × ingreso de la primera compra.</p>
-              <p><strong>Contribución:</strong> ingresos × margen. Se resta mensualidad SUMA y pauta, pero no se descuentan impuestos, licencias, WhatsApp, IA ni infraestructura externa.</p>
-              <p><strong>Horas:</strong> tareas × minutos ahorrables ÷ 60. El valor del tiempo se presenta aparte y no se trata como ahorro monetario automático.</p>
-              <p><strong>Crecimiento porcentual:</strong> compara nuevos clientes del escenario con los clientes actuales modelados a partir de consultas que sí se atienden y la misma tasa de conversión; no es una cifra histórica comprobada.</p>
-              <p><strong>Escenarios:</strong> conservador aplica 50%, base 100% y optimista 125% sobre la recuperación que tú indicas. Estos factores son ejemplos de sensibilidad, no datos estadísticos.</p>
-              <p><strong>Precios:</strong> catálogo oficial SUMA, sin descuentos y antes de IVA. Implementación {formatMXN(outcome.setup)}; mensualidad {formatMXN(quote.monthlySuma)}; pauta {formatMXN(quote.monthlyAds)}.</p>
-              {outcome.capacityBound && <p><strong>Capacidad:</strong> tu límite de cupos restringió la estimación de nuevos clientes.</p>}
+              <p><strong>Clientes nuevos:</strong> consultas × % sin respuesta × % que recuperarías × % que compra, con tope en tus lugares libres.</p>
+              <p><strong>Lo que te queda:</strong> ingresos × margen. Después se resta la mensualidad SUMA{quote.hasAds ? " y la pauta" : ""}.</p>
+              <p><strong>Escenarios (supuesto de SUMA):</strong> conservador aplica 50%, base 100% y optimista 125% a la recuperación y al tiempo ahorrado. No son estadísticas.</p>
+              <p><strong>Crecimiento:</strong> {outcome.growthPct === null ? "no calculable con estos datos" : "+" + formatDecimal(outcome.growthPct) + "% frente a los clientes que hoy obtienes de las consultas que sí atiendes"} (estimado, no histórico).</p>
+              <p><strong>Precios:</strong> catálogo oficial SUMA, sin descuentos y antes de IVA: implementación {formatMXN(outcome.setup)} y mensualidad {formatMXN(quote.monthlySuma)}{quote.hasAds ? "; pauta " + formatMXN(quote.monthlyAds) + "/mes" : ""}.</p>
+              <p><strong>No incluye:</strong> IVA, licencias de software, WhatsApp API, consumo de IA, hosting ni pagos futuros de tus clientes.</p>
             </div>
           </details>
 
@@ -242,24 +294,18 @@ export function ShowroomImpacto({ selection, quote }: Props) {
             className="mt-5 flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-5 text-center text-sm font-extrabold text-suma-navy transition-colors hover:bg-suma-navy hover:text-white">
             Quiero que SUMA revise mis números →
           </a>
-          <p className="mt-3 text-center text-xs text-suma-navy/60">
-            Solicitud por WhatsApp · No contratas ni reservas automáticamente.
-          </p>
+          <p className="mt-3 text-center text-xs text-suma-navy/60">Abre WhatsApp con un mensaje editable · No contratas ni reservas nada.</p>
         </div>
       </div>
 
-      <div className="border-t border-suma-line bg-white px-5 py-5 md:px-8">
-        <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Contexto de investigación</p>
-            <p className="mt-1 text-sm text-suma-navy/75">Los estudios orientan qué procesos vale la pena mejorar, pero sus cifras <strong>no</strong> son porcentajes de resultados prometidos por SUMA.</p>
-          </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold">
-            <a href="https://hbr.org/2011/03/the-short-life-of-online-sales-leads" target="_blank" rel="noopener noreferrer" className="underline decoration-suma-orange underline-offset-4">Respuesta a prospectos · HBR 2011 ↗</a>
-            <a href="https://wwwmatnp.sat.gob.mx/articulo/19848/articulo-1" target="_blank" rel="noopener noreferrer" className="underline decoration-suma-orange underline-offset-4">Tasa general IVA · SAT ↗</a>
-            <a href="https://www.mindbodyonline.com/business/education/research-reports/2025-state-industry-report" target="_blank" rel="noopener noreferrer" className="underline decoration-suma-orange underline-offset-4">Retención wellness · Mindbody 2025 ↗</a>
-          </div>
-        </div>
+      <div className="border-t border-suma-line bg-white px-5 py-4 md:px-8">
+        <p className="text-xs leading-relaxed text-suma-navy/70">
+          <strong className="text-suma-purple">Contexto:</strong> estudios como{" "}
+          <a href="https://hbr.org/2011/03/the-short-life-of-online-sales-leads" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-suma-orange underline-offset-4">HBR 2011 (respuesta a prospectos) ↗</a>{" "}
+          y{" "}
+          <a href="https://www.mindbodyonline.com/business/education/research-reports/2025-state-industry-report" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-suma-orange underline-offset-4">Mindbody 2025 (retención wellness) ↗</a>{" "}
+          explican por qué importa responder rápido, pero sus cifras no son resultados prometidos por SUMA.
+        </p>
       </div>
     </section>
   );
