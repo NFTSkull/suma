@@ -28,6 +28,7 @@ function Page() {
 
 describe("AnalyticsClicks", () => {
   beforeEach(() => {
+    localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
     (window as DL).dataLayer = [];
   });
 
