@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   individualServices,
   pricingPlans,
@@ -28,6 +28,19 @@ export function PricingEstimator() {
   const [goal, setGoal] = useState("Atraer más clientes");
   const [platform, setPlatform] = useState("WhatsApp");
   const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const selectedPlan = params.get("plan");
+    const selectedService = params.get("servicio");
+    if (selectedPlan && pricingPlans.some((p) => p.id === selectedPlan)) {
+      setPlanId(selectedPlan as PricingPlanId);
+    }
+    if (selectedService && individualServices.some((s) => s.id === selectedService)) {
+      setMode("services");
+      setServiceIds([selectedService as IndividualServiceId]);
+    }
+  }, []);
 
   const selection: PricingSelection = {
     mode, planId, serviceIds, months, adBudget, locations, teamUsers,
