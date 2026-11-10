@@ -110,7 +110,7 @@ export default function PreciosPage() {
                   >
                     {plan.action}
                   </ButtonLink>
-                  <a href="#simulador" className={"mt-4 min-h-10 text-center text-sm font-bold underline decoration-2 underline-offset-4 " + (dark ? "text-suma-cream" : "text-suma-purple")}>
+                  <a href={"/precios?plan=" + plan.id + "#simulador"} className={"mt-4 min-h-10 text-center text-sm font-bold underline decoration-2 underline-offset-4 " + (dark ? "text-suma-cream" : "text-suma-purple")}>
                     Personalizar con otros servicios
                   </a>
                 </article>
@@ -190,7 +190,7 @@ export default function PreciosPage() {
                     {service.setup === 0 ? "/mes · sin implementación base" : service.monthly ? "+ " + formatMXN(service.monthly) + "/mes" : "Pago único"}
                   </p>
                   <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">{service.detail}</p>
-                  <a href="#simulador" className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-2 underline-offset-4">
+                  <a href={"/precios?servicio=" + service.id + "#simulador"} className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-2 underline-offset-4">
                     Incluir en mi propuesta →
                   </a>
                 </div>
