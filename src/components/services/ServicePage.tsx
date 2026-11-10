@@ -11,6 +11,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AdJourneyMini, ChatMini, CrmMini, PhoneMini, WebScreensMini } from "@/components/visuals/MiniVisuals";
 import { industryBySlug } from "@/content/industries";
 import { getService, serviceBySlug } from "@/content/services";
+import { site } from "@/content/site";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
 import { serviceCtaAttrs } from "@/lib/analytics";
@@ -135,7 +136,7 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
               {s.hero.lead}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
-              <ButtonLink href="/contacto" size="lg" variant={theme.dark ? "accent" : "primary"} arrow {...serviceCtaAttrs(slug, "hero")}>
+              <ButtonLink href={site.contact.whatsappUrl} size="lg" variant={theme.dark ? "accent" : "primary"} arrow target="_blank" rel="noopener noreferrer" {...serviceCtaAttrs(slug, "hero")}>
                 Hablemos de tu proyecto
               </ButtonLink>
               <ButtonLink href="#experiencia" variant={theme.dark ? "link-light" : "link"}>
