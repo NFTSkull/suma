@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SELECTOR_STORAGE_KEY } from "@/lib/recommend";
+import { site } from "@/content/site";
 import { NeedsSelector } from "./NeedsSelector";
 
 vi.mock("next/link", () => import("@/test/next-link-mock"));
@@ -54,7 +55,8 @@ describe("NeedsSelector", () => {
     const cards = screen.getAllByRole("heading", { level: 4 });
     expect(cards.length).toBeGreaterThanOrEqual(1);
     expect(cards.length).toBeLessThanOrEqual(3);
-    expect(screen.getByRole("link", { name: /Conversemos sobre esto/ })).toHaveAttribute("href", "/contacto");
+    expect(screen.getByRole("link", { name: /Conversemos por WhatsApp/ })).toHaveAttribute("href", site.contact.whatsappUrl);
+    expect(screen.getByRole("link", { name: /Prefiero enviar el formulario/ })).toHaveAttribute("href", "/contacto");
   });
 
   it("guarda el contexto sin datos personales al ir al formulario", async () => {
@@ -64,7 +66,7 @@ describe("NeedsSelector", () => {
     await user.click(screen.getByRole("button", { name: "Continuar" }));
     await user.click(screen.getByRole("radio", { name: /ordenar mis citas/ }));
     await user.click(screen.getByRole("button", { name: "Ver recomendación" }));
-    await user.click(screen.getByRole("link", { name: /Conversemos sobre esto/ }));
+    await user.click(screen.getByRole("link", { name: /Prefiero enviar el formulario/ }));
 
     const saved = JSON.parse(sessionStorage.getItem(SELECTOR_STORAGE_KEY) ?? "null");
     expect(saved).toMatchObject({ negocio: "spa", reto: "orden" });
