@@ -9,12 +9,12 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { getIndustry, industries } from "@/content/industries";
-import { site } from "@/content/site";
 import { photos } from "@/content/photos";
 import { serviceBySlug, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
 import { ids, pageGraph } from "@/lib/seo";
+import { whatsappUrlFor } from "@/lib/whatsapp";
 import type { IndustrySlug, SumaColor } from "@/types/content";
 import { IndustryDemo } from "./IndustryDemo";
 
@@ -69,7 +69,7 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
               {ind.hero.lead}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
-              <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer">
+              <ButtonLink href={whatsappUrlFor({ industry: ind.name })} size="lg" arrow target="_blank" rel="noopener noreferrer">
                 Hablemos de tu negocio
               </ButtonLink>
               <ButtonLink href="#prioridades" variant="link">
@@ -260,6 +260,7 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
         title="Cuéntanos cómo funciona tu negocio hoy."
         text="Te ayudamos a identificar qué pieza tendría más impacto primero."
         secondary={{ label: "Explorar soluciones", href: "/soluciones" }}
+        primaryHref={whatsappUrlFor({ industry: ind.name })}
       />
 
       <JsonLd
