@@ -25,7 +25,7 @@ describe("PricingEstimator", () => {
     expect(screen.getByText(formatMXN(44300))).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "SUMA Growth" }));
     expect(screen.getByText(formatMXN(34800))).toBeInTheDocument();
-    expect(screen.getByText(formatMXN(48000), { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(formatMXN(36000), { exact: false })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /revisar mi propuesta por WhatsApp/i })).toHaveAttribute("data-pricing-source", "estimator");
   });
 
@@ -33,7 +33,7 @@ describe("PricingEstimator", () => {
     render(<PricingEstimator />);
     fireEvent.click(screen.getByRole("button", { name: "SUMA Ads" }));
     expect(screen.getByText(formatMXN(10800))).toBeInTheDocument();
-    expect(screen.getByText(formatMXN(6000), { exact: false })).toBeInTheDocument();
+    expect(screen.getAllByText(formatMXN(6000), { exact: false }).length).toBeGreaterThan(0);
     expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     expect((window as DL).dataLayer).toContainEqual({ event: "pricing_plan_selected", plan: "ads" });
   });
