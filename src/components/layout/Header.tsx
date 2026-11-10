@@ -203,7 +203,7 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:block">
-            <ButtonLink href={primaryCta.href} variant="primary" className="whitespace-nowrap" arrow>
+            <ButtonLink href={primaryCta.href} variant="primary" className="whitespace-nowrap" arrow target="_blank" rel="noopener noreferrer">
               {primaryCta.label}
             </ButtonLink>
           </div>

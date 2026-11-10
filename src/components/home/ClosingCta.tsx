@@ -37,7 +37,7 @@ export function ClosingCta({
             <p className="text-lead mt-8 max-w-2xl text-suma-navy/75">{text}</p>
           </Reveal>
           <Reveal delay={220} className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
-            <ButtonLink href={primaryCta.href} size="lg" arrow {...primaryAttrs}>
+            <ButtonLink href={primaryCta.href} size="lg" arrow target="_blank" rel="noopener noreferrer" {...primaryAttrs}>
               {primaryCta.label}
             </ButtonLink>
             {secondary && (

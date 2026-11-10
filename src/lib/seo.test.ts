@@ -31,14 +31,18 @@ describe("metadata", () => {
 });
 
 describe("JSON-LD", () => {
-  it("Organization usa solo datos confirmados: sin teléfono, calle, reseñas, precios ni fundación", () => {
+  it("Organization publica el teléfono confirmado, sin domicilios ni pruebas sociales inventadas", () => {
     const org = organizationNode();
     expect(org["@type"]).toBe("Organization");
     expect(org["@id"]).toBe(`${site.url}/#organization`);
     const json = JSON.stringify(org);
-    for (const key of ["telephone", "streetAddress", "postalCode", "aggregateRating", "review", "priceRange", "founder", "foundingDate", "award"]) {
+    for (const key of ["streetAddress", "postalCode", "aggregateRating", "review", "priceRange", "founder", "foundingDate", "award"]) {
       expect(json).not.toContain(`"${key}"`);
     }
+    const sales = org.contactPoint as Node;
+    expect(sales["@type"]).toBe("ContactPoint");
+    expect(sales.telephone).toBe("+528114688882");
+    expect(sales.email).toBeUndefined();
     expect((org.logo as Node).url).toBe(absoluteUrl("/brand/isotipo-512.png"));
     expect(org.sameAs).toBeUndefined();
   });

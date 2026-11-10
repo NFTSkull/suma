@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ClosingCta } from "@/components/home/ClosingCta";
+import { site } from "@/content/site";
 import { PageHero } from "@/components/layout/PageHero";
 import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
@@ -243,7 +244,7 @@ export default function SoftwarePilatesGuidePage() {
                 el problema que necesitas resolver, no por imponerte un software.
               </p>
               <div className="mt-9">
-                <ButtonLink href="/contacto" size="lg" arrow>
+                <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer">
                   Cuéntanos cómo funciona tu estudio
                 </ButtonLink>
               </div>

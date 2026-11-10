@@ -115,6 +115,7 @@ export function organizationNode(): Node {
             areaServed: "MX",
             availableLanguage: "es",
             ...(email ? { email } : {}),
+            ...(whatsapp ? { telephone: site.contact.phoneE164 } : {}),
           },
         }
       : {}),

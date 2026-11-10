@@ -19,6 +19,7 @@ function Page() {
       <a href="/contacto" {...serviceCtaAttrs("crm", "closing")}>
         Cierre
       </a>
+      <a href="https://wa.me/528114688882" {...serviceCtaAttrs("crm", "hero")}>CTA CRM por WhatsApp</a>
       <a href="/servicios">Servicios</a>
     </>
   );
@@ -48,6 +49,15 @@ describe("AnalyticsClicks", () => {
     expect(layer()).toEqual([
       { event: "service_cta_click", service: "crm", cta_location: "hero" },
       { event: "service_cta_click", service: "crm", cta_location: "closing" },
+    ]);
+  });
+
+  it("un CTA de servicio a WhatsApp registra contacto y servicio una sola vez cada uno", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByText("CTA CRM por WhatsApp"));
+    expect(layer()).toEqual([
+      { event: "contact_click", contact_method: "whatsapp" },
+      { event: "service_cta_click", service: "crm", cta_location: "hero" },
     ]);
   });
 

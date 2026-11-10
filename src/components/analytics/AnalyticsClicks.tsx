@@ -18,9 +18,10 @@ export function AnalyticsClicks() {
       const method = contactMethodOf(link.getAttribute("href") ?? "");
       if (method) {
         track({ event: "contact_click", contact_method: method });
-        return;
       }
 
+      // Cuando un CTA de servicio abre WhatsApp se registran los dos eventos,
+      // una sola vez cada uno: contacto y servicio de origen (sin datos personales).
       if (link.dataset.analytics === "service_cta" && link.dataset.service) {
         track({
           event: "service_cta_click",

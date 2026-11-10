@@ -125,7 +125,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
           </nav>
 
           <div className="container-suma relative mt-10 space-y-5">
-            <ButtonLink href={primaryCta.href} size="lg" arrow className="w-full">
+            <ButtonLink href={primaryCta.href} size="lg" arrow className="w-full" target="_blank" rel="noopener noreferrer">
               {primaryCta.label}
             </ButtonLink>
             <p className="text-center text-sm text-suma-navy/65">{site.location.label}</p>
