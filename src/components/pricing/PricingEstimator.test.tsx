@@ -11,30 +11,35 @@ describe("PricingEstimator", () => {
     (window as DL).dataLayer = [];
   });
 
-  it("inicia en Flow y presenta un desglose de primer pago y tres meses", () => {
+  it("inicia en Flow, cotiza instalación y mensualidad y permite WhatsApp", () => {
     render(<PricingEstimator />);
     expect(screen.getByRole("button", { name: "SUMA Flow" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText(formatMXN(19800))).toBeInTheDocument();
-    expect(screen.getByText(formatMXN(29600))).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /revisar mi propuesta por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "flow");
+    expect(screen.getByText(formatMXN(13800))).toBeInTheDocument();
+    expect(screen.getByText(formatMXN(21600))).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "flow");
   });
 
-  it("ajusta meses, cambia de plan y conserva publicidad como gasto externo", () => {
-    render(<PricingEstimator />);
-    fireEvent.change(screen.getByLabelText("Periodo de referencia"), { target: { value: "6" } });
-    expect(screen.getByText(formatMXN(44300))).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "SUMA Growth" }));
-    expect(screen.getByText(formatMXN(34800))).toBeInTheDocument();
-    expect(screen.getByText(formatMXN(36000), { exact: false })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /revisar mi propuesta por WhatsApp/i })).toHaveAttribute("data-pricing-source", "estimator");
-  });
-
-  it("permite Ads sin exigir web, con presupuesto publicitario externo", () => {
+  it("al elegir Ads separa la pauta del cobro a SUMA", () => {
     render(<PricingEstimator />);
     fireEvent.click(screen.getByRole("button", { name: "SUMA Ads" }));
     expect(screen.getByText(formatMXN(10800))).toBeInTheDocument();
     expect(screen.getAllByText(formatMXN(6000), { exact: false }).length).toBeGreaterThan(0);
-    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     expect((window as DL).dataLayer).toContainEqual({ event: "pricing_plan_selected", plan: "ads" });
+  });
+
+  it("se puede contratar solo una herramienta y seleccionarla en el configurador", () => {
+    render(<PricingEstimator />);
+    fireEvent.click(screen.getByRole("button", { name: "Solo servicios" }));
+    expect(screen.getByText(/selecciona al menos un servicio/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Configurar reservador existente" }));
+    expect(screen.getByText(formatMXN(4900), { exact: true })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
+  });
+
+  it("informa sin recargo de SUMA por asiento y sedes extra no se multiplican automáticamente", () => {
+    render(<PricingEstimator />);
+    expect(screen.getByText(/sin recargo de SUMA por asiento/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Número de sedes"), { target: { value: "3" } });
+    expect(screen.getByText(/cotizaremos las demás/i)).toBeInTheDocument();
   });
 });
