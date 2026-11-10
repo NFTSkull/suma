@@ -50,6 +50,7 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
       { label: "Inicio", href: "/" },
       { label: "Soluciones", href: "/soluciones" },
       { label: "Cómo trabajamos", href: "/como-trabajamos" },
+      { label: "Guía de software para pilates", href: "/guias/software-para-estudios-de-pilates" },
       { label: "El estudio", href: "/nosotros" },
       { label: "Contacto", href: "/contacto" },
     ],
@@ -71,6 +72,7 @@ export const allRoutes: string[] = [
   "/como-trabajamos",
   "/nosotros",
   "/contacto",
+  "/guias/software-para-estudios-de-pilates",
   "/aviso-de-privacidad",
 ];
 
