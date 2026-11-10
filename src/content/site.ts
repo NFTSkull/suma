@@ -17,13 +17,14 @@ export const site = {
     country: "México",
     label: "Desde Monterrey, Nuevo León · Para todo México",
   },
-  /**
-   * Datos de contacto reales. Se dejan en null hasta que la marca los confirme;
-   * la interfaz solo los muestra cuando existen.
-   */
+  /** Único teléfono de contacto aprobado para SUMA STUDIO (México, +52). */
   contact: {
     email: null as string | null,
-    whatsapp: null as string | null,
+    phone: "8114688882",
+    phoneDisplay: "81 1468 8882",
+    phoneE164: "+528114688882",
+    whatsapp: "528114688882",
+    whatsappUrl: "https://wa.me/528114688882?text=Hola%2C%20vi%20SUMA%20STUDIO%20y%20me%20gustar%C3%ADa%20platicar%20sobre%20un%20proyecto.",
   },
   social: [] as { label: string; href: string }[],
   /** Contenedor de Google Tag Manager. */
