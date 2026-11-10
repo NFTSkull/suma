@@ -1,4 +1,4 @@
-import { pricingPlans, pricingSettings, type PricingPlanId } from "@/content/pricing";
+import { pricingPlans, type PricingPlanId } from "@/content/pricing";
 import { site } from "@/content/site";
 
 export const formatMXN = (amount: number) =>
