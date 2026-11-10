@@ -26,7 +26,9 @@ export const site = {
     whatsapp: "528114688882",
     whatsappUrl: "https://wa.me/528114688882?text=Hola%2C%20vi%20SUMA%20STUDIO%20y%20me%20gustar%C3%ADa%20platicar%20sobre%20un%20proyecto.",
   },
-  social: [] as { label: string; href: string }[],
+  social: [
+    { label: "LinkedIn · SUMA STUDIO", href: "https://www.linkedin.com/company/sumastudio-tecnologia/" },
+  ] as { label: string; href: string }[],
   /** Contenedor de Google Tag Manager. */
   gtmId: "GTM-W2CSD45N",
   url: target.url,
