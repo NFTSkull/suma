@@ -29,7 +29,7 @@ export default function SolucionesPage() {
         accent="purple"
         crumbs={crumbs}
         title="Empieza por lo que hoy te quita más tiempo."
-        lead="No vendemos paquetes cerrados. Partimos de lo que pasa en tu negocio y te recomendamos la pieza que más puede ayudarte ahora."
+        lead="Los paquetes son un punto de partida, no una camisa de fuerza. Partimos de tu operación y te recomendamos la pieza que más puede ayudarte ahora."
       >
         <ButtonLink href="#selector" size="lg" arrow>
           Encontrar mi solución

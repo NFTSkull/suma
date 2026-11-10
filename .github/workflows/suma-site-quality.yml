@@ -1,0 +1,30 @@
+name: Calidad del sitio SUMA
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Revisar tipos
+        run: npm run typecheck
+      - name: Validar reglas de código
+        run: npm run lint
+      - name: Ejecutar pruebas
+        run: npm test

@@ -155,6 +155,22 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Enlace comercial estable: da acceso a precios sin reemplazar el diagnóstico. */}
+      <section aria-labelledby="home-precios-title" className="bg-suma-cream-deep/55 py-16 md:py-24">
+        <div className="container-suma grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12">
+          <div>
+            <p className="text-eyebrow text-suma-orange-ink">Planes claros, soluciones flexibles</p>
+            <h2 id="home-precios-title" className="text-display-md mt-4 max-w-3xl">
+              Un buen siguiente paso también cabe en tu presupuesto.
+            </h2>
+            <p className="mt-5 max-w-3xl text-lg text-suma-navy/75">
+              Conoce nuestras opciones de página web, CRM, seguimiento y crecimiento para estudios y spas. Tres paquetes base con inversión inicial y mensualidades explicadas por separado.
+            </p>
+          </div>
+          <ButtonLink href="/precios" size="lg" arrow>Conocer precios y paquetes</ButtonLink>
+        </div>
+      </section>
+
       <ImpactBlock />
       <ClosingCta />
       <JsonLd

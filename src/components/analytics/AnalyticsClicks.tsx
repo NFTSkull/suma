@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { contactMethodOf, track } from "@/lib/analytics";
+import type { PricingPlanId } from "@/content/pricing";
 import type { ServiceSlug } from "@/types/content";
 
 /**
@@ -18,6 +19,16 @@ export function AnalyticsClicks() {
       const method = contactMethodOf(link.getAttribute("href") ?? "");
       if (method) {
         track({ event: "contact_click", contact_method: method });
+      }
+
+      // La selección de precios se mide sin nombre, teléfono, importe variable ni texto libre.
+      const pricingPlan = link.dataset.pricingPlan;
+      if (pricingPlan === "start" || pricingPlan === "flow" || pricingPlan === "growth") {
+        track({
+          event: "pricing_cta_click",
+          plan: pricingPlan as PricingPlanId,
+          source: link.dataset.pricingSource === "estimator" ? "estimator" : "card",
+        });
       }
 
       // Cuando un CTA de servicio abre WhatsApp se registran los dos eventos,
