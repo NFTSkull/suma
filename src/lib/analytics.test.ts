@@ -12,7 +12,7 @@ describe("eventos analíticos y consentimiento", () => {
   });
 
   it("no encola eventos sin decisión", () => {
-    track({ event: "pricing_plan_selected", plan: "start" });
+    track({ event: "pricing_plan_selected", plan: "ads" });
     expect((window as LayerWindow).dataLayer).toEqual([]);
   });
 
@@ -33,9 +33,9 @@ describe("eventos analíticos y consentimiento", () => {
 
   it("deja de registrar eventos inmediatamente al revocar el consentimiento", () => {
     saveAnalyticsConsent("granted");
-    track({ event: "pricing_plan_selected", plan: "start" });
+    track({ event: "pricing_plan_selected", plan: "ads" });
     saveAnalyticsConsent("denied");
     track({ event: "pricing_plan_selected", plan: "growth" });
-    expect((window as LayerWindow).dataLayer!.filter((x) => (x as { event?: string }).event === "pricing_plan_selected")).toEqual([{ event: "pricing_plan_selected", plan: "start" }]);
+    expect((window as LayerWindow).dataLayer!.filter((x) => (x as { event?: string }).event === "pricing_plan_selected")).toEqual([{ event: "pricing_plan_selected", plan: "ads" }]);
   });
 });
