@@ -1,4 +1,5 @@
 import type { NavLink } from "@/types/content";
+import { site } from "./site";
 import { industries } from "./industries";
 import { services } from "./services";
 
@@ -41,7 +42,7 @@ export const mainNav: MainNavItem[] = [
   { kind: "link", label: "Contacto", href: "/contacto" },
 ];
 
-export const primaryCta = { label: "Hablemos de tu proyecto", href: "/contacto" } as const;
+export const primaryCta = { label: "Hablemos por WhatsApp", href: site.contact.whatsappUrl } as const;
 
 export const footerNav: { title: string; links: NavLink[] }[] = [
   {
