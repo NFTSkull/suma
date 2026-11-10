@@ -65,7 +65,7 @@ Reutilizar los mismos datos auténticos, una vez exista consistencia en la web y
 - Vercel reportó despliegue de producción READY del commit `0c7e863c` (unificación de contacto WhatsApp).
 - Lectura pública de `/guias`, `/guias/software-para-estudios-de-pilates` y `/guias/automatizar-reservas-spa`: se muestran contenido, títulos/canonicals propios y CTAs.
 - Sitemap público: **21 URLs**, incluidas las tres rutas de guías; `robots.txt` incluye sitemap.
-- La página `/nosotros` aún describe exclusivamente trabajo remoto en producción al momento de la comprobación. PR #3 propone corregirlo.
+- La página `/nosotros` ya declara correctamente atención remota para México y visitas presenciales en Monterrey y su área metropolitana. PR #3 fusionado en `main` como commit `c59e4593`; despliegue de producción READY y contenido público comprobado.
 - El aviso de privacidad aún es **borrador**; no marcarlo completo sin responsable legal, domicilio y correo reales.
 - Search Console: la lectura pública de páginas y sitemap **no permite confirmar su indexación**. Inspeccionar estados en la propiedad verificada.
 - La existencia de un enlace de WhatsApp **no equivale** a lead, conversación iniciada ni venta cerrada.
