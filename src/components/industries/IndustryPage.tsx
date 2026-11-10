@@ -209,6 +209,29 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
         </section>
       )}
 
+      {slug === "spas" && (
+        <section aria-labelledby="guia-spa-title" className="bg-suma-cream py-14 md:py-20">
+          <div className="container-suma grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <p className="text-eyebrow text-suma-orange-ink">Guía para spas</p>
+              <h2 id="guia-spa-title" className="mt-3 font-display text-3xl font-bold">
+                Cómo automatizar reservas, confirmaciones y seguimiento.
+              </h2>
+              <p className="mt-4 max-w-3xl text-lg text-suma-navy/80">
+                Aprende a conectar WhatsApp, agenda, cabinas y recepción sin perder la atención humana
+                ni confirmar citas que todavía no tienen horario.
+              </p>
+            </div>
+            <Link
+              href="/guias/automatizar-reservas-spa"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-suma-navy px-7 font-bold text-suma-cream transition-colors hover:bg-suma-purple"
+            >
+              Leer guía de reservas para spas →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* Otras industrias */}
       <section aria-labelledby="otras-title" className="bg-suma-cream py-16">
         <div className="container-suma">

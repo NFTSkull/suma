@@ -288,6 +288,29 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
         </section>
       )}
 
+      {slug === "chatbots" && (
+        <section aria-labelledby="recurso-chatbot-spa-title" className="bg-suma-cream-soft py-14 md:py-20">
+          <div className="container-suma grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <p className="text-eyebrow text-suma-purple">Recurso para spas</p>
+              <h2 id="recurso-chatbot-spa-title" className="mt-3 font-display text-3xl font-bold">
+                ¿Cómo se conecta un chatbot con la agenda de un spa?
+              </h2>
+              <p className="mt-4 max-w-3xl text-lg text-suma-navy/80">
+                Recorre seis pasos desde la consulta por WhatsApp hasta la confirmación y el seguimiento.
+                Distingue solicitudes de reservas reales antes de automatizar.
+              </p>
+            </div>
+            <Link
+              href="/guias/automatizar-reservas-spa"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-suma-navy px-7 font-bold text-suma-cream transition-colors hover:bg-suma-purple"
+            >
+              Guía para automatizar reservas →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* FAQ */}
       <section aria-labelledby="faq-title" className="section-y bg-suma-cream-soft">
         <div className="container-suma grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">

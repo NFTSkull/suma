@@ -138,6 +138,9 @@ export default function HomePage() {
               <ButtonLink href="/guias/software-para-estudios-de-pilates" variant="secondary" arrow>
                 Leer la guía de software para pilates
               </ButtonLink>
+              <div className="mt-4">
+                <ButtonLink href="/guias" variant="link">Ver todas las guías</ButtonLink>
+              </div>
             </div>
           </div>
           <div className="rounded-[2rem] bg-suma-cream p-8 shadow-soft md:p-10">
