@@ -28,6 +28,8 @@ describe("metadata", () => {
     }
     expect(indexableRoutes.length).toBe(allRoutes.length - noindexRoutes.length);
     expect(indexableRoutes).toContain("/guias/chatbot-whatsapp-pilates");
+    expect(indexableRoutes).toContain("/precios");
+    expect(buildMetadata({ title: "Precios", description: "d", path: "/precios" }).alternates?.canonical).toBe(`${site.url}/precios`);
   });
 });
 
