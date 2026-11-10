@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { getIndustry, industries } from "@/content/industries";
+import { site } from "@/content/site";
 import { photos } from "@/content/photos";
 import { serviceBySlug, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
@@ -68,7 +69,7 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
               {ind.hero.lead}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
-              <ButtonLink href="/contacto" size="lg" arrow>
+              <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer">
                 Hablemos de tu negocio
               </ButtonLink>
               <ButtonLink href="#prioridades" variant="link">
