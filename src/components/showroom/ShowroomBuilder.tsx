@@ -10,6 +10,7 @@ import {
 import { formatMXN } from "@/lib/pricing";
 import { showroomEstimate, showroomWhatsAppHref, toggleShowroomService, type ShowroomSelection } from "@/lib/showroom";
 import { ShowroomLivePreview } from "./ShowroomLivePreview";
+import { ShowroomImpacto } from "./ShowroomImpacto";
 
 const field = "mt-2 min-h-12 w-full rounded-xl border border-suma-line bg-white px-4 text-base text-suma-navy focus-visible:outline-2 focus-visible:outline-suma-orange";
 const categories = ["Captación", "Atención", "Operación", "Presencia", "Desarrollo"] as const;
@@ -128,9 +129,11 @@ export function ShowroomBuilder() {
         </div>
       </section>
 
+      <ShowroomImpacto selection={selection} quote={quote} />
+
       <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="scroll-mt-24 rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
         <div className="mb-7">
-          <p className="text-eyebrow text-suma-orange-ink">03 · Diseña tu propuesta</p>
+          <p className="text-eyebrow text-suma-orange-ink">04 · Diseña tu propuesta</p>
           <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Elige funciones. Ve un estimado al instante.</h2>
           <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">Puedes combinar módulos, usar un paquete o pedir que revisemos tu presupuesto. Los importes salen del catálogo público de SUMA, sin descuentos automáticos.</p>
         </div>
