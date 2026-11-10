@@ -37,4 +37,15 @@ describe("ShowroomBuilder", () => {
     expect(decodeURIComponent(href!.split("?text=")[1])).toContain("CRM + seguimiento administrado");
     expect(screen.getByText(/Esta solicitud no agenda automáticamente una cita/i)).toBeInTheDocument();
   });
+  it("recomienda tres experiencias sin esconder el catálogo completo", () => {
+    render(<ShowroomBuilder />);
+    expect(screen.getByRole("button", { name: /Chatbot para WhatsApp/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Campañas digitales/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Atraer más clientes" }));
+    expect(screen.getByRole("button", { name: /Campañas digitales/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Chatbot para WhatsApp/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Explorar las 9 experiencias/i }));
+    expect(screen.getByRole("button", { name: /Chatbot para WhatsApp/i })).toBeInTheDocument();
+  });
+
 });
