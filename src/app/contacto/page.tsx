@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { site } from "@/content/site";
 import { buildMetadata, pageGraph } from "@/lib/seo";
@@ -36,6 +37,25 @@ export default function ContactoPage() {
           <p className="text-lead mt-8 max-w-xl text-suma-navy/75">
             Cuéntanos cómo funciona tu negocio hoy. No necesitas tener todo claro: para eso es la primera conversación.
           </p>
+          <div className="mt-10 rounded-[2rem] border border-suma-line bg-suma-cream-soft p-7 shadow-soft md:p-8">
+            <p className="text-eyebrow text-suma-orange-ink">Contacto directo</p>
+            <h2 className="mt-3 font-display text-2xl font-bold">Escríbenos por WhatsApp</h2>
+            <p className="mt-3 text-suma-navy/75">
+              Cuéntanos qué necesitas para tu negocio. El mensaje llega a nuestro número de atención.
+            </p>
+            <p className="mt-5 font-display text-2xl font-bold text-suma-navy">{site.contact.phoneDisplay}</p>
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer">
+                Abrir WhatsApp
+              </ButtonLink>
+              <a
+                href={`tel:${site.contact.phoneE164}`}
+                className="inline-flex min-h-12 items-center font-bold text-suma-navy underline decoration-2 decoration-suma-orange underline-offset-4"
+              >
+                Llamar al {site.contact.phoneDisplay}
+              </a>
+            </div>
+          </div>
           <div className="mt-12 rounded-[2rem] bg-suma-navy p-8 text-suma-cream">
             <h2 className="font-display text-2xl font-bold">Qué pasa después</h2>
             <ol className="mt-6 space-y-5">
@@ -50,6 +70,8 @@ export default function ContactoPage() {
           </div>
         </div>
         <div className="rounded-[2rem] bg-suma-cream-soft p-6 shadow-soft md:p-10">
+          <p className="text-eyebrow text-suma-purple">También puedes escribirnos aquí</p>
+          <p className="mb-8 mt-3 text-suma-navy/75">Si prefieres explicar tu proyecto con más detalle, envía el formulario y revisaremos tu solicitud.</p>
           <ContactForm />
         </div>
       </div>
