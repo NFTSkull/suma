@@ -7,8 +7,8 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
-  title: "Showroom interactivo: visualiza y configura tu solución | SUMA STUDIO",
-  description: "Prueba demos personalizadas de CRM, chatbots, publicidad, reservas, webs y apps. Añade funciones, ve precios orientativos en MXN y pide una propuesta por WhatsApp.",
+  title: "SUMA Vision Studio: prueba, personaliza y estima tu impacto | SUMA STUDIO",
+  description: "Experimenta CRM, chatbots y reservas con tu marca. Simula ingresos potenciales, tiempo recuperable, inversión y punto de equilibrio con supuestos transparentes.",
   path: "/showroom",
   keywords: [
     "demo CRM pilates Monterrey", "showroom chatbot WhatsApp wellness",
@@ -22,12 +22,12 @@ export default function ShowroomPage() {
   return (
     <>
       <PageHero
-        eyebrow="SUMA SHOWROOM · Interactivo"
+        eyebrow="SUMA VISION STUDIO · Interactivo"
         accent="orange"
         dark
         crumbs={crumbs}
         title={<>Tu idea, <span className="text-suma-orange">a la vista.</span></>}
-        lead="Imagina cómo podría funcionar tu próximo CRM, chatbot, anuncio, sitio o aplicación. Personaliza una simulación, elige funciones y ve un presupuesto inicial, sin tener que agendar una reunión para empezar."
+        lead="Prueba cómo podría funcionar tu negocio, descubre oportunidades de crecimiento y compara tu inversión con resultados hipotéticos transparentes. Sin registro ni compromiso."
       >
         <div className="flex flex-wrap gap-3">
           <ButtonLink href="#showroom-construir" variant="light" size="lg" arrow>Diseñar mi experiencia</ButtonLink>
@@ -41,9 +41,19 @@ export default function ShowroomPage() {
             <p className="max-w-xl text-sm text-suma-navy/70">
               No necesitas conocimientos técnicos. Cambia el nombre de tu negocio, explora las pantallas, combina lo que sí te sirve y envíanos tu idea preparada.
             </p>
-            <span className="rounded-full border border-suma-line px-4 py-2 text-xs font-bold text-suma-purple">
-              1 · Personaliza &nbsp; 2 · Prueba &nbsp; 3 · Cotiza
-            </span>
+            <nav aria-label="Etapas de la experiencia" className="flex max-w-full gap-2 overflow-x-auto pb-2">
+              {[
+                { href: "#showroom-construir", text: "01 · Tu negocio" },
+                { href: "#showroom-explorar", text: "02 · Pruébalo" },
+                { href: "#showroom-impacto", text: "03 · Tu potencial" },
+                { href: "#showroom-cotizar", text: "04 · Tu propuesta" },
+              ].map((step) => (
+                <a key={step.href} href={step.href}
+                  className="shrink-0 rounded-full border border-suma-line bg-white px-4 py-2.5 text-xs font-bold text-suma-navy transition-colors hover:border-suma-orange hover:text-suma-orange-ink focus-visible:outline-2 focus-visible:outline-suma-orange">
+                  {step.text}
+                </a>
+              ))}
+            </nav>
           </div>
           <ShowroomBuilder />
         </div>
