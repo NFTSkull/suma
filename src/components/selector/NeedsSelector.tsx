@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ButtonLink } from "@/components/ui/Button";
+import { site } from "@/content/site";
 import { businessOptions, challengeOptions, type BusinessId, type ChallengeId } from "@/content/selector-rules";
 import { serviceBySlug, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
@@ -209,8 +210,11 @@ export function NeedsSelector() {
             </ul>
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <ButtonLink href="/contacto" size="lg" arrow onClick={saveContext}>
-                Conversemos sobre esto
+              <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer" onClick={saveContext}>
+                Conversemos por WhatsApp
+              </ButtonLink>
+              <ButtonLink href="/contacto" variant="link" onClick={saveContext}>
+                Prefiero enviar el formulario
               </ButtonLink>
               <button type="button" onClick={() => setStep(2)} className="min-h-12 rounded-full border-2 border-suma-navy/70 px-6 font-bold text-suma-navy hover:bg-suma-navy hover:text-suma-cream">
                 Cambiar respuestas
