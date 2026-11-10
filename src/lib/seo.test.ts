@@ -45,7 +45,7 @@ describe("JSON-LD", () => {
     expect(sales.telephone).toBe("+528114688882");
     expect(sales.email).toBeUndefined();
     expect((org.logo as Node).url).toBe(absoluteUrl("/brand/isotipo-512.png"));
-    expect(org.sameAs).toBeUndefined();
+    expect(org.sameAs).toEqual(["https://www.linkedin.com/company/sumastudio-tecnologia/"]);
   });
 
   it("cada página tiene Organization, WebSite y WebPage enlazados por @id", () => {
