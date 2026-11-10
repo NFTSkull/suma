@@ -20,6 +20,7 @@ function Page() {
         Cierre
       </a>
       <a href="https://wa.me/528114688882" {...serviceCtaAttrs("crm", "hero")}>CTA CRM por WhatsApp</a>
+      <a href="https://wa.me/528114688882" data-pricing-plan="flow" data-pricing-source="card">Cotizar Flow</a>
       <a href="/servicios">Servicios</a>
     </>
   );
@@ -58,6 +59,15 @@ describe("AnalyticsClicks", () => {
     expect(layer()).toEqual([
       { event: "contact_click", contact_method: "whatsapp" },
       { event: "service_cta_click", service: "crm", cta_location: "hero" },
+    ]);
+  });
+
+  it("registra solicitud de precios con identificador de paquete, sin datos personales", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByText("Cotizar Flow"));
+    expect(layer()).toEqual([
+      { event: "contact_click", contact_method: "whatsapp" },
+      { event: "pricing_cta_click", plan: "flow", source: "card" },
     ]);
   });
 
