@@ -27,6 +27,7 @@ describe("metadata", () => {
       expect(indexableRoutes).not.toContain(r);
     }
     expect(indexableRoutes.length).toBe(allRoutes.length - noindexRoutes.length);
+    expect(indexableRoutes).toContain("/guias/chatbot-whatsapp-pilates");
   });
 });
 
