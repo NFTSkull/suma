@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { challengeOptions } from "@/content/selector-rules";
+import { site } from "@/content/site";
 import { cn } from "@/lib/cn";
 import { track, type AnalyticsEvent } from "@/lib/analytics";
 import {
@@ -354,6 +355,23 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
         >
           <p className="font-bold">{feedback.title}</p>
           <p className="mt-1 text-suma-navy/80">{feedback.text}</p>
+          <div className="mt-5 border-t border-suma-orange-ink/20 pt-5">
+            <p className="text-sm font-semibold text-suma-navy">
+              ¿Prefieres continuar por otro canal?
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">
+              Puedes escribirnos directamente. Este enlace no envía ni copia los datos del formulario:
+              cuéntanos brevemente tu proyecto al abrir el chat.
+            </p>
+            <a
+              href={site.contact.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex min-h-12 items-center justify-center rounded-full bg-suma-navy px-6 text-sm font-bold text-suma-cream transition-colors hover:bg-suma-purple"
+            >
+              Escribir directamente por WhatsApp
+            </a>
+          </div>
         </div>
       )}
 
