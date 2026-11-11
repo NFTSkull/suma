@@ -38,7 +38,7 @@ describe("ShowroomBuilder", () => {
     render(<ShowroomBuilder />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" }));
     expect(within(summary()).getByText("Organizar clientes (CRM)")).toBeInTheDocument();
-    expect(screen.getByText(/Organizamos las consultas/)).toBeInTheDocument();
+    expect(screen.getByText(/Sabes quién preguntó/)).toBeInTheDocument();
     // ($2,490 / 3 + $1,490) × 1.16
     expect(screen.getByText(formatMXNExact(2691.20))).toBeInTheDocument();
     for (const step of ["Descubrimos", "Diseñamos", "Construimos", "Evolucionamos"]) {
