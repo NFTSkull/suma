@@ -419,10 +419,20 @@ export function ShowroomBuilder() {
 
       {stage === "impact" && (
       <div className="space-y-3">
-        <p className="mx-auto max-w-4xl text-center text-sm leading-relaxed text-suma-navy/70">
-          El cálculo es opcional. Primero elige una solución; si aún no sabes cuál, puedes solicitar una recomendación.
-        </p>
-        <h2 data-wizard-heading tabIndex={-1} className="sr-only">Paso 3: Calcula con tus números</h2>
+        <div className="rounded-2xl border border-suma-line bg-white p-5 shadow-soft md:p-7">
+          <p className="text-eyebrow text-suma-orange-ink">PASO 3 · TOTALMENTE OPCIONAL</p>
+          <h2 data-wizard-heading tabIndex={-1} className="mt-2 font-display text-2xl font-extrabold text-suma-navy">¿Te gustaría hacer un cálculo de ejemplo?</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-suma-navy/75">
+            Podemos estimar cuántos clientes adicionales necesitarías para cubrir el costo. Los resultados son ejemplos, no promesas de venta.
+            Si prefieres, pasa directo a tu propuesta.
+          </p>
+          {!quote.isEmpty && !showImpactCalculator && (
+            <button type="button" onClick={() => setShowImpactCalculator(true)}
+              className="mt-5 min-h-12 w-full rounded-full border-2 border-suma-purple bg-white px-6 text-sm font-extrabold text-suma-purple hover:bg-suma-purple hover:text-white sm:w-auto">
+              Sí, quiero ver el cálculo →
+            </button>
+          )}
+        </div>
         {quote.isEmpty ? (
           <div className="rounded-[2rem] border border-suma-line bg-white p-6 text-suma-navy shadow-soft md:p-9">
             <p className="text-eyebrow text-suma-orange-ink">03 · CALCULA</p>
@@ -432,17 +442,17 @@ export function ShowroomBuilder() {
               También puedes pedirnos una recomendación sin hacer ningún cálculo.
             </p>
           </div>
-        ) : (
+        ) : showImpactCalculator ? (
           <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
-        )}
+        ) : null}
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-suma-line bg-white p-5">
           <button type="button" onClick={() => goTo("explore")}
             className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
             ← Volver a las demos
           </button>
           <button type="button" onClick={() => goTo("quote")}
-            className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
-            {quote.isEmpty ? "Pedir una recomendación →" : "Siguiente: mi propuesta →"}
+            className="min-h-12 w-full rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white sm:w-auto">
+            {quote.isEmpty ? "Pedir una recomendación →" : "Ver mi propuesta →"}
           </button>
         </div>
       </div>
@@ -453,8 +463,11 @@ export function ShowroomBuilder() {
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
           <h2 id="showroom-price-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Esta es tu propuesta.</h2>
-          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">
-            Revisa lo que elegiste y cuánto costaría. Puedes cambiar cualquier opción sin volver a empezar.
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-suma-navy/75">
+            Este es el resumen de los servicios que tú decidiste incluir. Aquí verás el pago inicial, la mensualidad y los gastos que van aparte. Todavía no estás contratando nada.
+          </p>
+          <p className="mt-3 rounded-xl border border-suma-purple/20 bg-white px-4 py-3 text-sm font-bold text-suma-navy">
+            {chosenDescription}
           </p>
           <button type="button" onClick={() => goTo("explore")}
             className="mt-4 min-h-11 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-white">
