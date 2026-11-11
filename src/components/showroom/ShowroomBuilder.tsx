@@ -20,10 +20,27 @@ const IVA_RATE = 0.16;
 const field = "mt-2 min-h-12 w-full rounded-xl border border-suma-line bg-white px-4 text-base text-suma-navy focus-visible:outline-2 focus-visible:outline-suma-orange";
 const categories = ["Captación", "Atención", "Operación", "Presencia", "Desarrollo"] as const;
 const guidedGoals = [
-  { id: "captar", name: "Atraer más clientes", experience: "ads", recommendations: ["ads", "web", "seo"] },
-  { id: "responder", name: "Responder mejor", experience: "crm", recommendations: ["crm", "chatbot", "automatizacion"] },
-  { id: "operar", name: "Ordenar mi operación", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
+  { id: "captar", name: "Quiero que más personas me conozcan", experience: "ads", recommendations: ["ads", "web", "seo"] },
+  { id: "responder", name: "Quiero organizar los mensajes", experience: "crm", recommendations: ["crm", "chatbot", "automatizacion"] },
+  { id: "operar", name: "Quiero facilitar las reservas", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
 ] as const;
+
+const paletteDescriptions: Record<ShowroomPaletteId, string> = {
+  suma: "Azul oscuro, crema y naranja. Moderno y con contraste.",
+  almendra: "Café, beige y arena. Cálido y natural.",
+  salvia: "Verde, blanco suave y salvia. Tranquilo y fresco.",
+};
+const simpleDemoExplanations: Record<ShowroomExperienceId, string> = {
+  crm: "Mira cómo tu equipo sabría quién preguntó por una clase y quién falta por atender.",
+  chatbot: "Prueba qué respuestas podría recibir alguien que pregunta por WhatsApp.",
+  ads: "Mira un anuncio de ejemplo para invitar a personas a conocer tu negocio.",
+  reservas: "Prueba cómo una persona podría escoger un horario disponible.",
+  web: "Mira cómo podría verse una página sencilla con tu marca.",
+  automatizacion: "Descubre cómo se podría crear un aviso cuando alguien necesita seguimiento.",
+  app: "Explora cómo una alumna podría consultar sus clases.",
+  seo: "Mira cómo podría aparecer la información de tu negocio en Google.",
+  "crm-medida": "Explora un ejemplo de sistema propio para organizar tu operación.",
+};
 type GuidedGoalId = (typeof guidedGoals)[number]["id"];
 type WizardStage = "welcome" | "personalize" | "explore" | "impact" | "quote";
 const demoHints: Record<ShowroomExperienceId, string> = {
@@ -71,6 +88,7 @@ export function ShowroomBuilder() {
   const [guidedGoal, setGuidedGoal] = useState<GuidedGoalId>("responder");
   const [showAllExperiences, setShowAllExperiences] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
+  const [showImpactCalculator, setShowImpactCalculator] = useState(false);
   const [mode, setMode] = useState<"services" | "package">("services");
   const [planId, setPlanId] = useState<PricingPlanId>("flow");
   // La demo inicial es ilustrativa, no una selección de compra.
@@ -91,6 +109,7 @@ export function ShowroomBuilder() {
   };
   const quote = showroomEstimate(selection);
   const paymentOptions = availableSetupPayments(quote.setup);
+  const selectedPalette = showroomPalettes.find((item) => item.id === paletteId) ?? showroomPalettes[0];
   const active = showroomExperiences.find((item) => item.id === experience) ?? showroomExperiences[0];
   const activeGoal = guidedGoals.find((goal) => goal.id === guidedGoal) ?? guidedGoals[1];
   const visibleExperiences = showroomExperiences.filter((item) =>
@@ -106,6 +125,11 @@ export function ShowroomBuilder() {
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
     : [];
   const selectedCurrent = serviceIds.includes(active.serviceId) || included.includes(active.serviceId);
+  const chosenDescription = quote.isEmpty
+    ? "Solo estás probando una demostración. No has elegido ningún servicio para pagar."
+    : mode === "package"
+      ? "Elegiste " + quote.plan.name + (quote.services.length ? " con " + quote.services.length + " extras." : ".")
+      : "Has elegido " + quote.services.length + (quote.services.length === 1 ? " servicio." : " servicios.");
   const addCurrent = () => {
     if (included.includes(active.serviceId)) return;
     if (!serviceIds.includes(active.serviceId)) setServiceIds((items) => toggleShowroomService(items, active.serviceId));
@@ -192,7 +216,7 @@ export function ShowroomBuilder() {
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/70">
             {personalizeField === 0 ? "Es opcional. Si lo escribes, aparecerá en tu demostración." :
-              personalizeField === 1 ? "Así adaptamos los ejemplos a lo que haces." : "Solo cambia los colores del ejemplo. Podrás modificarlos después."}
+              personalizeField === 1 ? "Usaremos situaciones parecidas a tu negocio, como clases, consultas o reservas." : "Los colores se muestran abajo: tócalos y mira cómo se ve la pantalla antes de seguir."}
           </p>
           <p className="mt-5 text-xs font-bold text-suma-purple">Pregunta {personalizeField + 1} de 3</p>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-suma-navy/10">
@@ -203,7 +227,7 @@ export function ShowroomBuilder() {
               <div>
                 <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio (opcional)</label>
                 <input id="showroom-name" maxLength={45} value={businessName}
-                  onChange={(e) => { personalized({}); setBusinessName(e.target.value); }}
+                  onChange={(e) => setBusinessName(e.target.value)}
                   className={field} placeholder="Ej. Mi estudio de Pilates" autoComplete="organization" />
               </div>
             )}
@@ -211,7 +235,7 @@ export function ShowroomBuilder() {
               <div>
                 <label htmlFor="showroom-industry" className="text-sm font-bold text-suma-navy">Tipo de negocio</label>
                 <select id="showroom-industry" value={industry}
-                  onChange={(e) => { personalized({ industry: e.target.value as ShowroomIndustryId }); setIndustry(e.target.value as ShowroomIndustryId); }}
+                  onChange={(e) => setIndustry(e.target.value as ShowroomIndustryId)}
                   className={field}>
                   {showroomIndustries.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                 </select>
@@ -219,13 +243,39 @@ export function ShowroomBuilder() {
             )}
             {personalizeField === 2 && (
               <div>
-                <label htmlFor="showroom-palette" className="text-sm font-bold text-suma-navy">Estilo de colores</label>
-                <select id="showroom-palette" value={paletteId}
-                  onChange={(e) => { personalized({ style: e.target.value as ShowroomPaletteId }); setPaletteId(e.target.value as ShowroomPaletteId); }}
-                  className={field}>
-                  {showroomPalettes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-                </select>
-                <p className="mt-2 text-xs text-suma-navy/60">Tu elección se reflejará en la pantalla del siguiente paso.</p>
+                <p id="showroom-color-label" className="text-sm font-bold text-suma-navy">Toca los colores que más te gusten</p>
+                <div role="group" aria-labelledby="showroom-color-label" className="mt-3 grid gap-3 sm:grid-cols-3">
+                  {showroomPalettes.map((item) => {
+                    const selected = item.id === paletteId;
+                    return (
+                      <button key={item.id} type="button" aria-label={"Elegir colores " + item.label}
+                        aria-pressed={selected} onClick={() => setPaletteId(item.id)}
+                        className={cn("min-h-32 rounded-2xl border-2 bg-white p-3 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-suma-orange",
+                          selected ? "border-suma-purple shadow-md ring-2 ring-suma-purple/15" : "border-suma-line hover:border-suma-purple/60")}>
+                        <span className="flex gap-1.5" aria-hidden="true">
+                          <span className={item.base + " h-9 min-w-0 flex-1 rounded-lg border border-black/10"} />
+                          <span className={item.light + " h-9 min-w-0 flex-1 rounded-lg border border-black/10"} />
+                          <span className={item.accent + " h-9 min-w-0 flex-1 rounded-lg border border-black/10"} />
+                        </span>
+                        <span className="mt-3 block text-sm font-extrabold text-suma-navy">
+                          {item.label} {selected ? "✓" : ""}
+                        </span>
+                        <span className="mt-1 block text-xs leading-relaxed text-suma-navy/65">{paletteDescriptions[item.id]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div aria-live="polite" className="mt-5 overflow-hidden rounded-2xl border border-suma-line bg-white">
+                  <div className={selectedPalette.base + " px-5 py-4 text-white"}>
+                    <p className="text-[0.7rem] font-semibold uppercase tracking-wider text-white/75">Vista previa de los colores elegidos</p>
+                    <p className="mt-1 font-display text-lg font-extrabold">{businessName.trim() || "Tu negocio · ejemplo"}</p>
+                  </div>
+                  <div className={selectedPalette.light + " flex items-center justify-between gap-3 p-4"}>
+                    <p className={selectedPalette.text + " text-xs font-bold"}>Así se verá tu demostración</p>
+                    <span className={selectedPalette.accent + " rounded-full border border-black/10 px-4 py-2 text-xs font-bold text-suma-navy"}>Ver horarios</span>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-suma-navy/60">Esto solo cambia el aspecto de la demo; no modifica tu página ni contrata un diseño.</p>
               </div>
             )}
           </div>
