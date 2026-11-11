@@ -2,6 +2,15 @@
 
 ## [Sin publicar]
 
+### Optimización de conversión Showroom: captura de leads y UX mobile (PR #30)
+- **Correcciones UX**: mensajes WhatsApp acortados a ~800 chars máximo (abreviando listas largas de servicios), persistencia de configuración en `sessionStorage` para no perder selecciones al navegar entre páginas.
+- **Captura de leads**: formulario `ShowroomLeadForm` integrado después de la sección de cotización, con campos nombre, negocio, email/WhatsApp (al menos uno obligatorio), necesidades opcionales y opción de demo personalizada. Validación completa con Zod (`showroomLeadSchema`).
+- **API `/api/showroom-lead`**: endpoint dedicado con anti-spam (honeypot + tiempo mínimo + rate limit), validación server-side, tracking de atribución (utm_*, referrer, fbclid/gclid/li_fat_id) y prevención de duplicados (idempotencia 24h).
+- **Notificaciones internas**: email estructurado a `ventas@sumastudio.mx` vía Resend con todos los detalles del lead (contacto, necesidades, configuración elegida, estimado, atribución). Sin auto-envío al prospecto, solo acknowledgement en pantalla.
+- **Medición GA4**: cuatro nuevos eventos para funnel de conversión: `showroom_visit` (page load), `showroom_demo_started` (primera interacción), `showroom_proposal_requested` (visualización del formulario), `generate_lead` (envío exitoso). Todos respetan privacidad: solo IDs de catálogo, sin datos personales.
+- **Tipos y validaciones**: extendido `ActionLogEntry` para soportar `showroom_lead.submit`, `AnalyticsEvent` para nuevos eventos, función `deliverShowroomLead` en `contact-delivery.ts`.
+- Pruebas: 230 (sin cambios en precios ni catálogo).
+
 ### SUMA Vision Studio (`/showroom`): pulido de experiencia (PR #21)
 - **Hero**: explica en una frase qué se obtiene y muestra los cuatro pasos con el mismo nombre que usan después las secciones (Personaliza, Pruébalo, Calcula, Tu propuesta). Se quitaron la barra de chips, el texto intermedio y la sección de límites que repetían lo mismo. Acento morado para que "a la vista" no quede naranja sobre naranja en móvil. Title SEO sin la marca duplicada.
 - **Personaliza**: solo nombre, giro y estilo; la herramienta actual pasó a la propuesta.

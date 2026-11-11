@@ -1,5 +1,25 @@
 # DEVLOG — decisiones
 
+## 2026-11-11 — Optimización de conversión Showroom
+
+**Captura de leads sin duplicar arquitectura.** En lugar de crear una infraestructura nueva de almacenamiento, se extendió el sistema existente de `contact-delivery` con una función `deliverShowroomLead` que reutiliza la misma configuración (Resend/webhook), validación Zod y protección anti-spam. Los leads del Showroom se diferencian por su schema (`showroomLeadSchema`) que incluye la configuración completa del simulador y permite email O WhatsApp en lugar de ambos obligatorios.
+
+**Atribución sin modificar el cliente.** Los parámetros UTM, referrer y píxeles de conversión (fbclid/gclid/li_fat_id) se extraen en el servidor desde los headers y searchParams de la Request en `/api/showroom-lead`, no desde `window.location` en el cliente. Esto evita componentes cliente adicionales, mantiene los parámetros fuera del bundle y garantiza que la captura ocurre incluso si el usuario modifica la URL manualmente.
+
+**Persistencia ligera con sessionStorage.** La configuración del Showroom (servicios, plan, período, etc.) se guarda en `sessionStorage` al cambiar, no en cada keystroke ni en mount. Se carga usando lazy initialization de `useState` (`() => loadShowroomConfig()?.field || default`) para evitar llamadas a `setState` en efectos, que el nuevo linter de React 19 rechaza. Un ref (`hasMounted`) previene guardar durante la hidratación inicial. El patrón se aplica solo a datos de configuración; los datos del formulario de lead (nombre, email) no se persisten para no retener datos personales entre sesiones.
+
+**Mensajes WhatsApp acotados.** La función `showroomWhatsAppHref` trunca nombres de servicios cuando la lista supera 3 items (modo servicios) o 2 items (modo paquete), sustituyéndolos por "X módulos adicionales" o "y N más". Los textos también se acortaron: "Referencia:" en lugar de "Precio de referencia desde", "(sin IVA ni terceros)" en lugar de "antes de IVA; terceros aparte". El límite objetivo es ~800 caracteres para dejar margen bajo el límite de WhatsApp (~1000 chars en diferentes clientes).
+
+**Eventos GA4 sin datos personales.** Los cuatro eventos nuevos (`showroom_visit`, `showroom_demo_started`, `showroom_proposal_requested`, `generate_lead`) solo envían IDs de catálogo (industry, experience, mode, plan) y conteos agregados (services_count, has_config). Nunca el nombre del negocio, las notas del cliente, los estimados calculados ni contacto. `generate_lead` reutiliza el evento existente con `form_name: "showroom_lead"` y `lead_source: "showroom"` para distinguirlo del formulario general.
+
+**Anti-spam reutilizado.** El endpoint `/api/showroom-lead` comparte el mismo `antiSpamSchema` (honeypot + tiempo mínimo 2.5s) y `contactRateLimiter` (5 por IP en 10 min) que `/api/contacto`. La idempotencia usa una clave SHA256 del fingerprint (email, whatsapp, negocio, serviceIds, planId) con prefijo `showroom-lead/` y duración de 24h en Resend, previniendo envíos duplicados por doble clic o F5.
+
+**Email interno estructurado.** La función `deliverShowroomLead` genera un email HTML con tres secciones: (1) datos de contacto y necesidades, (2) configuración elegida (modo, plan, servicios, período, estimado, notas), (3) atribución (fuente, campaña, referrer, píxeles). El email incluye reply-to con el email del prospecto si existe, y nunca se auto-envía confirmación al lead (solo acknowledgement en pantalla). El subject es "Propuesta desde Showroom: {negocio}".
+
+**Sin cambio de precios.** El formulario usa exactamente los mismos precios y lógica que el cotizador existente (`showroomEstimate` llama a `estimatePricing`). No se introdujeron descuentos, "precios especiales para Showroom" ni cálculos alternativos. La configuración guardada incluye `setup` y `monthly` calculados para que el equipo de ventas vea el rango orientativo que el cliente vio, pero el email aclara que es un estimado sujeto a revisión.
+
+**Tipos extendidos, no duplicados.** En lugar de crear tipos nuevos para action_log o analytics, se extendieron los existentes: `ActionLogEntry["action"]` ahora acepta `"showroom_lead.submit"`, `AnalyticsEvent` acepta `form_name: "showroom_lead"`. Esto mantiene un solo tipo unión y permite que las funciones `actionLog` y `track` manejen ambos orígenes sin sobrecarga.
+
 ## 2026-10-12
 
 **Logotipo provisional.** No se recibieron archivos oficiales; las capturas disponibles no son assets de SUMA. Se usa un wordmark tipográfico marcado con `data-provisional="wordmark"` y un registro (`src/content/brand-assets.ts`) para que los SVG oficiales sustituyan todo el sitio al añadirse. No se dibujó ni se "recreó" ningún logo. Favicon y OG también son tipográficos y provisionales.
