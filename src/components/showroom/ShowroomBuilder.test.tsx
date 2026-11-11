@@ -131,7 +131,7 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     expect(screen.getByText(/Para evitar resultados engañosos/)).toBeInTheDocument();
     expect(screen.queryByRole("group", { name: "Periodo a evaluar" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Pedir una recomendación/i }));
-    expect(screen.getByText(/Elige al menos un módulo para ver cuánto pagarías/)).toBeInTheDocument();
+    expect(screen.getByText(/Elige una solución o pídenos una recomendación para conocer el costo/)).toBeInTheDocument();
   });
 
   it("una propuesta de CRM muestra el IVA y el pago inicial completo sin duplicarlo", () => {
@@ -150,7 +150,7 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     completePersonalization();
     openQuote();
     openAdvanced();
-    fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
+    fireEvent.click(screen.getByRole("button", { name: "Un plan completo" }));
     expect(screen.getAllByText(formatMXNExact(2320)).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" }));
     expect(within(screen.getByRole("list", { name: "Lo que estás eligiendo" })).getByText("Asistente con IA para WhatsApp")).toBeInTheDocument();
