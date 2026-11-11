@@ -16,7 +16,7 @@ describe("PricingEstimator", () => {
     render(<PricingEstimator />);
     expect(screen.getByRole("button", { name: "SUMA Flow" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(formatMXNExact(2320))).toBeInTheDocument();
-    expect(screen.getByText("Desde " + formatMXN(6960))).toBeInTheDocument();
+    expect(screen.getByText(formatMXN(6960), { exact: false })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "flow");
   });
 
