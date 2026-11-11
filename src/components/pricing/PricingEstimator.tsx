@@ -116,6 +116,20 @@ export function PricingEstimator() {
           </fieldset>
         )}
 
+        <div aria-live="polite" className="mt-5 rounded-2xl border border-suma-cream/25 bg-white/10 p-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-suma-orange">En palabras sencillas</p>
+          {mode === "package" ? (
+            <>
+              <p className="mt-2 text-base font-bold text-white">{story.title}</p>
+              <p className="mt-1 text-sm leading-relaxed text-suma-cream/80">{story.intro}</p>
+            </>
+          ) : quote.isEmpty ? (
+            <p className="mt-2 text-sm leading-relaxed text-suma-cream/80">Marca una función y te explicaremos qué obtendrías con ella.</p>
+          ) : (
+            <p className="mt-2 text-sm leading-relaxed text-suma-cream/80">{chosenDetails.join(" ")}</p>
+          )}
+        </div>
+
         <fieldset className="mt-7">
           <legend className="mb-1 text-sm font-bold">{mode === "package" ? "3. ¿Necesitas alguna función adicional?" : "2. ¿Qué quieres que hagamos por tu negocio?"}</legend>
           <p className="mb-3 text-xs text-suma-cream/65">
