@@ -91,7 +91,9 @@ export function ShowroomBuilder() {
     ? planId === "growth" ? ["meta-ads", "crm-gestionado"]
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
     : [];
-  const selectedCurrent = serviceIds.includes(active.serviceId) || included.includes(active.serviceId);
+  const selectedVariant = serviceIds.find((id) => servicePreview[id]?.experience === experience);
+  const selectedCurrent = Boolean(selectedVariant) || included.some((id) => servicePreview[id]?.experience === experience);
+  const selectedGuidedChatbot = experience === "chatbot" && selectedVariant === "chatbot-guiado";
   const showServicePreview = (serviceId: IndividualServiceId) => {
     const next = servicePreview[serviceId];
     if (!next) return;
@@ -112,6 +114,7 @@ export function ShowroomBuilder() {
     if (adding) showServicePreview(id);
   };
   const choosePlan = (id: PricingPlanId) => {
+    if (id !== planId) setServiceIds([]); // evita cargar extras del plan anterior sin avisar
     setPlanId(id);
     if (id === "ads") showServicePreview("meta-ads");
     else showServicePreview("crm-gestionado");
@@ -224,7 +227,11 @@ export function ShowroomBuilder() {
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{active.lead}</p>
-          <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">{active.detail}</p>
+          <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">
+            {selectedGuidedChatbot
+              ? "Elegiste respuestas con opciones y sin IA. La demo muestra un menú ficticio; cualquier conexión real exige permisos."
+              : active.detail}
+          </p>
           {selectedCurrent ? (
             <p role="status" className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-full bg-emerald-50 px-5 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
               <span aria-hidden="true">✓</span> Ya está en tu propuesta
@@ -254,11 +261,11 @@ export function ShowroomBuilder() {
             <fieldset>
               <legend className="text-sm font-bold text-suma-navy">¿Cómo prefieres contratar?</legend>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}
+                <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setServiceIds([]); setMode("services"); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "services" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
                   Elegir funciones
                 </button>
-                <button type="button" aria-pressed={mode === "package"} onClick={() => setMode("package")}
+                <button type="button" aria-pressed={mode === "package"} onClick={() => { if (mode !== "package") setServiceIds([]); setMode("package"); choosePlan(planId); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "package" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
                   Plan + opciones
                 </button>
@@ -277,7 +284,7 @@ export function ShowroomBuilder() {
                     </button>
                   ))}
                 </div>
-                <p className="mt-2 text-xs text-suma-navy/60">Lo que ya incluye un paquete no se cobra dos veces.</p>
+                <p className="mt-2 text-xs text-suma-navy/60">Cada plan muestra su precio base. Si cambias de plan, los extras se reinician para comparar sin cargos sorpresa.</p>
               </fieldset>
             )}
 
