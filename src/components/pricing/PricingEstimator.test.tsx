@@ -43,7 +43,7 @@ describe("PricingEstimator", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" }));
     expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).toBeChecked();
     fireEvent.click(screen.getByRole("button", { name: "SUMA Ads" }));
-    expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).not.toBeChecked();
+    expect(screen.queryByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).not.toBeInTheDocument();
     const href = screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i }).getAttribute("href");
     const text = decodeURIComponent(href!.split("?text=")[1]);
     expect(text).toContain("SUMA Ads");
@@ -90,7 +90,7 @@ describe("PricingEstimator", () => {
   it("entra al configurador con el servicio elegido desde la tarjeta", () => {
     window.history.replaceState({}, "", "/precios?servicio=chatbot-ia#simulador");
     render(<PricingEstimator />);
-    expect(screen.getByRole("button", { name: "Solo servicios" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Solo una función" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).toBeChecked();
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
   });
