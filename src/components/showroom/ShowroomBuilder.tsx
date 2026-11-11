@@ -25,6 +25,24 @@ const guidedGoals = [
   { id: "operar", name: "Ordenar mi operación", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
 ] as const;
 type GuidedGoalId = (typeof guidedGoals)[number]["id"];
+type WizardStage = "welcome" | "personalize" | "explore" | "impact" | "quote";
+const demoHints: Record<ShowroomExperienceId, string> = {
+  crm: "Prueba marcar una consulta como respondida o cambia a la vista de operación.",
+  chatbot: "Elige una pregunta, como horarios o precios, y mira la respuesta de ejemplo.",
+  ads: "Cambia el tipo de anuncio y descubre cómo variaría el mensaje.",
+  reservas: "Elige un horario de ejemplo para ver qué sucede después.",
+  web: "Pulsa el botón de la página para ver qué encontraría el visitante.",
+  automatizacion: "Pulsa «Simular recorrido» para ver los avisos y tareas.",
+  app: "Prueba las pestañas de clases y membresía.",
+  seo: "Mira cómo podría presentarse tu negocio en un resultado de búsqueda.",
+  "crm-medida": "Explora las vistas de interesados y operación del panel de ejemplo.",
+};
+const wizardLabels = [
+  { stage: "personalize", title: "Tu negocio", detail: "Personaliza el ejemplo" },
+  { stage: "explore", title: "Prueba", detail: "Elige y usa una demo" },
+  { stage: "impact", title: "Calcula", detail: "Opcional, con tus datos" },
+  { stage: "quote", title: "Tu propuesta", detail: "Precio y contacto" },
+] as const;
 
 const priceLine = (service: (typeof individualServices)[number]) =>
   (service.from ? "Desde " : "") + (service.setup
@@ -32,6 +50,20 @@ const priceLine = (service: (typeof individualServices)[number]) =>
     : formatMXN(service.monthly) + "/mes");
 
 export function ShowroomBuilder() {
+  const [stage, setStage] = useState<WizardStage>("welcome");
+  const [personalizeField, setPersonalizeField] = useState(0);
+  const activeWizardIndex = wizardLabels.findIndex((item) => item.stage === stage);
+  const goTo = (next: WizardStage) => setStage(next);
+  // Cada etapa mantiene los datos de la anterior. Sin almacenamiento ni envío silencioso.
+  useEffect(() => {
+    if (stage === "welcome") return;
+    const el = document.getElementById("showroom-wizard");
+    if (el && typeof el.scrollIntoView === "function") {
+      el.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+    const heading = el?.querySelector<HTMLElement>("[data-wizard-heading]");
+    heading?.focus({ preventScroll: true });
+  }, [stage, personalizeField]);
   const [industry, setIndustry] = useState<ShowroomIndustryId>("pilates");
   const [businessName, setBusinessName] = useState("");
   const [paletteId, setPaletteId] = useState<ShowroomPaletteId>("suma");
@@ -111,36 +143,120 @@ export function ShowroomBuilder() {
 
   return (
     <div className="space-y-10">
-      <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
-        <p className="text-eyebrow text-suma-orange-ink">01 · Personaliza</p>
-        <h2 id="showroom-custom-title" className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">Pon tu marca en la demo.</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div>
-            <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio</label>
-            <input id="showroom-name" maxLength={45} value={businessName} onChange={(e) => { personalized({}); setBusinessName(e.target.value); }}
-              className={field} placeholder="Ej. Estudio Aurora" autoComplete="organization" />
-          </div>
-          <div>
-            <label htmlFor="showroom-industry" className="text-sm font-bold text-suma-navy">Giro</label>
-            <select id="showroom-industry" value={industry} onChange={(e) => { personalized({ industry: e.target.value as ShowroomIndustryId }); setIndustry(e.target.value as ShowroomIndustryId); }} className={field}>
-              {showroomIndustries.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="showroom-palette" className="text-sm font-bold text-suma-navy">Estilo de la demo</label>
-            <select id="showroom-palette" value={paletteId} onChange={(e) => { personalized({ style: e.target.value as ShowroomPaletteId }); setPaletteId(e.target.value as ShowroomPaletteId); }} className={field}>
-              {showroomPalettes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-            </select>
-          </div>
-        </div>
-        <p className="mt-4 text-xs text-suma-navy/60">Solo cambia la demo en tu navegador. No se guarda ni se envía.</p>
-      </section>
+      <div id="showroom-wizard" className="scroll-mt-28">
+        {stage === "welcome" ? (
+          <section aria-labelledby="showroom-welcome-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-6 shadow-soft md:p-10">
+            <p className="text-eyebrow text-suma-orange-ink">SUMA VISION STUDIO · UNA EXPERIENCIA A TU RITMO</p>
+            <h2 id="showroom-welcome-title" className="mt-3 max-w-3xl font-display text-3xl font-extrabold text-suma-navy md:text-4xl">
+              Descubre cómo podría funcionar SUMA en tu negocio.
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-suma-navy/75">
+              Responde tres preguntas sencillas, prueba una herramienta de ejemplo y conoce el precio de lo que elijas. Sin saber de sistemas ni registrarte.
+            </p>
+            <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {wizardLabels.map((item, index) => (
+                <li key={item.stage} className="rounded-2xl border border-suma-line bg-white p-4">
+                  <span className="text-xs font-extrabold text-suma-orange-ink">PASO {index + 1}</span>
+                  <p className="mt-1 font-bold text-suma-navy">{item.title}</p>
+                  <p className="mt-1 text-xs text-suma-navy/65">{item.detail}</p>
+                </li>
+              ))}
+            </ol>
+            <button type="button" onClick={() => goTo("personalize")}
+              className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-8 text-base font-extrabold text-suma-navy transition-colors hover:bg-suma-navy hover:text-white focus-visible:outline-2 focus-visible:outline-suma-purple">
+              Iniciar experiencia →
+            </button>
+            <p className="mt-3 text-xs text-suma-navy/60">Tú decides qué probar. Nada se contrata ni se envía automáticamente.</p>
+          </section>
+        ) : (
+          <nav aria-label="Avance de la experiencia" className="mb-7 rounded-2xl border border-suma-line bg-white px-4 py-4 md:px-6">
+            <p aria-live="polite" className="text-xs font-bold text-suma-purple">Paso {activeWizardIndex + 1} de 4 · {wizardLabels[activeWizardIndex]?.title}</p>
+            <ol className="mt-3 grid grid-cols-4 gap-2">
+              {wizardLabels.map((item, index) => (
+                <li key={item.stage} className="min-w-0">
+                  <div aria-current={stage === item.stage ? "step" : undefined}
+                    className={"h-2 rounded-full " + (index <= activeWizardIndex ? "bg-suma-orange" : "bg-suma-navy/10")} />
+                  <span className={"mt-1.5 block truncate text-[0.65rem] font-bold sm:text-xs " + (stage === item.stage ? "text-suma-navy" : "text-suma-navy/50")}>{item.title}</span>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
 
+      {stage === "personalize" && (
+        <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
+          <p className="text-eyebrow text-suma-orange-ink">01 · PERSONALIZA</p>
+          <h2 id="showroom-custom-title" data-wizard-heading tabIndex={-1} className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">
+            {personalizeField === 0 ? "¿Cómo se llama tu negocio?" :
+              personalizeField === 1 ? "¿A qué se dedica tu negocio?" : "¿Qué estilo te gusta más?"}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-suma-navy/70">
+            {personalizeField === 0 ? "Es opcional. Si lo escribes, aparecerá en tu demostración." :
+              personalizeField === 1 ? "Así adaptamos los ejemplos a lo que haces." : "Solo cambia los colores del ejemplo. Podrás modificarlos después."}
+          </p>
+          <p className="mt-5 text-xs font-bold text-suma-purple">Pregunta {personalizeField + 1} de 3</p>
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-suma-navy/10">
+            <div className="h-full rounded-full bg-suma-orange transition-all" style={{ width: ((personalizeField + 1) / 3 * 100) + "%" }} />
+          </div>
+          <div className="mt-6 max-w-xl">
+            {personalizeField === 0 && (
+              <div>
+                <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio (opcional)</label>
+                <input id="showroom-name" maxLength={45} value={businessName}
+                  onChange={(e) => { personalized({}); setBusinessName(e.target.value); }}
+                  className={field} placeholder="Ej. Mi estudio de Pilates" autoComplete="organization" />
+              </div>
+            )}
+            {personalizeField === 1 && (
+              <div>
+                <label htmlFor="showroom-industry" className="text-sm font-bold text-suma-navy">Tipo de negocio</label>
+                <select id="showroom-industry" value={industry}
+                  onChange={(e) => { personalized({ industry: e.target.value as ShowroomIndustryId }); setIndustry(e.target.value as ShowroomIndustryId); }}
+                  className={field}>
+                  {showroomIndustries.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                </select>
+              </div>
+            )}
+            {personalizeField === 2 && (
+              <div>
+                <label htmlFor="showroom-palette" className="text-sm font-bold text-suma-navy">Estilo de colores</label>
+                <select id="showroom-palette" value={paletteId}
+                  onChange={(e) => { personalized({ style: e.target.value as ShowroomPaletteId }); setPaletteId(e.target.value as ShowroomPaletteId); }}
+                  className={field}>
+                  {showroomPalettes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                </select>
+                <p className="mt-2 text-xs text-suma-navy/60">Tu elección se reflejará en la pantalla del siguiente paso.</p>
+              </div>
+            )}
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+            <button type="button"
+              onClick={() => personalizeField === 0 ? goTo("welcome") : setPersonalizeField((value) => value - 1)}
+              className="min-h-12 rounded-full border border-suma-line bg-white px-6 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              ← Atrás
+            </button>
+            <button type="button"
+              onClick={() => {
+                if (personalizeField < 2) setPersonalizeField((value) => value + 1);
+                else { personalized({}); goTo("explore"); }
+              }}
+              className="min-h-12 rounded-full bg-suma-navy px-7 text-sm font-bold text-white hover:bg-suma-purple">
+              {personalizeField < 2 ? personalizeField === 0 && !businessName.trim() ? "Omitir nombre y seguir →" : "Siguiente →" : "Probar mi demo →"}
+            </button>
+          </div>
+          <p className="mt-5 text-xs text-suma-navy/60">Los datos de esta prueba solo se usan en tu navegador. No enviamos nada.</p>
+        </section>
+      )}
+
+      {stage === "explore" && (
       <section id="showroom-explorar" aria-labelledby="showroom-preview-title"
         className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7 lg:col-start-1 lg:row-start-1">
           <p className="text-eyebrow text-suma-orange">02 · Pruébalo</p>
-          <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Mira cómo podría funcionar.</h2>
+          <h2 id="showroom-preview-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold">Elige algo y pruébalo.</h2>
+          <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
+            Toca una opción. La pantalla de la derecha cambia al instante y puedes interactuar con ella.
+          </p>
           <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">¿Qué quieres mejorar primero?</p>
           <div role="group" aria-label="Objetivo principal del negocio" className="mt-3 flex flex-wrap gap-2">
             {guidedGoals.map((goal) => (
@@ -176,7 +292,7 @@ export function ShowroomBuilder() {
         </div>
 
         <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} />
+          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
           <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
             Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
           </p>
@@ -185,56 +301,129 @@ export function ShowroomBuilder() {
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
+          <p className="mt-3 rounded-xl bg-suma-purple/5 p-3 text-sm font-semibold leading-relaxed text-suma-purple">
+            Pruébalo tú: {demoHints[experience]}
+          </p>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{active.lead}</p>
           <p className="mt-2 text-xs text-suma-navy/55">{active.detail}</p>
           {selectedCurrent ? (
-            <p role="status" className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-full bg-emerald-50 px-5 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
-              <span aria-hidden="true">✓</span> Ya está en tu propuesta
-            </p>
+            <div role="status" className="mt-5 flex min-h-12 flex-wrap items-center justify-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
+              <span>✓ Añadido a tu propuesta</span>
+              {serviceIds.includes(active.serviceId) && !included.includes(active.serviceId) && (
+                <button type="button" onClick={() => toggle(active.serviceId)}
+                  className="rounded-full border border-emerald-300 bg-white px-3 py-2 text-xs font-bold text-emerald-900 hover:border-emerald-600">
+                  Quitar
+                </button>
+              )}
+            </div>
           ) : (
             <button type="button" onClick={addCurrent}
               className="mt-5 min-h-12 w-full rounded-full bg-suma-navy px-5 text-sm font-bold text-suma-cream transition-colors hover:bg-suma-purple">
-              Añadir a mi propuesta +
+              Quiero incluir esta solución +
             </button>
           )}
           <Link href={active.href} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-suma-navy underline decoration-suma-orange underline-offset-4">
             Ver detalles de este servicio →
           </Link>
         </div>
+        <div className="lg:col-span-2 rounded-2xl border border-suma-line bg-white px-5 py-5 md:px-7">
+          <p aria-live="polite" className="text-sm font-semibold text-suma-navy">
+            {quote.isEmpty
+              ? "Todavía no has añadido ninguna solución. Puedes probar las demos sin contratar nada."
+              : mode === "package"
+                ? "Tu propuesta incluye " + quote.plan.name + (quote.services.length ? " y " + quote.services.length + " extras." : ".")
+                : "Has elegido " + quote.services.length + (quote.services.length === 1 ? " servicio." : " servicios.")}
+          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <button type="button" onClick={() => { setPersonalizeField(0); goTo("personalize"); }}
+              className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              ← Cambiar datos de mi negocio
+            </button>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => goTo("quote")}
+                className="min-h-12 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-suma-purple/5">
+                Ir directo a mi propuesta
+              </button>
+              <button type="button" onClick={() => goTo("impact")}
+                className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
+                Siguiente: calcular →
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
+      )}
 
+      {stage === "impact" && (
       <div className="space-y-3">
         <p className="mx-auto max-w-4xl text-center text-sm leading-relaxed text-suma-navy/70">
           El cálculo es opcional. Primero elige una solución; si aún no sabes cuál, puedes solicitar una recomendación.
         </p>
-        <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
+        <h2 data-wizard-heading tabIndex={-1} className="sr-only">Paso 3: Calcula con tus números</h2>
+        {quote.isEmpty ? (
+          <div className="rounded-[2rem] border border-suma-line bg-white p-6 text-suma-navy shadow-soft md:p-9">
+            <p className="text-eyebrow text-suma-orange-ink">03 · CALCULA</p>
+            <h3 className="mt-2 font-display text-2xl font-extrabold">¿Quieres calcular el impacto?</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-suma-navy/75">
+              Todavía no has elegido una solución. Para evitar resultados engañosos, primero elige qué te interesa.
+              También puedes pedirnos una recomendación sin hacer ningún cálculo.
+            </p>
+          </div>
+        ) : (
+          <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
+        )}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-suma-line bg-white p-5">
+          <button type="button" onClick={() => goTo("explore")}
+            className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
+            ← Volver a las demos
+          </button>
+          <button type="button" onClick={() => goTo("quote")}
+            className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
+            {quote.isEmpty ? "Pedir una recomendación →" : "Siguiente: mi propuesta →"}
+          </button>
+        </div>
       </div>
+      )}
 
+      {stage === "quote" && (
       <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
-          <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Elige qué contratar y ve cuánto pagarías.</h2>
-          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">Prueba la opción básica de cada servicio. Te mostramos cuánto puede variar el presupuesto, antes de IVA.</p>
+          <h2 id="showroom-price-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Esta es tu propuesta.</h2>
+          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">
+            Revisa lo que elegiste y cuánto costaría. Puedes cambiar cualquier opción sin volver a empezar.
+          </p>
+          <button type="button" onClick={() => goTo("explore")}
+            className="mt-4 min-h-11 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-white">
+            ← Cambiar la solución que probé
+          </button>
         </div>
         <div className="grid gap-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="space-y-7">
+            <details className="rounded-2xl border border-suma-line bg-white p-4 md:p-5">
+              <summary className="min-h-11 cursor-pointer text-sm font-bold text-suma-navy">
+                Cambiar mi plan o agregar funciones (opcional)
+              </summary>
+              <p className="mb-4 mt-2 text-xs text-suma-navy/65">
+                Solo abre esto si quieres comparar otras opciones. Si cambias de plan, se reinician los extras para evitar cobros sorpresa.
+              </p>
             <fieldset>
               <legend className="text-sm font-bold text-suma-navy">¿Cómo prefieres contratar?</legend>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setServiceIds([]); setMode("services"); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "services" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
-                  Por módulos
+                  Servicios por separado
                 </button>
                 <button type="button" aria-pressed={mode === "package"} onClick={() => { if (mode !== "package") setServiceIds([]); setMode("package"); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "package" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
-                  Paquete + extras
+                  Un plan completo
                 </button>
               </div>
             </fieldset>
 
             {mode === "package" && (
               <fieldset>
-                <legend className="text-sm font-bold text-suma-navy">Paquete base</legend>
+                <legend className="text-sm font-bold text-suma-navy">Elige un plan</legend>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {pricingPlans.map((plan) => (
                     <button key={plan.id} type="button" aria-pressed={planId === plan.id} onClick={() => { if (planId !== plan.id) setServiceIds([]); setPlanId(plan.id); }}
@@ -249,7 +438,7 @@ export function ShowroomBuilder() {
             )}
 
             <fieldset>
-              <legend className="text-sm font-bold text-suma-navy">{mode === "package" ? "Extras opcionales" : "Módulos"}</legend>
+              <legend className="text-sm font-bold text-suma-navy">{mode === "package" ? "Funciones adicionales (opcionales)" : "Servicios disponibles"}</legend>
               <p className="mt-1 text-xs text-suma-navy/60">
                 {showAllServices ? "Catálogo completo." : "Recomendados para «" + activeGoal.name.toLowerCase() + "»."} Los importes mínimos son para la versión sencilla de cada servicio.
               </p>
@@ -288,13 +477,14 @@ export function ShowroomBuilder() {
                 {showAllServices ? "Ver solo los recomendados ↑" : "Ver los " + availableServices.length + " módulos (" + hiddenCount + " más) ↓"}
               </button>
             </fieldset>
+            </details>
 
             <div className="grid grid-cols-2 items-end gap-3 sm:grid-cols-3 sm:gap-4">
               <div><label htmlFor="showroom-users" className="text-sm font-bold text-suma-navy">Personas del equipo</label>
                 <select id="showroom-users" value={teamUsers} onChange={(e) => setTeamUsers(Number(e.target.value))} className={field}>
                   {[1, 5, 10, 25, 50, 100, 500].map((number) => <option value={number} key={number}>{number === 500 ? "500 o más" : number}</option>)}
                 </select></div>
-              <div><label htmlFor="showroom-locations" className="text-sm font-bold text-suma-navy">Sedes</label>
+              <div><label htmlFor="showroom-locations" className="text-sm font-bold text-suma-navy">Sucursales</label>
                 <select id="showroom-locations" value={locations} onChange={(e) => setLocations(Number(e.target.value))} className={field}>
                   {[1, 2, 3, 4, 5, 10].map((number) => <option value={number} key={number}>{number === 10 ? "10 o más" : number}</option>)}
                 </select></div>
@@ -305,7 +495,7 @@ export function ShowroomBuilder() {
             </div>
             {quote.setup > 0 && (
               <fieldset className="rounded-2xl border border-suma-line bg-white p-4 md:p-5">
-                <legend className="px-2 text-sm font-bold text-suma-navy">¿Cómo pagarías la implementación?</legend>
+                <legend className="px-2 text-sm font-bold text-suma-navy">¿Cómo prefieres pagar la configuración inicial?</legend>
                 <div role="group" aria-label="Pagar implementación" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {paymentOptions.map((count) => (
                     <button key={count} type="button" aria-pressed={quote.setupPayments === count}
@@ -351,7 +541,7 @@ export function ShowroomBuilder() {
             <div className="rounded-[1.75rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-8">
               <p className="text-eyebrow text-suma-orange">Tu propuesta estimada</p>
               {quote.isEmpty ? (
-                <p className="mt-5 rounded-xl border border-white/15 p-4 text-sm">Elige al menos un módulo para ver cuánto pagarías.</p>
+                <p className="mt-5 rounded-xl border border-white/15 p-4 text-sm">Elige una solución o pídenos una recomendación para conocer el costo.</p>
               ) : (
                 <>
                   <ul aria-label="Lo que estás eligiendo" className="mt-4 space-y-2 text-sm">
@@ -378,17 +568,17 @@ export function ShowroomBuilder() {
                     </details>
                   )}
 
-                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Opción básica · primer pago estimado</p>
+                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Primer pago estimado · desde</p>
                   <p className="mt-2 font-display text-[clamp(2.4rem,5vw,3.5rem)] font-extrabold leading-none tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
                   <p className="mt-2 text-xs text-suma-cream/60">{quote.setupPayments === 1 ? "Implementación íntegra" : "Primer abono de implementación"} + primera mensualidad, antes de IVA.</p>
                   <dl className="mt-5 divide-y divide-white/15 border-y border-white/15 text-sm">
-                    <div className="flex justify-between gap-4 py-3"><dt>Pago inicial (una vez)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd></div>
+                    <div className="flex justify-between gap-4 py-3"><dt>Configuración (pago único)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd></div>
                     {quote.setupPayments > 1 && <div className="flex justify-between gap-4 py-3">
-                      <dt>Implementación: abono 1 de {quote.setupPayments}</dt>
+                      <dt>Configuración: abono 1 de {quote.setupPayments}</dt>
                       <dd className="font-bold tabular-nums">{formatMXNExact(quote.setupInstallment)}</dd>
                     </div>}
-                    <div className="flex justify-between gap-4 py-3"><dt>Servicio mensual</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd></div>
-                    {quote.hasAds && <div className="flex justify-between gap-4 py-3"><dt>Pauta mensual (aparte, a Meta/Google)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd></div>}
+                    <div className="flex justify-between gap-4 py-3"><dt>Servicio mensual de SUMA</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd></div>
+                    {quote.hasAds && <div className="flex justify-between gap-4 py-3"><dt>Presupuesto de anuncios (aparte)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd></div>}
                     <div className="flex justify-between gap-4 py-3">
                       <dt>
                         Primer pago con IVA ({IVA_RATE * 100}%), si aplica{" "}
@@ -399,7 +589,7 @@ export function ShowroomBuilder() {
                     <div className="flex justify-between gap-4 py-3"><dt>Total mínimo: pago inicial + {quote.months} {quote.months === 1 ? "mes de servicio" : "meses de servicio"}</dt><dd className="font-bold tabular-nums">{formatMXN(quote.totalSuma)}</dd></div>
                   </dl>
                   <p className="mt-4 rounded-xl bg-white/10 p-3 text-xs leading-relaxed text-suma-cream/85">
-                    <strong>Rango de referencia para una sede:</strong> pago inicial {formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}
+                    <strong>Rango de referencia para 1 sucursal:</strong> pago inicial {formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}
                     {quote.monthlyMax > 0 ? " y servicio mensual " + formatMXN(quote.monthlySuma) + "–" + formatMXN(quote.monthlyMax) : ""}.
                     Un proyecto más grande puede superar ese rango. Confirmamos el costo final antes de contratar.
                   </p>
@@ -410,7 +600,7 @@ export function ShowroomBuilder() {
                 </>
               )}
               <p className="mt-4 text-xs leading-relaxed text-suma-cream/65">
-                Sin cargo de SUMA por persona del equipo. Aparte: licencias de software, WhatsApp API, consumo de IA, hosting y publicidad. {locations > 1 ? "Con varias sedes revisamos el precio final." : ""}
+                Sin cargo de SUMA por persona del equipo. Aparte: licencias de software, WhatsApp API, consumo de IA, hosting y publicidad. {locations > 1 ? "Con varias sucursales revisamos el precio final." : ""}
               </p>
 
               <a href={showroomWhatsAppHref(selection, "quote")} target="_blank" rel="noopener noreferrer" {...showroomWhatsAppAttrs("quote")}
@@ -463,6 +653,8 @@ export function ShowroomBuilder() {
           </ol>
         </div>
       </section>
+      )}
+      </div>
     </div>
   );
 }

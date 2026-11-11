@@ -14,14 +14,16 @@ type Props = {
   industry: ShowroomIndustryId;
   brandName: string;
   paletteId: ShowroomPaletteId;
+  teamUsers?: number;
+  locations?: number;
 };
 
 const simulated = "Simulación con datos ficticios · Sin conexiones reales";
 
-export function ShowroomLivePreview({ experience, industry, brandName, paletteId }: Props) {
+export function ShowroomLivePreview({ experience, industry, brandName, paletteId, teamUsers = 5, locations = 1 }: Props) {
   const palette = showroomPalettes.find((item) => item.id === paletteId) ?? showroomPalettes[0];
   const business = getShowroomIndustry(industry);
-  const name = brandName.trim().slice(0, 45) || business.example;
+  const name = brandName.trim().slice(0, 45) || "Tu negocio · ejemplo";
   const [leadContacted, setLeadContacted] = useState(false);
   const [chatChoice, setChatChoice] = useState<"hola" | "horarios" | "precio" | "persona">("hola");
   const [adAngle, setAdAngle] = useState<"prueba" | "paquete">("prueba");
@@ -51,10 +53,12 @@ export function ShowroomLivePreview({ experience, industry, brandName, paletteId
           <div className="min-h-[25rem]">
             <div className={palette.base + " flex flex-wrap items-center justify-between gap-2 px-5 py-5 text-white"}>
               <div>
-                <p className="text-xs font-medium text-white/70">{experience === "crm-medida" ? "Panel personalizado" : "CRM comercial · conceptual"}</p>
+                <p className="text-xs font-medium text-white/70">{experience === "crm-medida" ? "Panel personalizado" : "Consultas de clientes · ejemplo"}</p>
                 <h3 className="mt-1 font-display text-xl font-extrabold">{name}</h3>
               </div>
-              <span className="rounded-full bg-white/15 px-3 py-1 text-xs">Equipo · 5 personas</span>
+              <span className="rounded-full bg-white/15 px-3 py-1 text-xs">
+                Equipo · {teamUsers} {teamUsers === 1 ? "persona" : "personas"}{locations > 1 ? " · " + locations + " sucursales" : ""}
+              </span>
             </div>
             <div className="p-4 md:p-6">
               <div className="flex flex-wrap gap-2">
@@ -77,7 +81,7 @@ export function ShowroomLivePreview({ experience, industry, brandName, paletteId
                     ))}
                   </div>
                   <div className="mt-4 rounded-xl border border-suma-line p-4">
-                    <p className="text-xs font-semibold text-suma-navy/55">Oportunidad de ejemplo · WhatsApp</p>
+                    <p className="text-xs font-semibold text-suma-navy/55">Consulta ficticia · WhatsApp</p>
                     <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="font-bold">{leadName}</p>
@@ -87,7 +91,7 @@ export function ShowroomLivePreview({ experience, industry, brandName, paletteId
                     </div>
                     <button type="button" onClick={() => setLeadContacted(!leadContacted)}
                       className="mt-4 min-h-11 w-full rounded-xl bg-suma-navy px-4 text-sm font-bold text-white hover:bg-suma-purple">
-                      {leadContacted ? "Reabrir oportunidad de ejemplo" : "Simular seguimiento →"}
+                      {leadContacted ? "Volver a pendiente" : "Marcar como respondido →"}
                     </button>
                   </div>
                 </>
