@@ -81,6 +81,28 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     expect(screen.getByText("Vista previa de los colores elegidos").parentElement).toHaveClass("bg-[#4D453D]");
   });
 
+  it("explica para qué sirve cada demo y que probar no añade servicios", () => {
+    render(<ShowroomBuilder />);
+    completePersonalization();
+    expect(screen.getByText(/No hace falta que sepas qué programa necesitas/)).toBeInTheDocument();
+    expect(screen.getByText(/Mira cómo tu equipo sabría quién preguntó/)).toBeInTheDocument();
+    expect(screen.getByText(/Solo estás probando una demostración/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Responder dudas por WhatsApp/i }));
+    expect(screen.getByText(/Prueba qué respuestas podría recibir alguien/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Sí, añadir esta solución a mi propuesta/i })).toBeInTheDocument();
+  });
+
+  it("solo abre la calculadora de ejemplo si la persona lo solicita", () => {
+    render(<ShowroomBuilder />);
+    completePersonalization();
+    addCRM();
+    fireEvent.click(screen.getByRole("button", { name: /Opcional: hacer un cálculo/i }));
+    expect(screen.getByText(/Los resultados son ejemplos, no promesas/)).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Periodo a evaluar" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Sí, quiero ver el cálculo/i }));
+    expect(screen.getByRole("group", { name: "Periodo a evaluar" })).toBeInTheDocument();
+  });
+
   it("no inventa un nombre de negocio cuando lo omites", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
@@ -95,12 +117,12 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
     expect(screen.getByText(/Consultas de clientes · ejemplo/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Chatbot para WhatsApp/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Responder dudas por WhatsApp/i }));
     expect(screen.getByText(/Asistente · escenario ilustrativo/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Chatbot para WhatsApp/i })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /Responder dudas por WhatsApp/i })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByRole("button", { name: /Ver las 9 demos/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Campañas digitales/i }));
-    expect(screen.getByRole("button", { name: /Campañas digitales/i })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: /Crear anuncios para mi negocio/i }));
+    expect(screen.getByRole("button", { name: /Crear anuncios para mi negocio/i })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(/Prototipo con datos ficticios/)).toBeInTheDocument();
   });
 
@@ -108,7 +130,7 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
     expect(screen.getByText(/Solo estás probando una demostración/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Chatbot para WhatsApp/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Responder dudas por WhatsApp/i }));
     expect(screen.getByText(/Solo estás probando una demostración/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Sí, añadir esta solución a mi propuesta/i }));
     expect(screen.getByRole("status")).toHaveTextContent("Añadido a tu propuesta");
@@ -231,7 +253,7 @@ describe("ShowroomBuilder · analítica sin datos personales", () => {
     (window as DL).dataLayer = [];
     fireEvent.click(screen.getByRole("button", { name: "Quiero que más personas me conozcan" }));
     fireEvent.click(screen.getByRole("button", { name: /Ver las 9 demos/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Chatbot para WhatsApp/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Responder dudas por WhatsApp/i }));
     expect(layer()).toEqual([
       { event: "showroom_demo_viewed", goal: "captar", experience: "ads" },
       { event: "showroom_demo_viewed", goal: "captar", experience: "chatbot" },
