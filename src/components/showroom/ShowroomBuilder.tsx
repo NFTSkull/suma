@@ -14,6 +14,7 @@ import { availableSetupPayments, formatMXN, formatMXNExact, type SetupPayments }
 import { showroomEstimate, showroomWhatsAppHref, toggleShowroomService, saveShowroomConfig, loadShowroomConfig, type ShowroomSelection } from "@/lib/showroom";
 import { ShowroomLivePreview } from "./ShowroomLivePreview";
 import { ShowroomImpacto } from "./ShowroomImpacto";
+import { ShowroomLeadForm } from "./ShowroomLeadForm";
 
 /** Tasa general de IVA (SAT). Solo como referencia de desembolso. */
 const IVA_RATE = 0.16;
@@ -32,50 +33,28 @@ const priceLine = (service: (typeof individualServices)[number]) =>
     : formatMXN(service.monthly) + "/mes");
 
 export function ShowroomBuilder() {
-  const [initialized, setInitialized] = useState(false);
-  const [industry, setIndustry] = useState<ShowroomIndustryId>("pilates");
-  const [businessName, setBusinessName] = useState("");
+  // Cargar configuración guardada usando lazy initialization
+  const hasMounted = useRef(false);
+  const [industry, setIndustry] = useState<ShowroomIndustryId>(() => loadShowroomConfig()?.industry || "pilates");
+  const [businessName, setBusinessName] = useState(() => loadShowroomConfig()?.businessName || "");
   const [paletteId, setPaletteId] = useState<ShowroomPaletteId>("suma");
-  const [experience, setExperience] = useState<ShowroomExperienceId>("crm");
+  const [experience, setExperience] = useState<ShowroomExperienceId>(() => loadShowroomConfig()?.experience || "crm");
   const [guidedGoal, setGuidedGoal] = useState<GuidedGoalId>("responder");
   const [showAllExperiences, setShowAllExperiences] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
-  const [mode, setMode] = useState<"services" | "package">("services");
-  const [planId, setPlanId] = useState<PricingPlanId>("flow");
+  const [mode, setMode] = useState<"services" | "package">(() => loadShowroomConfig()?.mode || "services");
+  const [planId, setPlanId] = useState<PricingPlanId>(() => loadShowroomConfig()?.planId || "flow");
   // La demo inicial es ilustrativa, no una selección de compra.
-  const [serviceIds, setServiceIds] = useState<IndividualServiceId[]>([]);
-  const [locations, setLocations] = useState(1);
-  const [teamUsers, setTeamUsers] = useState(5);
-  const [months, setMonths] = useState<number>(pricingSettings.defaultMonths);
-  const [setupPayments, setSetupPayments] = useState<SetupPayments>(pricingSettings.defaultSetupPayments);
-  const [adBudget, setAdBudget] = useState<number>(pricingSettings.defaultAdBudget);
-  const [platform, setPlatform] = useState("WhatsApp / Instagram");
-  const [budget, setBudget] = useState("");
-  const [notes, setNotes] = useState("");
-  const [availability, setAvailability] = useState("Por definir");
-
-  // Cargar configuración guardada al montar
-  useEffect(() => {
-    const saved = loadShowroomConfig();
-    if (saved) {
-      if (saved.industry) setIndustry(saved.industry);
-      if (saved.businessName) setBusinessName(saved.businessName);
-      if (saved.experience) setExperience(saved.experience);
-      if (saved.mode) setMode(saved.mode);
-      if (saved.planId) setPlanId(saved.planId);
-      if (saved.serviceIds) setServiceIds(saved.serviceIds);
-      if (saved.locations) setLocations(saved.locations);
-      if (saved.teamUsers) setTeamUsers(saved.teamUsers);
-      if (saved.months) setMonths(saved.months);
-      if (saved.setupPayments) setSetupPayments(saved.setupPayments);
-      if (saved.adBudget !== undefined) setAdBudget(saved.adBudget);
-      if (saved.platform) setPlatform(saved.platform);
-      if (saved.budget) setBudget(saved.budget);
-      if (saved.notes) setNotes(saved.notes);
-      if (saved.availability) setAvailability(saved.availability);
-    }
-    setInitialized(true);
-  }, []);
+  const [serviceIds, setServiceIds] = useState<IndividualServiceId[]>(() => loadShowroomConfig()?.serviceIds || []);
+  const [locations, setLocations] = useState(() => loadShowroomConfig()?.locations || 1);
+  const [teamUsers, setTeamUsers] = useState(() => loadShowroomConfig()?.teamUsers || 5);
+  const [months, setMonths] = useState<number>(() => loadShowroomConfig()?.months || pricingSettings.defaultMonths);
+  const [setupPayments, setSetupPayments] = useState<SetupPayments>(() => loadShowroomConfig()?.setupPayments || pricingSettings.defaultSetupPayments);
+  const [adBudget, setAdBudget] = useState<number>(() => loadShowroomConfig()?.adBudget ?? pricingSettings.defaultAdBudget);
+  const [platform, setPlatform] = useState(() => loadShowroomConfig()?.platform || "WhatsApp / Instagram");
+  const [budget, setBudget] = useState(() => loadShowroomConfig()?.budget || "");
+  const [notes, setNotes] = useState(() => loadShowroomConfig()?.notes || "");
+  const [availability, setAvailability] = useState(() => loadShowroomConfig()?.availability || "Por definir");
 
   const selection: ShowroomSelection = {
     businessName, industry, experience, serviceIds, mode, planId, months, setupPayments, adBudget,
@@ -83,15 +62,18 @@ export function ShowroomBuilder() {
   };
   const quote = showroomEstimate(selection);
 
-  // Guardar configuración cuando cambia (solo después de inicializar)
+  // Guardar configuración cuando cambia (solo después del primer render)
   useEffect(() => {
-    if (!initialized) return;
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
     saveShowroomConfig({
       industry, businessName, experience, mode, planId, serviceIds,
       locations, teamUsers, months, setupPayments, adBudget,
       platform, budget, notes, availability,
     });
-  }, [initialized, industry, businessName, experience, mode, planId, serviceIds, 
+  }, [industry, businessName, experience, mode, planId, serviceIds, 
       locations, teamUsers, months, setupPayments, adBudget,
       platform, budget, notes, availability]);
   const paymentOptions = availableSetupPayments(quote.setup);
@@ -498,6 +480,13 @@ export function ShowroomBuilder() {
             ))}
           </ol>
         </div>
+      </section>
+
+      <section id="showroom-solicitar" aria-labelledby="showroom-lead-title" className="mt-10">
+        <ShowroomLeadForm 
+          selection={selection} 
+          quote={{ setup: quote.setup, monthly: quote.monthlySuma, isEmpty: quote.isEmpty }} 
+        />
       </section>
     </div>
   );

@@ -77,6 +77,61 @@ export const contactSchema = z.object({
     .optional(),
 });
 
+/** Schema para leads del Showroom con configuración de servicios */
+export const showroomLeadSchema = z.object({
+  nombre: z
+    .string({ error: "Escribe tu nombre." })
+    .trim()
+    .min(2, { error: "Escribe tu nombre." })
+    .max(80, { error: "El nombre es demasiado largo." }),
+  negocio: z
+    .string({ error: "Escribe el nombre de tu negocio." })
+    .trim()
+    .min(2, { error: "Escribe el nombre de tu negocio." })
+    .max(120, { error: "El nombre del negocio es demasiado largo." }),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(160, { error: "El correo es demasiado largo." })
+    .pipe(z.email({ error: "Revisa tu correo electrónico; parece incompleto." }))
+    .optional()
+    .or(z.literal("")),
+  whatsapp: z
+    .string()
+    .transform((v) => v.replace(/[\s\-().+]/g, ""))
+    .pipe(z.string().regex(/^\d{10,15}$/))
+    .optional()
+    .or(z.literal("")),
+  necesidades: z
+    .string()
+    .trim()
+    .max(500, { error: "Las necesidades pueden tener hasta 500 caracteres." })
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+  quieroDemoPersonalizada: z.boolean().optional().default(false),
+  privacidad: z.literal(true, { error: "Necesitamos tu consentimiento para responderte." }),
+  // Configuración del showroom (preservada)
+  showroomConfig: z
+    .object({
+      mode: z.enum(["services", "package"]).optional(),
+      planId: z.string().optional(),
+      serviceIds: z.array(z.string()).optional(),
+      months: z.number().optional(),
+      setup: z.number().optional(),
+      monthly: z.number().optional(),
+      locations: z.number().optional(),
+      notes: z.string().optional(),
+    })
+    .optional(),
+}).refine(
+  (data) => Boolean(data.email) || Boolean(data.whatsapp),
+  {
+    message: "Proporciona al menos un correo electrónico o número de WhatsApp.",
+    path: ["email"],
+  }
+);
+
 /** Campos técnicos anti-spam: se validan aparte para no mezclarlos con los datos del usuario. */
 export const antiSpamSchema = z.object({
   sitio: z.string().max(200).optional().default(""),
@@ -86,6 +141,10 @@ export const antiSpamSchema = z.object({
 export type ContactInput = z.input<typeof contactSchema>;
 export type ContactData = z.output<typeof contactSchema>;
 export type ContactField = keyof ContactInput;
+
+export type ShowroomLeadInput = z.input<typeof showroomLeadSchema>;
+export type ShowroomLeadData = z.output<typeof showroomLeadSchema>;
+export type ShowroomLeadField = keyof ShowroomLeadInput;
 
 export function fieldErrors(error: z.ZodError): Partial<Record<ContactField, string>> {
   const out: Partial<Record<ContactField, string>> = {};

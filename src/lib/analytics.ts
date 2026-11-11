@@ -14,15 +14,15 @@ import type { ImpactScenario } from "@/lib/showroom-impact";
 export type AnalyticsEvent =
   | {
       event: "generate_lead";
-      form_name: "contacto";
-      lead_source: "contact_form";
+      form_name: "contacto" | "showroom_lead";
+      lead_source: "contact_form" | "showroom";
       business_type: string;
       services: string;
       from_selector: boolean;
     }
   | {
       event: "form_error";
-      form_name: "contacto";
+      form_name: "contacto" | "showroom_lead";
       error_type: "not_configured" | "rate_limited" | "validation" | "delivery_failed" | "unconfirmed" | "server_error" | "network";
     }
   | { event: "contact_click"; contact_method: "email" | "whatsapp" | "phone" }

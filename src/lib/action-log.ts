@@ -1,5 +1,5 @@
 export type ActionLogEntry = {
-  action: "contact.submit";
+  action: "contact.submit" | "showroom_lead.submit";
   outcome:
     | "delivered"
     | "invalid_json"
@@ -18,6 +18,9 @@ export type ActionLogEntry = {
   servicios?: string[];
   tipoNegocio?: string;
   fromSelector?: boolean;
+  fromShowroom?: boolean;
+  hasConfig?: boolean;
+  wantsDemoPersonalizada?: boolean;
 };
 
 /**
