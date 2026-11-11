@@ -258,8 +258,6 @@ export function PricingEstimator() {
               <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">Mostramos Flow como ejemplo. Puedes elegir Ads o Growth sin compromiso.</p>
             )}
             <p className="sr-only">El desglose se actualiza cuando eliges un plan o una función.</p>
-            <p className="hidden" aria-hidden="true">
-            </p>
             {quote.isEmpty ? (
               <p className="mt-7 rounded-xl bg-suma-navy/10 p-4 text-sm">Marca una función para ver qué incluye y cuánto costaría.</p>
             ) : (
