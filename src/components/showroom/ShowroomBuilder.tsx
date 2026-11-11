@@ -428,7 +428,7 @@ export function ShowroomBuilder() {
               className="min-h-12 w-full rounded-full border-2 border-suma-navy/30 px-5 text-sm font-bold text-suma-navy hover:border-suma-purple sm:w-auto">
               ← Cambiar datos de mi negocio
             </button>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex w-full flex-wrap gap-2 sm:w-auto">
               <button type="button" onClick={() => goTo("quote")}
                 className="min-h-12 w-full rounded-full bg-suma-orange px-5 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white sm:w-auto">
                 Ver mi propuesta sin calcular
