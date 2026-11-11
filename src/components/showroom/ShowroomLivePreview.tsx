@@ -21,7 +21,8 @@ const simulated = "Simulación con datos ficticios · Sin conexiones reales";
 export function ShowroomLivePreview({ experience, industry, brandName, paletteId }: Props) {
   const palette = showroomPalettes.find((item) => item.id === paletteId) ?? showroomPalettes[0];
   const business = getShowroomIndustry(industry);
-  const name = brandName.trim().slice(0, 45) || business.example;
+  const userBrandName = brandName.trim().slice(0, 45);
+  const name = userBrandName || `${business.example} (ejemplo)`;
   const [leadContacted, setLeadContacted] = useState(false);
   const [chatChoice, setChatChoice] = useState<"hola" | "horarios" | "precio" | "persona">("hola");
   const [adAngle, setAdAngle] = useState<"prueba" | "paquete">("prueba");
