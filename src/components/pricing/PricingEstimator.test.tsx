@@ -30,8 +30,8 @@ describe("PricingEstimator", () => {
 
   it("se puede contratar solo una herramienta y seleccionarla en el configurador", () => {
     render(<PricingEstimator />);
-    fireEvent.click(screen.getByRole("button", { name: "Solo servicios" }));
-    expect(screen.getByText(/selecciona al menos un servicio/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Solo una función" }));
+    expect(screen.getByText(/Marca una función para ver qué incluye/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("checkbox", { name: "Configurar agenda de reservas" }));
     expect(screen.getAllByText(formatMXN(990), { exact: true }).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
@@ -39,6 +39,7 @@ describe("PricingEstimator", () => {
 
   it("no conserva servicios extra cuando cambia de Flow a Ads o Growth", () => {
     render(<PricingEstimator />);
+    fireEvent.click(screen.getByRole("button", { name: "Ver funciones opcionales" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" }));
     expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).toBeChecked();
     fireEvent.click(screen.getByRole("button", { name: "SUMA Ads" }));
@@ -56,14 +57,34 @@ describe("PricingEstimator", () => {
     expect(screen.getByText(formatMXNExact(3980))).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "3 mensualidades" }));
     expect(screen.getByText(formatMXNExact(2320))).toBeInTheDocument();
-    expect(screen.getByText(/Este ejemplo incluye todo el pago inicial/i)).toBeInTheDocument();
+    expect(screen.getByText(/Este total incluye toda la configuración/i)).toBeInTheDocument();
   });
 
   it("informa sin recargo de SUMA por asiento y sedes extra no se multiplican automáticamente", () => {
     render(<PricingEstimator />);
-    expect(screen.getByText(/sin recargo de SUMA por asiento/i)).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Número de sedes"), { target: { value: "3" } });
-    expect(screen.getByText(/cotizaremos las demás/i)).toBeInTheDocument();
+    expect(screen.getByText(/SUMA no cobra extra por integrante/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("¿Cuántas sucursales tienes?"), { target: { value: "3" } });
+    expect(screen.getByText(/Las demás necesitan una cotización/i)).toBeInTheDocument();
+  });
+
+  it("explica los conceptos del desglose sin cambiar precios", () => {
+    render(<PricingEstimator />);
+    expect(screen.getAllByText("¿Qué es?").length).toBeGreaterThan(3);
+    expect(screen.getAllByText("¿Qué es SUMA Flow?").length).toBeGreaterThan(0);
+    expect(screen.getByText("Pago de configuración (una vez)")).toBeInTheDocument();
+    expect(screen.getByText("Servicio de SUMA al mes")).toBeInTheDocument();
+    expect(screen.getByText(formatMXNExact(2320))).toBeInTheDocument();
+    expect(screen.getByText(/Con IVA general del 16%/)).toBeInTheDocument();
+  });
+
+  it("los extras se muestran solo cuando los solicita", () => {
+    render(<PricingEstimator />);
+    expect(screen.queryByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).not.toBeInTheDocument();
+    const toggle = screen.getByRole("button", { name: "Ver funciones opcionales" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle);
+    expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ver funciones opcionales" })).toHaveAttribute("aria-expanded", "true");
   });
 
   it("entra al configurador con el servicio elegido desde la tarjeta", () => {
