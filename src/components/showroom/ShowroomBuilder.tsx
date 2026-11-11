@@ -703,9 +703,9 @@ export function ShowroomBuilder() {
 
               <a href={showroomWhatsAppHref(selection, "quote")} target="_blank" rel="noopener noreferrer" {...showroomWhatsAppAttrs("quote")}
                 className="mt-6 flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-4 text-center text-sm font-extrabold text-suma-navy transition-colors hover:bg-suma-cream">
-                Enviar mi propuesta por WhatsApp →
+                {quote.isEmpty ? "Pedir una recomendación por WhatsApp →" : "Enviar mi propuesta por WhatsApp →"}
               </a>
-              <p className="mt-2 text-center text-xs text-suma-cream/60">Abre WhatsApp con un mensaje que puedes editar. Nada se envía sin ti.</p>
+              <p className="mt-2 text-center text-xs leading-relaxed text-suma-cream/75">Al tocar el botón se abre WhatsApp con un mensaje preparado. Tú decides si lo envías; no se realiza ningún pago.</p>
 
               <details className="mt-4 rounded-2xl border border-white/20 p-4">
                 <summary className="cursor-pointer text-sm font-bold text-suma-cream">¿Tienes un presupuesto definido?</summary>
