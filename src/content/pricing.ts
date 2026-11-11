@@ -221,7 +221,7 @@ export const pricingFaqs = [
   },
   {
     q: "¿Cómo funciona la cancelación?",
-    a: "Nuestra propuesta comercial es trabajar sin permanencia forzosa: podrás solicitar la cancelación antes de la próxima renovación mensual. El pago por servicios ya prestados y las parcialidades pendientes de configuración se detallarán en el acuerdo escrito; las licencias de otros proveedores tienen condiciones propias. Confirma las condiciones definitivas antes de contratar.",,
+    a: "Nuestra propuesta comercial es trabajar sin permanencia forzosa: podrás solicitar la cancelación antes de la próxima renovación mensual. El pago por servicios ya prestados y las parcialidades pendientes de configuración se detallarán en el acuerdo escrito; las licencias de otros proveedores tienen condiciones propias. Confirma las condiciones definitivas antes de contratar.",
   },
   {
     q: "¿SUMA cobra por cada persona que usa el CRM?",
