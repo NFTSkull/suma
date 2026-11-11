@@ -253,6 +253,13 @@ export function PricingEstimator() {
             <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">
               {mode === "services" ? "Funciones elegidas" : "Plan base"} · {quote.locations} {quote.locations === 1 ? "sucursal" : "sucursales"}
             </p>
+            {mode === "package" && <PricingWhatIs explanation={planExplanations[quote.plan.id]} subject={quote.plan.name} compact />}
+            {mode === "package" && manualPlanId === null && !requestedPlan && (
+              <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">Mostramos Flow como ejemplo. Puedes elegir Ads o Growth sin compromiso.</p>
+            )}
+            <p className="sr-only">El desglose se actualiza cuando eliges un plan o una función.</p>
+            <p className="hidden" aria-hidden="true">
+            </p>
             {quote.isEmpty ? (
               <p className="mt-7 rounded-xl bg-suma-navy/10 p-4 text-sm">Marca una función para ver qué incluye y cuánto costaría.</p>
             ) : (
@@ -265,6 +272,7 @@ export function PricingEstimator() {
                 <p className="mt-2 text-sm font-semibold text-suma-navy/80">
                   Con IVA general del 16%, si aplica: {formatMXNExact(quote.firstPaymentSuma * 1.16)}
                 </p>
+                <PricingWhatIs explanation={pricingConcepts.vat} compact />
                 <dl className="mt-7 divide-y divide-suma-navy/15 border-y border-suma-navy/15">
                   <div className="flex items-start justify-between gap-3 py-3 text-sm">
                     <dt className="min-w-0 flex-1">
@@ -303,7 +311,7 @@ export function PricingEstimator() {
                   <PricingWhatIs explanation={pricingConcepts.range} compact />
                 </div>
                 <p className="mt-5 text-xs font-bold uppercase tracking-widest text-suma-navy/60">Costo de {quote.months} {quote.months === 1 ? "mes" : "meses"}: configuración completa + servicio</p>
-                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatMXN(quote.totalSuma)} <span className="text-sm font-normal">mínimo orientativo</span></p>
+                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatMXN(quote.totalSuma)} <span className="text-sm font-normal">desde, antes de IVA</span></p>
                 <p className="mt-1 text-sm text-suma-navy/65">Precio de referencia del periodo: {formatMXN(quote.totalSuma)}–{formatMXN(quote.totalSumaMax)}. No es cotización definitiva.</p>
                 {quote.hasAds && <p className="mt-1 text-xs text-suma-navy/65">+ {formatMXN(quote.totalExternalAds)} para anuncios, pagados aparte, en ese periodo.</p>}
                 {quote.setupPayments > 1 && <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">
