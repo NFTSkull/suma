@@ -30,12 +30,12 @@ export const pricingPlans = [
     monthlyMax: 4900,
     launchWindow: "3 a 5 días hábiles",
     setupIncludes: [
-      "Preparamos una campaña básica para una sede.",
-      "Conectamos el anuncio con tu WhatsApp o enlace de reservas.",
+      "Creamos una campaña de anuncios para 1 sucursal de tu negocio.",
+      "Ponemos un botón para que puedan escribirte por WhatsApp o ir a tus reservas.",
     ],
     monthlyIncludes: [
-      "Revisamos y ajustamos una campaña dos veces al mes.",
-      "Preparamos un diseño sencillo al mes y te explicamos los resultados.",
+      "Revisamos tus anuncios 2 veces al mes y hacemos ajustes.",
+      "Creamos 1 imagen para anuncios al mes y te compartimos los resultados.",
     ],
     featured: false,
     includes: [
@@ -43,7 +43,7 @@ export const pricingPlans = [
       "Revisión quincenal y resumen de resultados",
       "El dinero de los anuncios se paga aparte",
     ],
-    boundaries: "Entrada para una sede y una campaña sencilla. Más campañas, diseños, video o seguimiento intensivo se cotizan aparte. No respondemos mensajes por ti.",
+    boundaries: "Precio base para 1 sucursal y 1 campaña. El dinero de los anuncios va aparte. No contestamos los mensajes de tus clientes.",
     action: "Consultar publicidad",
   },
   {
@@ -59,13 +59,13 @@ export const pricingPlans = [
     monthlyMax: 3900,
     launchWindow: "5 a 10 días hábiles",
     setupIncludes: [
-      "Organizamos las consultas en un CRM existente (una lista de clientes con seguimiento).",
-      "Definimos etapas y responsables para una sede.",
-      "Configuramos hasta dos tareas automáticas sencillas, como avisos internos o recordatorios de seguimiento.",
+      "Ordenamos las personas que te escriben en un programa para clientes (CRM) que ya existe.",
+      "Organizamos quién responde cada consulta y cuál es el siguiente paso.",
+      "Dejamos listas hasta 2 tareas automáticas sencillas, como avisos internos o recordatorios.",
     ],
     monthlyIncludes: [
-      "Revisamos el proceso una vez al mes.",
-      "Un ajuste pequeño dentro del proceso y un resumen mensual.",
+      "Revisamos una vez al mes cómo va tu seguimiento de clientes.",
+      "Hacemos 1 ajuste sencillo y te compartimos un resumen mensual.",
     ],
     featured: true,
     includes: [
@@ -73,7 +73,7 @@ export const pricingPlans = [
       "Hasta 2 tareas automáticas sencillas al inicio",
       "Revisión mensual, 1 ajuste pequeño e informe",
     ],
-    boundaries: "Entrada para una sede y un proceso sencillo con hasta dos automatizaciones básicas. Conexiones especiales, mensajería automática, más canales o sedes se cotizan aparte. No incluye licencias ni un bot que conteste solo.",
+    boundaries: "Precio base para 1 sucursal. No incluye licencias del programa, respuestas automáticas por WhatsApp ni conexiones especiales.",
     action: "Consultar seguimiento",
   },
   {
@@ -89,12 +89,12 @@ export const pricingPlans = [
     monthlyMax: 9900,
     launchWindow: "7 a 15 días hábiles",
     setupIncludes: [
-      "Configuramos el proceso básico de SUMA Flow para una sede, con hasta dos tareas automáticas sencillas.",
-      "Preparamos una campaña inicial en Facebook e Instagram.",
+      "Organizamos las consultas de 1 sucursal como en Flow, con hasta 2 tareas automáticas sencillas.",
+      "Creamos 1 campaña de anuncios en Facebook e Instagram.",
     ],
     monthlyIncludes: [
-      "Revisamos las consultas y su seguimiento una vez al mes.",
-      "Gestionamos una campaña, hasta dos diseños sencillos al mes y un resumen.",
+      "Revisamos una vez al mes los mensajes pendientes y el seguimiento.",
+      "Revisamos 1 campaña, creamos hasta 2 imágenes para anuncios y te damos un resumen cada mes.",
     ],
     featured: false,
     includes: [
@@ -102,7 +102,7 @@ export const pricingPlans = [
       "Hasta 2 diseños sencillos al mes",
       "Revisiones y resumen mensual",
     ],
-    boundaries: "El precio desde cubre una sede, hasta dos tareas automáticas sencillas y una campaña. Más anuncios o conexiones especiales elevan el presupuesto. Publicidad, licencias y chatbot con IA aparte.",
+    boundaries: "Precio base para 1 sucursal. Los anuncios se pagan aparte; también las licencias y los asistentes con IA.",
     action: "Consultar plan completo",
   },
 ] as const;
@@ -119,62 +119,62 @@ export const individualServices = [
   {
     id: "google-ads", name: "Anuncios en Google", category: "Captación",
     setup: 1490, setupMax: 4900, monthly: 2490, monthlyMax: 5900, from: true,
-    detail: "Una campaña de búsqueda sencilla, ajustes e informe mensual. El presupuesto de anuncios va aparte.",
+    detail: "Anuncios para búsquedas en Google. Los revisamos cada mes; el dinero de Google va aparte.",
   },
   {
     id: "crm-gestionado", name: "Organizar clientes (CRM)", category: "Atención",
     setup: 2490, setupMax: 7900, monthly: 1490, monthlyMax: 3900, from: true,
-    detail: "Organizamos las consultas y hasta dos tareas automáticas sencillas en un programa de clientes existente. Licencias aparte.",
+    detail: "Sabes quién preguntó, quién respondió y qué sigue. Configuramos hasta 2 avisos o recordatorios; licencia aparte.",
   },
   {
     id: "chatbot-guiado", name: "Menú de respuestas automáticas (sin IA)", category: "Atención",
     setup: 1490, setupMax: 4900, monthly: 590, monthlyMax: 1490, from: true,
-    detail: "Opciones para dudas frecuentes y paso a una persona, en canal compatible. Plataforma y mensajes aparte.",
+    detail: "Un menú con respuestas elegidas por ti, como horarios y precios. Plataforma y mensajes aparte.",
   },
   {
     id: "chatbot-ia", name: "Asistente con IA para WhatsApp", category: "Atención",
     setup: 6900, setupMax: 24900, monthly: 1990, monthlyMax: 6900, from: true,
-    detail: "Versión básica: preguntas frecuentes, respuestas con IA y paso al equipo. API oficial y consumos aparte.",
+    detail: "Un asistente que responde dudas frecuentes y puede pasar la conversación a tu equipo. Permisos y mensajes aparte.",
   },
   {
     id: "reservas", name: "Configurar agenda de reservas", category: "Operación",
     setup: 990, setupMax: 3900, monthly: 0, monthlyMax: 0, from: true,
-    detail: "Configuración básica de una agenda ya existente. No creamos software nuevo; licencia aparte.",
+    detail: "Dejamos lista tu agenda o reservador actual. No construimos otra aplicación; licencia aparte.",
   },
   {
     id: "automatizacion", name: "Una tarea automática", category: "Operación",
     setup: 1490, setupMax: 6900, monthly: 0, monthlyMax: 0, from: true,
-    detail: "Una acción sencilla: aviso de cita o seguimiento. Herramientas y consumos aparte.",
+    detail: "Automatizamos 1 tarea repetitiva, como crear un recordatorio interno. Herramientas aparte.",
   },
   {
     id: "seo-local", name: "Ayudarte a aparecer en Google (SEO local)", category: "Presencia",
     setup: 990, setupMax: 3900, monthly: 990, monthlyMax: 3990, from: true,
-    detail: "Revisamos tu presencia local y actualizamos información básica; seguimiento mensual sin garantías de posición.",
+    detail: "Mejoramos información de tu negocio en búsquedas locales. No garantizamos lugares en Google.",
   },
   {
     id: "landing", name: "Página sencilla para recibir clientes", category: "Presencia",
     setup: 2990, setupMax: 8900, monthly: 0, monthlyMax: 0, from: true,
-    detail: "Una página para celular con información, WhatsApp o formulario. Hosting y dominio aparte.",
+    detail: "Una página para mostrar una oferta y facilitar que te escriban. Dominio y alojamiento aparte.",
   },
   {
     id: "web", name: "Página web para tu negocio", category: "Presencia",
     setup: 6990, setupMax: 19900, monthly: 0, monthlyMax: 0, from: true,
-    detail: "Desde tres páginas informativas sencillas. Más páginas, tienda, reservas o funciones se cotizan aparte.",
+    detail: "Un sitio desde 3 páginas para presentar tu negocio. Tienda, reservas y más funciones van aparte.",
   },
   {
     id: "crm-medida", name: "Sistema de clientes hecho a medida", category: "Desarrollo",
     setup: 29900, setupMax: 129000, monthly: 0, monthlyMax: 0, from: true,
-    detail: "Desde un módulo básico a medida. Alcance, seguridad, acceso y soporte sujetos a cotización.",
+    detail: "Un programa propio para una necesidad específica. Definimos antes las funciones y el soporte.",
   },
   {
     id: "mantenimiento-crm", name: "Soporte para sistemas a medida", category: "Desarrollo",
     setup: 0, setupMax: 0, monthly: 1490, monthlyMax: 6900, from: true,
-    detail: "Revisión y correcciones básicas según contrato. Sin nuevas funciones ni servidores.",
+    detail: "Revisamos y corregimos errores pequeños de un sistema propio. Nuevas funciones y servidores aparte.",
   },
   {
     id: "app", name: "Aplicación móvil a medida", category: "Desarrollo",
     setup: 59000, setupMax: 189000, monthly: 0, monthlyMax: 0, from: true,
-    detail: "Desde una app sencilla para una plataforma. Publicación en tiendas y mantenimiento aparte.",
+    detail: "Una aplicación móvil con una función principal. Publicación en tiendas y soporte aparte.",
   },
 ] as const;
 
