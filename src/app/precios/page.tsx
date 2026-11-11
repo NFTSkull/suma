@@ -8,13 +8,13 @@ import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { individualServices, pricingFaqs, pricingPlans } from "@/content/pricing";
-import { estimatePricing, formatMXN, pricingWhatsAppHref } from "@/lib/pricing";
+import { estimatePricing, formatMXN, formatMXNExact, pricingWhatsAppHref } from "@/lib/pricing";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
   title: "Precios CRM sin cobro por usuario, automatización y publicidad",
   description:
-    "Configura SUMA Ads, Flow o Growth y cotiza servicios individuales: CRM administrado, CRM a medida sin tarifa por asiento, chatbots, automatizaciones, SEO y web. MXN, antes de IVA.",
+    "Configura SUMA Ads, Flow o Growth con cuotas más accesibles y parcialidades de implementación. Cotiza CRM, publicidad, automatizaciones y web en MXN antes de IVA.",
   path: "/precios",
   keywords: [
     "precios CRM para estudios de pilates",
@@ -54,12 +54,13 @@ export default function PreciosPage() {
             id="planes-title"
             eyebrow="Tres planes de servicio · Para una sede"
             title={<>Precios claros. <span className="text-suma-purple">Sin servicios innecesarios.</span></>}
-            lead="Implementación por única vez + mensualidad de operación. Contrata publicidad, CRM administrado o una solución que conecte ambos. Si ya tienes un reservador, lo aprovechamos."
+            lead="Ahora puedes solicitar la implementación en un pago o dividirla en 3 mensualidades (6 para proyectos mayores). El servicio mensual y los gastos externos se muestran por separado."
           />
           <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
             {pricingPlans.map((plan) => {
               const dark = plan.featured;
-              const firstPayment = estimatePricing({ planId: plan.id, months: 1 }).firstPaymentSuma;
+              const fullQuote = estimatePricing({ planId: plan.id, months: 1, setupPayments: 1 });
+              const flexibleQuote = estimatePricing({ planId: plan.id, months: 1, setupPayments: 3 });
               return (
                 <article
                   key={plan.id}
@@ -85,7 +86,8 @@ export default function PreciosPage() {
                         : <>Sin mensualidad obligatoria</>}
                     </p>
                     <p className={`mt-4 rounded-xl px-3 py-3 text-sm font-bold ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
-                      Primer pago base: {formatMXN(firstPayment)}
+                      Primer desembolso con 3 abonos: {formatMXNExact(flexibleQuote.firstPaymentSuma)}
+                      <span className="mt-1 block text-xs font-normal opacity-80">O {formatMXN(fullQuote.firstPaymentSuma)} con implementación en un solo pago.</span>
                     </p>
                   </div>
 
@@ -100,7 +102,7 @@ export default function PreciosPage() {
                   </ul>
                   <p className={`mt-7 border-t pt-5 text-xs leading-relaxed ${dark ? "border-suma-cream/20 text-suma-cream/65" : "border-suma-navy/15 text-suma-navy/65"}`}>{plan.boundaries}</p>
                   <ButtonLink
-                    href={pricingWhatsAppHref({ planId: plan.id, months: 1 })}
+                    href={pricingWhatsAppHref({ planId: plan.id, months: 1, setupPayments: 3 })}
                     target="_blank"
                     rel="noopener noreferrer"
                     variant={dark ? "accent" : "primary"}
@@ -119,7 +121,7 @@ export default function PreciosPage() {
             })}
           </div>
           <p className="mt-7 max-w-5xl text-sm leading-relaxed text-suma-navy/70">
-            Precios base en pesos mexicanos, antes de IVA y para una sede. Implementación y mensualidades se cobran por separado. La inversión en anuncios, licencias, hosting adicional y consumo de WhatsApp API o IA se pagan aparte. No exigimos una web nueva. Las reservas e integraciones dependen de permisos y viabilidad comprobada.
+            Precios base en pesos mexicanos, antes de IVA y para una sede. Las parcialidades son una propuesta sujeta a aprobación comercial por escrito, no un crédito aprobado ni cobro automático. Implementación y servicio mensual se cobran por separado. La inversión en anuncios, licencias, hosting adicional y consumo de WhatsApp API o IA se pagan aparte. No exigimos una web nueva. Las reservas e integraciones dependen de permisos y viabilidad comprobada.
           </p>
         </div>
       </section>
@@ -143,7 +145,7 @@ export default function PreciosPage() {
               <p className="text-eyebrow text-suma-orange">CRM propio a medida</p>
               <p className="mt-4 text-sm text-suma-cream/80">Desarrollo desde</p>
               <p className="mt-1 font-display text-4xl font-extrabold">$49,900</p>
-              <p className="mt-2 text-sm text-suma-cream/80">Pago de implementación · soporte opcional desde $2,990/mes.</p>
+              <p className="mt-2 text-sm text-suma-cream/80">Implementación personalizable; solicita 6 parcialidades o pagos por entregable. Soporte opcional desde $2,990/mes.</p>
               <ul className="mt-5 space-y-2 text-sm text-suma-cream/85">
                 <li>✓ Módulos según tu operación real</li>
                 <li>✓ Sin cobro de SUMA por usuario interno</li>
@@ -164,7 +166,7 @@ export default function PreciosPage() {
               id="simulador-title"
               eyebrow="Personaliza y cotiza"
               title="Un paquete o solo lo que te hace falta."
-              lead="Elige servicios, cantidad de integrantes, sedes, herramientas actuales y prioridades. Verás implementación, mensualidad y costos externos estimados; envía tu selección por WhatsApp."
+              lead="Elige módulos y modalidad de pago. Verás el primer desembolso, el costo total de implementación, la cuota mensual y los terceros por separado."
             />
           </div>
           <PricingEstimator />
@@ -199,7 +201,7 @@ export default function PreciosPage() {
             ))}
           </div>
           <p className="mt-7 max-w-4xl text-sm text-suma-navy/65">
-            Estas son tarifas iniciales de referencia, no cotizaciones automáticas. Los desarrollos a medida, integraciones y costos de terceros se definen mediante alcance técnico.
+            Los servicios de pago único también pueden solicitarse en 3 mensualidades; los proyectos con implementación de al menos $10,000 pueden solicitar 6. El calendario definitivo requiere aprobación. Estas son tarifas iniciales de referencia, no cotizaciones automáticas. Los desarrollos a medida, integraciones y costos de terceros se definen mediante alcance técnico.
           </p>
           <Link href="/servicios" className="mt-7 inline-flex min-h-11 items-center font-bold text-suma-purple underline decoration-2 underline-offset-[5px] hover:text-suma-navy">
             Explorar todos los servicios →
