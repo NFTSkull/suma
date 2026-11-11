@@ -107,7 +107,7 @@ describe("precios configurables SUMA", () => {
     expect(href).toMatch(/^https:\/\/wa\.me\/528114688882\?text=/);
     const message = decodeURIComponent(href.split("?text=")[1]);
     expect(message).toContain("servicios individuales");
-    expect(message).toContain("Asistente de WhatsApp con IA");
+    expect(message).toContain("Asistente con IA para WhatsApp");
     expect(message).toContain("25 integrantes");
     expect(message).toContain("2.");
     expect(message).toContain(formatMXN(6900));
