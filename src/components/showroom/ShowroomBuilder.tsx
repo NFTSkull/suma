@@ -395,13 +395,8 @@ export function ShowroomBuilder() {
         </div>
 
         <div className="lg:col-span-2 rounded-2xl border border-suma-line bg-white px-5 py-5 md:px-7">
-          <p aria-live="polite" className="text-sm font-semibold text-suma-navy">
-            {quote.isEmpty
-              ? "Todavía no has añadido ninguna solución. Puedes probar las demos sin contratar nada."
-              : mode === "package"
-                ? "Tu propuesta incluye " + quote.plan.name + (quote.services.length ? " y " + quote.services.length + " extras." : ".")
-                : "Has elegido " + quote.services.length + (quote.services.length === 1 ? " servicio." : " servicios.")}
-          </p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-suma-purple">Tu selección hasta ahora</p>
+          <p aria-live="polite" className="text-sm font-semibold text-suma-navy">{chosenDescription}</p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <button type="button" onClick={() => { setPersonalizeField(0); goTo("personalize"); }}
               className="min-h-12 w-full rounded-full border-2 border-suma-navy/30 px-5 text-sm font-bold text-suma-navy hover:border-suma-purple sm:w-auto">
