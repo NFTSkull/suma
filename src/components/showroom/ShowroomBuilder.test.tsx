@@ -153,7 +153,7 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     completePersonalization();
     openQuote();
     fireEvent.change(screen.getByLabelText("Personas del equipo"), { target: { value: "10" } });
-    fireEvent.change(screen.getByLabelText("Sedes"), { target: { value: "2" } });
+    fireEvent.change(screen.getByLabelText("Sucursales"), { target: { value: "2" } });
     fireEvent.click(screen.getByRole("button", { name: /Cambiar la solución que probé/i }));
     expect(screen.getByText(/Equipo · 10 personas · 2 sucursales/)).toBeInTheDocument();
   });
