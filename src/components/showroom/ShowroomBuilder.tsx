@@ -309,41 +309,51 @@ export function ShowroomBuilder() {
       <section id="showroom-explorar" aria-labelledby="showroom-preview-title"
         className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7 lg:col-start-1 lg:row-start-1">
-          <p className="text-eyebrow text-suma-orange">02 · Pruébalo</p>
-          <h2 id="showroom-preview-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold">Elige algo y pruébalo.</h2>
-          <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
-            Toca una opción. La pantalla de la derecha cambia al instante y puedes interactuar con ella.
+          <p className="text-eyebrow text-suma-orange">02 · PRUEBA CÓMO FUNCIONARÍA</p>
+          <h2 id="showroom-preview-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold">¿En qué te gustaría mejorar?</h2>
+          <p className="mt-3 text-sm leading-relaxed text-suma-cream/85">
+            No hace falta que sepas qué programa necesitas. Elige tu problema y te mostramos un ejemplo.
           </p>
-          <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">¿Qué quieres mejorar primero?</p>
+          <div className="mt-5 space-y-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm leading-relaxed text-suma-cream">
+            <p><strong className="text-suma-orange">1.</strong> Elige qué quieres mejorar.</p>
+            <p><strong className="text-suma-orange">2.</strong> Prueba los botones de la pantalla de ejemplo.</p>
+            <p><strong className="text-suma-orange">3.</strong> Si te interesa, añádelo a tu propuesta. Sin compromiso.</p>
+          </div>
+          <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">1 · Elige tu objetivo</p>
           <div role="group" aria-label="Objetivo principal del negocio" className="mt-3 flex flex-wrap gap-2">
             {guidedGoals.map((goal) => (
               <button key={goal.id} type="button" aria-pressed={guidedGoal === goal.id}
                 onClick={() => {
+                  setHasChosenGoal(true);
                   setGuidedGoal(goal.id);
                   showDemo(goal.id, goal.experience as ShowroomExperienceId);
                 }}
-                className={"min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-suma-orange " +
+                className={"min-h-12 w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-extrabold transition-colors focus-visible:outline-suma-orange sm:w-auto " +
                   (guidedGoal === goal.id ? "border-suma-orange bg-suma-orange text-suma-navy" : "border-white/30 bg-white/5 text-white hover:border-white")}>
                 {goal.name}
               </button>
             ))}
           </div>
-          <div role="group" aria-label="Experiencias para probar" className="mt-5 grid grid-cols-2 gap-2">
+          <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">2 · Elige qué ejemplo quieres ver</p>
+          <p className="mt-2 text-xs leading-relaxed text-suma-cream/75">
+            {hasChosenGoal ? "Estos ejemplos se relacionan con lo que quieres mejorar." : "Empezamos con ejemplos para organizar mensajes. Puedes elegir otro objetivo arriba."}
+          </p>
+          <div role="group" aria-label="Experiencias para probar" className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {visibleExperiences.map((item) => (
               <button key={item.id} type="button" aria-pressed={experience === item.id}
                 onClick={() => showDemo(guidedGoal, item.id)}
-                className={"min-h-[4.5rem] rounded-2xl border px-3 py-3 text-left transition-colors focus-visible:outline-suma-orange " +
+                className={"min-h-[4.5rem] rounded-2xl border-2 px-4 py-3 text-left transition-colors focus-visible:outline-suma-orange " +
                   (experience === item.id
                     ? "border-suma-orange bg-suma-orange text-suma-navy"
                     : "border-white/20 bg-white/5 text-white hover:border-white/60")}>
-                <span className="block text-xs font-semibold opacity-65">{item.category}</span>
+                <span className="block text-xs font-semibold opacity-75">{experience === item.id ? "✓ Estás viendo esta opción" : "Toca para ver el ejemplo"}</span>
                 <span className="mt-1 block text-sm font-bold leading-tight">{item.title}</span>
               </button>
             ))}
           </div>
           <button type="button" onClick={() => setShowAllExperiences((current) => !current)}
             aria-expanded={showAllExperiences}
-            className="mt-3 min-h-11 w-full rounded-xl border border-white/25 px-4 text-sm font-bold text-suma-cream transition-colors hover:border-suma-orange">
+            className="mt-3 min-h-12 w-full rounded-xl border-2 border-white/50 bg-white/10 px-4 text-sm font-bold text-suma-cream transition-colors hover:border-suma-orange hover:bg-white/15">
             {showAllExperiences ? "Ver solo las 3 sugeridas ↑" : "Ver las 9 demos ↓"}
           </button>
         </div>
