@@ -40,9 +40,9 @@ export function ShowroomLivePreview({ experience, industry, brandName, paletteId
     <div aria-label="Vista previa interactiva" className="overflow-hidden rounded-[1.5rem] border border-suma-line bg-white shadow-lift">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-suma-line bg-suma-cream-soft px-4 py-3">
         <div className="flex items-center gap-2">
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-suma-orange" />
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-suma-pink" />
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-suma-purple" />
+          <span aria-hidden="true" className={palette.base + " size-2.5 rounded-full border border-black/10"} />
+          <span aria-hidden="true" className={palette.light + " size-2.5 rounded-full border border-black/10"} />
+          <span aria-hidden="true" className={palette.accent + " size-2.5 rounded-full border border-black/10"} />
           <span className="ml-2 text-xs font-bold text-suma-navy/70">Vista previa de tu experiencia</span>
         </div>
         <span className="rounded-full bg-suma-navy/5 px-3 py-1 text-[0.7rem] font-bold text-suma-navy/70">DEMO · NO OPERATIVA</span>
