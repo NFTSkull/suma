@@ -61,7 +61,7 @@ describe("PricingEstimator", () => {
     fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
     expect(screen.getByRole("button", { name: "0 extra seleccionado" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ver funciones opcionales" })).toBeInTheDocument();
-    expect(screen.getByText(/De un anuncio a una consulta/)).toBeTruthy();
+    expect(screen.getAllByText(/De un anuncio a una consulta/).length).toBeGreaterThan(0);
   });
 
   it("ofrece un pago o 3 abonos y aclara el total del contrato", () => {
