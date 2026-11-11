@@ -1,8 +1,13 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "crypto";
 
-const PREVIEW_URL = process.env.PREVIEW_URL || "https://suma-dz52k1mfo-viozs-projects.vercel.app";
-const VERCEL_SHARE_TOKEN = process.env.VERCEL_SHARE_TOKEN || "DDecgsxaWoTkkvLAISl1ATvw5yRBsBQa";
+const PREVIEW_URL = process.env.PREVIEW_URL;
+const VERCEL_SHARE_TOKEN = process.env.VERCEL_SHARE_TOKEN;
+
+if (!PREVIEW_URL || !VERCEL_SHARE_TOKEN) {
+  throw new Error("PREVIEW_URL and VERCEL_SHARE_TOKEN environment variables are required");
+}
+
 const SHOWROOM_PATH = `/showroom?_vercel_share=${VERCEL_SHARE_TOKEN}&utm_source=instagram&utm_medium=social&utm_campaign=pilates_mty`;
 
 // Tipos para GA4 dataLayer

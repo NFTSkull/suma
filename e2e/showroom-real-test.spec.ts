@@ -1,7 +1,11 @@
 import { test, expect, type Page } from "@playwright/test";
 
-const PREVIEW_URL = process.env.PREVIEW_URL || "https://suma-dz52k1mfo-viozs-projects.vercel.app";
-const VERCEL_SHARE = "DDecgsxaWoTkkvLAISl1ATvw5yRBsBQa";
+const PREVIEW_URL = process.env.PREVIEW_URL;
+const VERCEL_SHARE = process.env.VERCEL_SHARE_TOKEN;
+
+if (!PREVIEW_URL || !VERCEL_SHARE) {
+  throw new Error("PREVIEW_URL and VERCEL_SHARE_TOKEN environment variables are required");
+}
 
 type DataLayerEvent = {
   event?: string;
