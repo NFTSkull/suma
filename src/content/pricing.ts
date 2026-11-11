@@ -201,7 +201,7 @@ export type IndividualService = (typeof individualServices)[number];
 export const pricingFaqs = [
   {
     q: "¿Qué significa «desde» y por qué hay un rango?",
-    a: "«Desde» es el precio mínimo para la versión sencilla que describimos. El rango es una guía para proyectos de tamaño pequeño o mediano. Si necesitas más campañas, páginas, reglas o sedes, revisamos tu caso y te enviamos el precio final antes de empezar. El rango no es un máximo garantizado.",
+    a: "«Desde» es el precio mínimo para la versión sencilla que describimos. El rango es una guía para proyectos de tamaño pequeño o mediano. Si necesitas más anuncios, páginas, tareas automáticas o sucursales, revisamos tu caso y te enviamos el precio final antes de empezar. El rango no es un máximo garantizado.",
   },
   {
     q: "¿Qué pago una vez y qué pago cada mes?",
