@@ -235,11 +235,15 @@ export function ShowroomBuilder() {
         </section>
       )}
 
+      {stage === "explore" && (
       <section id="showroom-explorar" aria-labelledby="showroom-preview-title"
         className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7 lg:col-start-1 lg:row-start-1">
           <p className="text-eyebrow text-suma-orange">02 · Pruébalo</p>
-          <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Mira cómo podría funcionar.</h2>
+          <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Elige algo y pruébalo.</h2>
+          <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
+            Toca una opción. La pantalla de la derecha cambia al instante y puedes interactuar con ella.
+          </p>
           <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">¿Qué quieres mejorar primero?</p>
           <div role="group" aria-label="Objetivo principal del negocio" className="mt-3 flex flex-wrap gap-2">
             {guidedGoals.map((goal) => (
@@ -275,7 +279,7 @@ export function ShowroomBuilder() {
         </div>
 
         <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} />
+          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
           <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
             Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
           </p>
@@ -284,39 +288,99 @@ export function ShowroomBuilder() {
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
+          <p className="mt-2 text-xs font-semibold text-suma-purple">
+            Toca los botones de la demostración para ver cómo cambiaría la pantalla.
+          </p>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{active.lead}</p>
           <p className="mt-2 text-xs text-suma-navy/55">{active.detail}</p>
           {selectedCurrent ? (
-            <p role="status" className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-full bg-emerald-50 px-5 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
-              <span aria-hidden="true">✓</span> Ya está en tu propuesta
-            </p>
+            <div role="status" className="mt-5 flex min-h-12 flex-wrap items-center justify-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
+              <span>✓ Añadido a tu propuesta</span>
+              {serviceIds.includes(active.serviceId) && !included.includes(active.serviceId) && (
+                <button type="button" onClick={() => toggle(active.serviceId)}
+                  className="rounded-full border border-emerald-300 bg-white px-3 py-2 text-xs font-bold text-emerald-900 hover:border-emerald-600">
+                  Quitar
+                </button>
+              )}
+            </div>
           ) : (
             <button type="button" onClick={addCurrent}
               className="mt-5 min-h-12 w-full rounded-full bg-suma-navy px-5 text-sm font-bold text-suma-cream transition-colors hover:bg-suma-purple">
-              Añadir a mi propuesta +
+              Quiero incluir esta solución +
             </button>
           )}
           <Link href={active.href} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-suma-navy underline decoration-suma-orange underline-offset-4">
             Ver detalles de este servicio →
           </Link>
         </div>
+        <div className="lg:col-span-2 rounded-2xl border border-suma-line bg-white px-5 py-5 md:px-7">
+          <p aria-live="polite" className="text-sm font-semibold text-suma-navy">
+            {quote.isEmpty
+              ? "Todavía no has añadido ninguna solución. Puedes probar las demos sin contratar nada."
+              : "Tu propuesta ya incluye " + (mode === "package" ? quote.plan.name + " y " : "") + quote.services.length +
+                (quote.services.length === 1 ? " función adicional." : " funciones adicionales.")}
+          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <button type="button" onClick={() => { setPersonalizeField(0); goTo("personalize"); }}
+              className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              ← Cambiar datos de mi negocio
+            </button>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => goTo("quote")}
+                className="min-h-12 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-suma-purple/5">
+                Ir directo a mi propuesta
+              </button>
+              <button type="button" onClick={() => goTo("impact")}
+                className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
+                Siguiente: calcular →
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
+      )}
 
+      {stage === "impact" && (
       <div className="space-y-3">
         <p className="mx-auto max-w-4xl text-center text-sm leading-relaxed text-suma-navy/70">
           El cálculo es opcional. Primero elige una solución; si aún no sabes cuál, puedes solicitar una recomendación.
         </p>
         <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-suma-line bg-white p-5">
+          <button type="button" onClick={() => goTo("explore")}
+            className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
+            ← Volver a las demos
+          </button>
+          <button type="button" onClick={() => goTo("quote")}
+            className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
+            {quote.isEmpty ? "Pedir una recomendación →" : "Siguiente: mi propuesta →"}
+          </button>
+        </div>
       </div>
+      )}
 
+      {stage === "quote" && (
       <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
-          <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Elige qué contratar y ve cuánto pagarías.</h2>
-          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">Prueba la opción básica de cada servicio. Te mostramos cuánto puede variar el presupuesto, antes de IVA.</p>
+          <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Esta es tu propuesta.</h2>
+          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">
+            Revisa lo que elegiste y cuánto costaría. Puedes cambiar cualquier opción sin volver a empezar.
+          </p>
+          <button type="button" onClick={() => goTo("explore")}
+            className="mt-4 min-h-11 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-white">
+            ← Cambiar la solución que probé
+          </button>
         </div>
         <div className="grid gap-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="space-y-7">
+            <details className="rounded-2xl border border-suma-line bg-white p-4 md:p-5">
+              <summary className="min-h-11 cursor-pointer text-sm font-bold text-suma-navy">
+                Cambiar mi plan o agregar funciones (opcional)
+              </summary>
+              <p className="mb-4 mt-2 text-xs text-suma-navy/65">
+                Solo abre esto si quieres comparar otras opciones. Las funciones que probaste se conservan.
+              </p>
             <fieldset>
               <legend className="text-sm font-bold text-suma-navy">¿Cómo prefieres contratar?</legend>
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -387,6 +451,7 @@ export function ShowroomBuilder() {
                 {showAllServices ? "Ver solo los recomendados ↑" : "Ver los " + availableServices.length + " módulos (" + hiddenCount + " más) ↓"}
               </button>
             </fieldset>
+            </details>
 
             <div className="grid grid-cols-2 items-end gap-3 sm:grid-cols-3 sm:gap-4">
               <div><label htmlFor="showroom-users" className="text-sm font-bold text-suma-navy">Personas del equipo</label>
@@ -562,6 +627,8 @@ export function ShowroomBuilder() {
           </ol>
         </div>
       </section>
+      )}
+      </div>
     </div>
   );
 }
