@@ -1,6 +1,9 @@
 import type { PricingPlanId } from "@/content/pricing";
+import type { ShowroomExperienceId, ShowroomIndustryId, ShowroomPaletteId } from "@/content/showroom";
 import type { ServiceSlug } from "@/types/content";
 import { readAnalyticsConsent } from "@/lib/consent";
+import type { ShowroomIntent } from "@/lib/showroom";
+import type { ImpactScenario } from "@/lib/showroom-impact";
 
 /**
  * Eventos de conversión para GA4 vía Google Tag Manager (`dataLayer`).
@@ -31,7 +34,13 @@ export type AnalyticsEvent =
       business_type: string;
       challenge: string;
       recommended_services: string;
-    };
+    }
+  /* SUMA Vision Studio (/showroom). Nunca el nombre del negocio, notas ni cifras del simulador. */
+  | { event: "showroom_personalized"; industry: ShowroomIndustryId; style: ShowroomPaletteId }
+  | { event: "showroom_demo_viewed"; goal: string; experience: ShowroomExperienceId }
+  | { event: "showroom_impact_used"; scenario: ImpactScenario; months: number; own_data_count: number }
+  | { event: "showroom_quote_updated"; mode: "services" | "package"; plan: PricingPlanId | "none"; services_count: number; months: number }
+  | { event: "showroom_whatsapp_click"; intent: ShowroomIntent };
 
 type DataLayerWindow = Window & { dataLayer?: unknown[] };
 
@@ -51,6 +60,12 @@ export function contactMethodOf(href: string): "email" | "whatsapp" | "phone" | 
   if (/^(https?:\/\/)?(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)\//i.test(href) || /^whatsapp:/i.test(href)) return "whatsapp";
   return null;
 }
+
+/** Atributos para los botones de WhatsApp del showroom; el evento solo registra el clic. */
+export const showroomWhatsAppAttrs = (intent: ShowroomIntent) => ({
+  "data-analytics": "showroom_whatsapp",
+  "data-showroom-intent": intent,
+});
 
 /** Atributos para marcar un CTA de contacto en una página de servicio. */
 export const serviceCtaAttrs = (service: ServiceSlug, location: "hero" | "closing") => ({

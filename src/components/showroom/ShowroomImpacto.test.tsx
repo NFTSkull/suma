@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShowroomImpacto } from "./ShowroomImpacto";
 import { showroomEstimate, type ShowroomSelection } from "@/lib/showroom";
@@ -27,8 +27,17 @@ describe("ShowroomImpacto · interacción", () => {
     expect(screen.getByText(formatMXN(5832))).toBeInTheDocument();
     expect(screen.getByText("−" + formatMXN(3900))).toBeInTheDocument();
     expect(screen.getByText("+" + formatMXN(1932))).toBeInTheDocument();
-    expect(screen.getByText(/la mensualidad se paga sola/)).toBeInTheDocument();
+    expect(screen.getByText(/Si estos supuestos se cumplen, el margen estimado cubriría la mensualidad/)).toBeInTheDocument();
+    expect(screen.getByText(/harían falta 4 clientes nuevos al mes/)).toBeInTheDocument();
+    expect(screen.getByText(/podrían liberarse/)).toBeInTheDocument();
     expect(screen.getAllByText(/No garantizado/i).length).toBeGreaterThan(0);
+  });
+
+  it("nunca promete resultados: sin frases afirmativas de rentabilidad", () => {
+    const { container } = render(<ShowroomImpacto selection={selection} quote={showroomEstimate(selection)} />);
+    const text = container.textContent ?? "";
+    expect(text).not.toMatch(/se paga sola|garantizamos|recuperarás|vas a ganar|cubren la mensualidad/i);
+    expect(text).toContain("Supone el mismo resultado cada mes desde el primero");
   });
 
   it("al editar un dato lo marca como propio; el escenario conservador reduce el resultado", () => {
@@ -47,7 +56,8 @@ describe("ShowroomImpacto · interacción", () => {
   it("sin consultas no cubre la mensualidad y nunca afirma que los datos se guardan", () => {
     render(<ShowroomImpacto selection={selection} quote={showroomEstimate(selection)} />);
     fireEvent.change(screen.getByLabelText("Consultas nuevas al mes"), { target: { value: "0" } });
-    expect(screen.getByText(/todavía no se cubre la mensualidad/)).toBeInTheDocument();
+    expect(screen.getByText(/el margen estimado no alcanzaría a cubrir la mensualidad/)).toBeInTheDocument();
+    expect(screen.getByText(/la implementación no se recuperaría/)).toBeInTheDocument();
     expect(screen.getByText(/se calcula en tu navegador y no se guarda/)).toBeInTheDocument();
   });
 
@@ -64,18 +74,43 @@ describe("ShowroomImpacto · interacción", () => {
     expect(screen.getByText(/se recuperaría en ~6 meses/)).toBeInTheDocument();
   });
 
-  it("sin implementación no dice que la implementación «no se recupera»", () => {
-    const seo: ShowroomSelection = { ...selection, serviceIds: ["mantenimiento-crm"] };
-    render(<ShowroomImpacto selection={seo} quote={showroomEstimate(seo)} />);
-    fireEvent.change(screen.getByLabelText("Consultas nuevas al mes"), { target: { value: "0" } });
-    expect(screen.getByText("Esta selección no tiene costo de implementación.")).toBeInTheDocument();
-    expect(screen.queryByText(/la implementación no se recupera/)).not.toBeInTheDocument();
-  });
-
-  it("advierte cuando el paquete elegido no incluye seguimiento", () => {
+  it("sin módulos de seguimiento no atribuye clientes, diferencia ni horas a lo elegido", () => {
     const adsSelection: ShowroomSelection = { ...selection, mode: "package", planId: "ads", serviceIds: [] };
     render(<ShowroomImpacto selection={adsSelection} quote={showroomEstimate(adsSelection)} />);
-    expect(screen.getByText(/Publicidad, SEO o una web por sí solos no lo hacen/)).toBeInTheDocument();
+    expect(screen.getByText(/Oportunidad si alguien atiende esas consultas/)).toBeInTheDocument();
+    expect(screen.getByText(/no la comparamos contra tu mensualidad/)).toBeInTheDocument();
+    expect(screen.queryByText(/Diferencia estimada al mes/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/cubriría la mensualidad/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/podrían liberarse/)).not.toBeInTheDocument();
+    const text = decoded(screen.getByRole("link", { name: /Quiero que SUMA revise mis números/ }).getAttribute("href"));
+    expect(text).toContain("mi selección actual no incluye seguimiento");
+    expect(text).not.toMatch(/diferencia de/);
+  });
+
+  it("el soporte de CRM o el SEO solos tampoco se presentan como fuente de clientes", () => {
+    for (const serviceIds of [["mantenimiento-crm"], ["seo-local"], ["landing", "reservas"]] as ShowroomSelection["serviceIds"][]) {
+      const only: ShowroomSelection = { ...selection, serviceIds };
+      const { unmount } = render(<ShowroomImpacto selection={only} quote={showroomEstimate(only)} />);
+      expect(screen.queryByText(/Diferencia estimada al mes/)).not.toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  it("GA4: un solo showroom_impact_used con escenario, periodo y cuántos datos propios, sin cifras", () => {
+    vi.useFakeTimers();
+    localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
+    const w = window as Window & { dataLayer?: Record<string, unknown>[] };
+    w.dataLayer = [];
+    render(<ShowroomImpacto selection={selection} quote={showroomEstimate(selection)} />);
+    fireEvent.change(screen.getByLabelText("Consultas nuevas al mes"), { target: { value: "360" } });
+    fireEvent.click(screen.getByRole("button", { name: "Conservador" }));
+    act(() => vi.advanceTimersByTime(1600));
+    fireEvent.change(screen.getByLabelText("Margen que te queda (%)"), { target: { value: "50" } });
+    act(() => vi.advanceTimersByTime(1600));
+    expect(w.dataLayer).toEqual([{ event: "showroom_impact_used", scenario: "conservative", months: 1, own_data_count: 1 }]);
+    expect(JSON.stringify(w.dataLayer)).not.toContain("360");
+    vi.useRealTimers();
+    localStorage.clear();
   });
 
   it("el mensaje de WhatsApp conserva las notas del cliente y añade el resumen de supuestos", () => {
@@ -84,7 +119,7 @@ describe("ShowroomImpacto · interacción", () => {
     const text = decoded(screen.getByRole("link", { name: /Quiero que SUMA revise mis números/ }).getAttribute("href"));
     expect(text).toContain("Quiero revisar con SUMA mi simulación de impacto");
     expect(text).toContain("Quiero agregar o revisar: Tengo dos sedes en San Pedro.");
-    expect(text).toContain("supuestos por validar");
+    expect(text).toContain("Escenario base (supuestos por validar)");
     expect(text).toContain(formatMXN(9720));
     expect(text).toContain("diferencia de +" + formatMXN(1932) + "/mes");
     expect(text).toContain("Mensualidad SUMA " + formatMXN(3900));

@@ -86,4 +86,14 @@
 
 **Hero compartido intacto.** `PageHero` lo usan 12 páginas; en `/showroom` solo se cambió el `accent` a morado.
 
-**Build local.** En esta Mac `next build` con Turbopack falla al resolver `next/font/google` ("queries have exactly one entry") también en el código base sin cambios; CI (`verify`) y Vercel compilan bien. Las capturas se tomaron con `next dev` (Turbopack), que aplica los mismos estilos; un build con webpack no sirve porque Tailwind solo está configurado como loader de Turbopack.
+**Build local.** Durante esta sesión `next build` con Turbopack falló varias veces al resolver `next/font/google` ("queries have exactly one entry"), también sin cambios; CI y Vercel compilaban bien. En la revisión final volvió a compilar sin tocar nada, así que fue un fallo transitorio del entorno. Un build con webpack no sirve para validar: Tailwind solo está configurado como loader de Turbopack.
+
+## 2026-11-10 — Revisión final de SUMA Vision Studio (PR #21)
+
+**Atribución antes que redacción.** Cambiar «se paga sola» por condicional no bastaba: con solo publicidad, SEO o web, el simulador seguía restando la mensualidad a clientes «recuperados» de consultas sin respuesta, un beneficio que esos servicios no generan. El criterio es el mismo que ya usaba la advertencia: solo CRM gestionado o a medida, chatbots, automatización y los paquetes Flow o Growth atienden o dan seguimiento. Sin ellos se muestra la oportunidad (para que se entienda qué falta), pero no se compara contra el costo, no se da veredicto ni horas, y el WhatsApp lo aclara. Con selecciones mixtas se resta el costo total, lo que no sobreatribuye.
+
+**Eventos sin cifras.** Las cifras del simulador son datos de negocio que la persona escribe; se envía cuántos datos cambió, no sus valores. `showroom_impact_used` y `showroom_personalized` van una vez por visita; `showroom_quote_updated` se agrupa 1.5 s y solo cuando cambia la clave (modo, paquete, extras cobrados, periodo), así que StrictMode y los clics seguidos no lo duplican. `showroom_whatsapp_click` sigue el patrón de `service_cta_click`: atributos `data-*` y el listener único del layout, para no añadir otro listener ni convertir enlaces. GTM ya reenvía los cinco eventos generales; los del showroom y los de precios necesitan sus etiquetas en GTM, que no se tocaron.
+
+**`pricing_cta_click` y el plan Ads.** La lista de planes estaba escrita a mano con un `start` que ya no existe; ahora se valida contra `pricingPlans`.
+
+**Anclas.** `globals.css` ya reserva el header con `scroll-padding-top`; el `scroll-mt-24` de las secciones lo duplicaba.

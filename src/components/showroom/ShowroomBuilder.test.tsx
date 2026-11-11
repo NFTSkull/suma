@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { formatMXN } from "@/lib/pricing";
 import { ShowroomBuilder } from "./ShowroomBuilder";
 
@@ -82,5 +82,63 @@ describe("ShowroomBuilder", () => {
     expect(screen.queryByRole("button", { name: /Chatbot para WhatsApp/i })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Ver las 9 demos/i }));
     expect(screen.getByRole("button", { name: /Chatbot para WhatsApp/i })).toBeInTheDocument();
+  });
+});
+
+describe("ShowroomBuilder · analítica GA4", () => {
+  type DL = Window & { dataLayer?: Record<string, unknown>[] };
+  const layer = () => ((window as DL).dataLayer ?? []).filter((item) => String(item.event).startsWith("showroom_"));
+
+  beforeEach(() => {
+    localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
+    (window as DL).dataLayer = [];
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it("personalizar envía giro y estilo una sola vez, nunca el nombre del negocio", () => {
+    render(<ShowroomBuilder />);
+    fireEvent.change(screen.getByLabelText("Nombre de tu negocio"), { target: { value: "Casa Luz Pilates" } });
+    fireEvent.change(screen.getByLabelText("Estilo de la demo"), { target: { value: "salvia" } });
+    expect(layer()).toEqual([{ event: "showroom_personalized", industry: "pilates", style: "suma" }]);
+    expect(JSON.stringify((window as DL).dataLayer)).not.toContain("Casa Luz");
+  });
+
+  it("elegir objetivo o demo registra el identificador de la demo mostrada", () => {
+    render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("button", { name: "Atraer más clientes" }));
+    fireEvent.click(screen.getByRole("button", { name: /Ver las 9 demos/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Chatbot para WhatsApp/i }));
+    expect(layer()).toEqual([
+      { event: "showroom_demo_viewed", goal: "captar", experience: "ads" },
+      { event: "showroom_demo_viewed", goal: "captar", experience: "chatbot" },
+    ]);
+  });
+
+  it("los cambios de propuesta se agrupan en un solo evento sin importes ni notas", () => {
+    vi.useFakeTimers();
+    render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Automatización puntual" }));
+    fireEvent.change(screen.getByLabelText("Periodo"), { target: { value: "6" } });
+    fireEvent.change(screen.getByLabelText("Algo más (opcional)"), { target: { value: "Tengo Fitco" } });
+    expect(layer()).toEqual([]);
+    act(() => vi.advanceTimersByTime(1600));
+    expect(layer()).toEqual([{ event: "showroom_quote_updated", mode: "services", plan: "none", services_count: 2, months: 6 }]);
+    expect(JSON.stringify((window as DL).dataLayer)).not.toContain("Fitco");
+  });
+
+  it("en paquete solo cuenta los módulos extra que se cobran", () => {
+    vi.useFakeTimers();
+    render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
+    act(() => vi.advanceTimersByTime(1600));
+    expect(layer()).toEqual([{ event: "showroom_quote_updated", mode: "package", plan: "flow", services_count: 0, months: 1 }]);
+  });
+
+  it("sin consentimiento no se registra nada", () => {
+    localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "denied" }));
+    render(<ShowroomBuilder />);
+    fireEvent.change(screen.getByLabelText("Nombre de tu negocio"), { target: { value: "Casa Luz" } });
+    fireEvent.click(screen.getByRole("button", { name: "Atraer más clientes" }));
+    expect((window as DL).dataLayer).toEqual([]);
   });
 });

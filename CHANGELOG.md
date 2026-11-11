@@ -12,6 +12,14 @@
 - Sin cambios en precios, catálogo, integraciones ni pagos.
 - Pruebas: 199.
 
+### SUMA Vision Studio: revisión final (PR #21)
+- **Confianza financiera**: sin «la mensualidad se paga sola». Veredicto, punto de equilibrio, recuperación, balance y horas en condicional («cubriría», «harían falta», «se recuperaría», «podrían liberarse»). Cifras rotuladas como estimadas. Se explica que el cálculo supone el mismo resultado desde el primer mes y no suma consultas nuevas de publicidad, SEO o web.
+- **Atribución**: si la selección no incluye CRM, chatbot, automatización ni los paquetes Flow o Growth, el simulador muestra la oportunidad pero no la compara contra la mensualidad, no da veredicto ni horas liberadas, y el mensaje de WhatsApp lo aclara.
+- **Analítica**: cinco eventos del Vision Studio (`showroom_personalized`, `showroom_demo_viewed`, `showroom_impact_used`, `showroom_quote_updated`, `showroom_whatsapp_click`), solo con consentimiento y sin datos personales. Corregido `pricing_cta_click`, que no registraba el plan SUMA Ads.
+- **Navegación móvil**: los pasos del hero dejaban 112 px vacíos bajo el header (doble margen de anclaje); ahora cada sección queda justo debajo.
+- **WhatsApp**: «Escenario conservador» en lugar de «Simulación conservador».
+- Pruebas: 208.
+
 ### Consentimiento opt-in y aviso de privacidad
 - `ANALYTICS_DEFAULT = "denied"` en todas las regiones; `ad_storage`, `ad_user_data` y `ad_personalization` siempre `denied`.
 - GTM ya no se carga sin consentimiento: `gtm.js` solo se descarga tras "Aceptar estadísticas" (primero `consent update`, después GTM) y en visitas posteriores si la aceptación está guardada. Se retiró el `<noscript>` de GTM.

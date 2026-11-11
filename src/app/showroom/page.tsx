@@ -21,7 +21,7 @@ export const metadata: Metadata = buildMetadata(seo);
 const steps = [
   { href: "#showroom-construir", number: "01", title: "Personaliza", text: "Tu nombre y estilo en la demo" },
   { href: "#showroom-explorar", number: "02", title: "Pruébalo", text: "Demo interactiva de cada servicio" },
-  { href: "#showroom-impacto", number: "03", title: "Calcula", text: "¿Te conviene? Con tus números" },
+  { href: "#showroom-impacto", number: "03", title: "Calcula", text: "Qué tendría que pasar, con tus números" },
   { href: "#showroom-cotizar", number: "04", title: "Tu propuesta", text: "Precio, qué incluye y WhatsApp" },
 ];
 
@@ -34,7 +34,7 @@ export default function ShowroomPage() {
         dark
         crumbs={crumbs}
         title={<>Tu idea, <span className="text-suma-orange">a la vista.</span></>}
-        lead="En cuatro pasos ves cómo funcionaría SUMA en tu negocio, calculas si la inversión te conviene y armas tu propuesta con precios reales. Sin registro ni compromiso."
+        lead="En cuatro pasos ves cómo funcionaría SUMA en tu negocio, estimas qué tendría que pasar para que la inversión te convenga y armas tu propuesta con precios reales. Sin registro ni compromiso."
       >
         <ol aria-label="Cómo funciona" className="grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-4">
           {steps.map((step) => (

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { showroomWhatsAppAttrs, track } from "@/lib/analytics";
 import { individualServices, pricingPlans, pricingSettings, type IndividualServiceId, type PricingPlanId } from "@/content/pricing";
 import { processSteps } from "@/content/process";
 import {
@@ -16,7 +17,8 @@ import { ShowroomImpacto } from "./ShowroomImpacto";
 
 /** Tasa general de IVA (SAT). Solo como referencia de desembolso. */
 const IVA_RATE = 0.16;
-const field = "mt-2 min-h-12 w-full rounded-xl border border-suma-line bg-white px-4 text-base text-suma-navy focus-visible:outline-2 focus-visible:outline-suma-orange";const categories = ["Captación", "Atención", "Operación", "Presencia", "Desarrollo"] as const;
+const field = "mt-2 min-h-12 w-full rounded-xl border border-suma-line bg-white px-4 text-base text-suma-navy focus-visible:outline-2 focus-visible:outline-suma-orange";
+const categories = ["Captación", "Atención", "Operación", "Presencia", "Desarrollo"] as const;
 const guidedGoals = [
   { id: "captar", name: "Atraer más clientes", experience: "ads", recommendations: ["ads", "web", "seo"] },
   { id: "responder", name: "Responder mejor", experience: "crm", recommendations: ["crm", "chatbot", "automatizacion"] },
@@ -81,26 +83,49 @@ export function ShowroomBuilder() {
     : availableServices.filter((s) => recommendedServices.has(s.id) || serviceIds.includes(s.id));
   const hiddenCount = availableServices.length - shownServices.length;
 
+  // GA4: solo identificadores de catálogo; el nombre, las notas y los importes no salen del navegador.
+  const personalizedSent = useRef(false);
+  const personalized = (next: { industry?: ShowroomIndustryId; style?: ShowroomPaletteId }) => {
+    if (personalizedSent.current) return;
+    personalizedSent.current = true;
+    track({ event: "showroom_personalized", industry: next.industry ?? industry, style: next.style ?? paletteId });
+  };
+  const showDemo = (goal: GuidedGoalId, id: ShowroomExperienceId) => {
+    if (id !== experience) track({ event: "showroom_demo_viewed", goal, experience: id });
+    setExperience(id);
+  };
+  const chargedServices = quote.services.length;
+  const quoteKey = [mode, mode === "package" ? planId : "none", chargedServices, months].join("|");
+  const lastQuoteKey = useRef(quoteKey);
+  useEffect(() => {
+    if (quoteKey === lastQuoteKey.current) return;
+    const timer = setTimeout(() => {
+      lastQuoteKey.current = quoteKey;
+      track({ event: "showroom_quote_updated", mode, plan: mode === "package" ? planId : "none", services_count: chargedServices, months });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [quoteKey, mode, planId, chargedServices, months]);
+
   return (
     <div className="space-y-10">
-      <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="scroll-mt-24 rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
+      <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
         <p className="text-eyebrow text-suma-orange-ink">01 · Personaliza</p>
         <h2 id="showroom-custom-title" className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">Pon tu marca en la demo.</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div>
             <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio</label>
-            <input id="showroom-name" maxLength={45} value={businessName} onChange={(e) => setBusinessName(e.target.value)}
+            <input id="showroom-name" maxLength={45} value={businessName} onChange={(e) => { personalized({}); setBusinessName(e.target.value); }}
               className={field} placeholder="Ej. Estudio Aurora" autoComplete="organization" />
           </div>
           <div>
             <label htmlFor="showroom-industry" className="text-sm font-bold text-suma-navy">Giro</label>
-            <select id="showroom-industry" value={industry} onChange={(e) => setIndustry(e.target.value as ShowroomIndustryId)} className={field}>
+            <select id="showroom-industry" value={industry} onChange={(e) => { personalized({ industry: e.target.value as ShowroomIndustryId }); setIndustry(e.target.value as ShowroomIndustryId); }} className={field}>
               {showroomIndustries.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="showroom-palette" className="text-sm font-bold text-suma-navy">Estilo de la demo</label>
-            <select id="showroom-palette" value={paletteId} onChange={(e) => setPaletteId(e.target.value as ShowroomPaletteId)} className={field}>
+            <select id="showroom-palette" value={paletteId} onChange={(e) => { personalized({ style: e.target.value as ShowroomPaletteId }); setPaletteId(e.target.value as ShowroomPaletteId); }} className={field}>
               {showroomPalettes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
             </select>
           </div>
@@ -109,7 +134,7 @@ export function ShowroomBuilder() {
       </section>
 
       <section id="showroom-explorar" aria-labelledby="showroom-preview-title"
-        className="scroll-mt-24 grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
+        className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7 lg:col-start-1 lg:row-start-1">
           <p className="text-eyebrow text-suma-orange">02 · Pruébalo</p>
           <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Mira cómo podría funcionar.</h2>
@@ -119,7 +144,7 @@ export function ShowroomBuilder() {
               <button key={goal.id} type="button" aria-pressed={guidedGoal === goal.id}
                 onClick={() => {
                   setGuidedGoal(goal.id);
-                  setExperience(goal.experience as ShowroomExperienceId);
+                  showDemo(goal.id, goal.experience as ShowroomExperienceId);
                 }}
                 className={"min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-suma-orange " +
                   (guidedGoal === goal.id ? "border-suma-orange bg-suma-orange text-suma-navy" : "border-white/30 bg-white/5 text-white hover:border-white")}>
@@ -130,7 +155,7 @@ export function ShowroomBuilder() {
           <div role="group" aria-label="Experiencias para probar" className="mt-5 grid grid-cols-2 gap-2">
             {visibleExperiences.map((item) => (
               <button key={item.id} type="button" aria-pressed={experience === item.id}
-                onClick={() => setExperience(item.id)}
+                onClick={() => showDemo(guidedGoal, item.id)}
                 className={"min-h-[4.5rem] rounded-2xl border px-3 py-3 text-left transition-colors focus-visible:outline-suma-orange " +
                   (experience === item.id
                     ? "border-suma-orange bg-suma-orange text-suma-navy"
@@ -177,7 +202,7 @@ export function ShowroomBuilder() {
 
       <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
 
-      <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="scroll-mt-24 rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
+      <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
           <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Elige qué contratar y ve cuánto pagarías.</h2>
@@ -347,7 +372,7 @@ export function ShowroomBuilder() {
                 Sin cargo de SUMA por persona del equipo. Aparte: licencias de software, WhatsApp API, consumo de IA, hosting y publicidad. {locations > 1 ? "Con varias sedes revisamos el precio final." : ""}
               </p>
 
-              <a href={showroomWhatsAppHref(selection, "quote")} target="_blank" rel="noopener noreferrer"
+              <a href={showroomWhatsAppHref(selection, "quote")} target="_blank" rel="noopener noreferrer" {...showroomWhatsAppAttrs("quote")}
                 className="mt-6 flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-4 text-center text-sm font-extrabold text-suma-navy transition-colors hover:bg-suma-cream">
                 Enviar mi propuesta por WhatsApp →
               </a>
@@ -359,7 +384,7 @@ export function ShowroomBuilder() {
                 <label htmlFor="showroom-budget" className="mt-3 block text-xs font-semibold">Presupuesto aproximado</label>
                 <input id="showroom-budget" maxLength={40} value={budget} onChange={(e) => setBudget(e.target.value)}
                   placeholder="Ej. $5,000 al mes" className="mt-2 min-h-11 w-full rounded-xl border border-white/30 bg-white px-3 text-base text-suma-navy"/>
-                <a href={showroomWhatsAppHref(selection, "budget")} target="_blank" rel="noopener noreferrer"
+                <a href={showroomWhatsAppHref(selection, "budget")} target="_blank" rel="noopener noreferrer" {...showroomWhatsAppAttrs("budget")}
                   className="mt-3 flex min-h-11 items-center justify-center rounded-full border border-white/50 px-4 text-center text-sm font-bold hover:bg-white/10">
                   Solicitar ajuste de alcance →
                 </a>
@@ -372,7 +397,7 @@ export function ShowroomBuilder() {
                   className="mt-2 min-h-11 w-full rounded-xl bg-white px-3 text-base text-suma-navy">
                   {["Por definir", "Entre semana, mañanas", "Entre semana, tardes", "Horario flexible"].map((option) => <option key={option}>{option}</option>)}
                 </select>
-                <a href={showroomWhatsAppHref(selection, "diagnostic")} target="_blank" rel="noopener noreferrer"
+                <a href={showroomWhatsAppHref(selection, "diagnostic")} target="_blank" rel="noopener noreferrer" {...showroomWhatsAppAttrs("diagnostic")}
                   className="mt-3 flex min-h-11 items-center justify-center rounded-full border border-white/50 px-4 text-center text-sm font-bold hover:bg-white/10">
                   Solicitar sesión de diagnóstico →
                 </a>
