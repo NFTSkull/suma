@@ -83,7 +83,7 @@ describe("ShowroomImpacto · interacción", () => {
     expect(screen.queryByText(/cubriría la mensualidad/)).not.toBeInTheDocument();
     expect(screen.queryByText(/podrían liberarse/)).not.toBeInTheDocument();
     const text = decoded(screen.getByRole("link", { name: /Quiero que SUMA revise mis números/ }).getAttribute("href"));
-    expect(text).toContain("mi selección actual no incluye seguimiento");
+    expect(text).toContain("Me interesa: SUMA Ads");
     expect(text).not.toMatch(/diferencia de/);
   });
 
@@ -120,7 +120,7 @@ describe("ShowroomImpacto · interacción", () => {
     expect(text).toContain("Quiero revisar una simulación con datos reales");
     expect(text).toContain("Nota: Tengo dos sedes en San Pedro.");
     expect(text).not.toContain("Escenario base (supuestos por validar)");
-    expect(text).not.toContain("Estudio Aurora");
+    expect(text).toContain("Estudio Aurora");
     expect(text.length).toBeLessThan(430);
   });
 });
