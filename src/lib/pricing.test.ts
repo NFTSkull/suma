@@ -7,6 +7,9 @@ describe("precios configurables SUMA", () => {
     expect(pricingPlans.map((plan) => plan.id)).toEqual(["ads", "flow", "growth"]);
     expect(pricingPlans.map((plan) => plan.setup)).toEqual([990, 2490, 4990]);
     expect(pricingPlans.map((plan) => plan.monthly)).toEqual([1990, 1490, 3990]);
+    expect(pricingPlans.map((plan) => plan.setupMax)).toEqual([3900, 7900, 14900]);
+    expect(pricingPlans.map((plan) => plan.monthlyMax)).toEqual([4900, 3900, 9900]);
+    expect(individualServices.every((s) => s.from && s.setupMax >= s.setup && s.monthlyMax >= s.monthly)).toBe(true);
     expect(new Set(individualServices.map((s) => s.id)).size).toBe(individualServices.length);
   });
 
@@ -107,8 +110,9 @@ describe("precios configurables SUMA", () => {
     expect(message).toContain("Asistente de WhatsApp con IA");
     expect(message).toContain("25 integrantes");
     expect(message).toContain("2.");
-    expect(message).toContain(formatMXN(14900));
-    expect(message).toContain("sin IVA, licencias de terceros");
+    expect(message).toContain(formatMXN(6900));
+    expect(message).toContain("Rangos orientativos");
+    expect(message).toContain("IVA, licencias, publicidad");
     expect(message).not.toMatch(/RFC|NSS/i);
   });
 });
