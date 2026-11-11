@@ -7,7 +7,7 @@ import { Accordion } from "@/components/ui/Accordion";
 import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { individualServices, pricingFaqs, pricingPlans } from "@/content/pricing";
+import { individualServiceDeliveryTimes, individualServices, pricingFaqs, pricingPlans } from "@/content/pricing";
 import { estimatePricing, formatMXN, formatMXNExact, pricingWhatsAppHref } from "@/lib/pricing";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
@@ -54,9 +54,21 @@ export default function PreciosPage() {
             id="planes-title"
             eyebrow="Tres planes de servicio · Para una sede"
             title={<>Precios claros. <span className="text-suma-purple">Sin servicios innecesarios.</span></>}
-            lead="Ahora puedes solicitar la implementación en un pago o dividirla en 3 mensualidades (6 para proyectos mayores). El servicio mensual y los gastos externos se muestran por separado."
+            lead="Un pago inicial para ponerlo en marcha y una mensualidad para operarlo. Mira exactamente qué incluye cada uno, cuánto tardamos y qué se paga aparte."
           />
-          <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
+          <div className="mt-9 grid gap-3 md:grid-cols-3">
+            {[
+              { title: "1. Implementación · una sola vez", text: "Pagas por configurar y dejar listo lo contratado. No equivale a meses de servicio." },
+              { title: "2. Servicio · cada mes", text: "Pagas por gestión, seguimiento y los entregables mensuales detallados en tu plan." },
+              { title: "3. Gastos externos · aparte", text: "Anuncios, licencias, hosting y mensajería se pagan directamente o según cotización." },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl border border-suma-line bg-suma-cream-soft p-5">
+                <h3 className="text-sm font-bold text-suma-navy">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{item.text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 grid items-stretch gap-5 lg:grid-cols-3">
             {pricingPlans.map((plan) => {
               const dark = plan.featured;
               const fullQuote = estimatePricing({ planId: plan.id, months: 1, setupPayments: 1 });
@@ -86,20 +98,35 @@ export default function PreciosPage() {
                         : <>Sin mensualidad obligatoria</>}
                     </p>
                     <p className={`mt-4 rounded-xl px-3 py-3 text-sm font-bold ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
-                      Primer desembolso con 3 abonos: {formatMXNExact(flexibleQuote.firstPaymentSuma)}
-                      <span className="mt-1 block text-xs font-normal opacity-80">O {formatMXN(fullQuote.firstPaymentSuma)} con implementación en un solo pago.</span>
+                      Primer pago (1/3 de implementación + 1 mes): {formatMXNExact(flexibleQuote.firstPaymentSuma)}
+                      <span className="mt-1 block text-xs font-normal opacity-80">O {formatMXN(fullQuote.firstPaymentSuma)} si liquidas la implementación y el primer mes.</span>
                     </p>
                   </div>
 
-                  <h3 className="mt-7 font-display text-lg font-bold">Lo que incluye</h3>
-                  <ul className={`mt-4 flex-1 space-y-3 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
-                    {plan.includes.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3">
-                        <span aria-hidden="true" className={`mt-0.5 font-bold ${dark ? "text-suma-orange" : "text-suma-purple"}`}>✓</span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="mt-7 flex-1">
+                    <h3 className="font-display text-lg font-bold">¿Qué te entregamos al inicio?</h3>
+                    <ul className={`mt-3 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
+                      {plan.setupIncludes.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2">
+                          <span aria-hidden="true" className={dark ? "text-suma-orange" : "text-suma-purple"}>✓</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <h3 className="mt-6 font-display text-lg font-bold">¿Qué hacemos cada mes?</h3>
+                    <ul className={`mt-3 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
+                      {plan.monthlyIncludes.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2">
+                          <span aria-hidden="true" className={dark ? "text-suma-orange" : "text-suma-purple"}>✓</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className={`mt-5 rounded-xl px-3 py-3 text-sm ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
+                      <strong>Tiempo inicial estimado: {plan.launchWindow}.</strong>
+                      <span className="mt-1 block text-xs opacity-80">Cuenta desde que confirmamos alcance y recibimos materiales y accesos; no incluye demoras de plataformas externas.</span>
+                    </p>
+                  </div>
                   <p className={`mt-7 border-t pt-5 text-xs leading-relaxed ${dark ? "border-suma-cream/20 text-suma-cream/65" : "border-suma-navy/15 text-suma-navy/65"}`}>{plan.boundaries}</p>
                   <ButtonLink
                     href={pricingWhatsAppHref({ planId: plan.id, months: 1, setupPayments: 3 })}
@@ -121,7 +148,7 @@ export default function PreciosPage() {
             })}
           </div>
           <p className="mt-7 max-w-5xl text-sm leading-relaxed text-suma-navy/70">
-            Precios base en pesos mexicanos, antes de IVA y para una sede. Las parcialidades son una propuesta sujeta a aprobación comercial por escrito, no un crédito aprobado ni cobro automático. Implementación y servicio mensual se cobran por separado. La inversión en anuncios, licencias, hosting adicional y consumo de WhatsApp API o IA se pagan aparte. No exigimos una web nueva. Las reservas e integraciones dependen de permisos y viabilidad comprobada.
+            Precios base en MXN, antes de IVA, para una sede. Cada mensualidad cubre un mes de servicio; las dos automatizaciones de Flow son parte de la configuración inicial, no dos nuevas por mes. El plazo de arranque es orientativo y se confirma por escrito. Puedes solicitar parcialidades de implementación sujetas a aprobación comercial: no son meses de servicio incluidos ni crédito automático. Pauta, licencias, hosting y consumos externos se pagan aparte. Integraciones según permisos y viabilidad.
           </p>
         </div>
       </section>
@@ -193,6 +220,7 @@ export default function PreciosPage() {
                     {service.setup === 0 ? "/mes · sin implementación base" : service.monthly ? "+ " + formatMXN(service.monthly) + "/mes" : "Pago único"}
                   </p>
                   <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">{service.detail}</p>
+                  <p className="mt-2 text-xs font-semibold text-suma-navy/80">Plazo orientativo: {individualServiceDeliveryTimes[service.id]}.</p>
                   <a href={"/precios?servicio=" + service.id + "#simulador"} className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-2 underline-offset-4">
                     Incluir en mi propuesta →
                   </a>
@@ -201,7 +229,7 @@ export default function PreciosPage() {
             ))}
           </div>
           <p className="mt-7 max-w-4xl text-sm text-suma-navy/65">
-            Los servicios de pago único también pueden solicitarse en 3 mensualidades; los proyectos con implementación de al menos $10,000 pueden solicitar 6. El calendario definitivo requiere aprobación. Estas son tarifas iniciales de referencia, no cotizaciones automáticas. Los desarrollos a medida, integraciones y costos de terceros se definen mediante alcance técnico.
+            Pago único significa entrega del alcance acordado, no mantenimiento de por vida. Los plazos empiezan tras recibir contenido, accesos y aprobaciones; revisiones, corrección de fallas, licencias y soporte posterior se definen en la propuesta. Puedes solicitar 3 parcialidades de implementación (6 si es de al menos $10,000), sujetas a aprobación. Los importes «desde» dependen del alcance técnico.
           </p>
           <Link href="/servicios" className="mt-7 inline-flex min-h-11 items-center font-bold text-suma-purple underline decoration-2 underline-offset-[5px] hover:text-suma-navy">
             Explorar todos los servicios →
