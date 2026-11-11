@@ -36,10 +36,13 @@ export type AnalyticsEvent =
       recommended_services: string;
     }
   /* SUMA Vision Studio (/showroom). Nunca el nombre del negocio, notas ni cifras del simulador. */
+  | { event: "showroom_visit" }
   | { event: "showroom_personalized"; industry: ShowroomIndustryId; style: ShowroomPaletteId }
+  | { event: "showroom_demo_started"; experience: ShowroomExperienceId }
   | { event: "showroom_demo_viewed"; goal: string; experience: ShowroomExperienceId }
   | { event: "showroom_impact_used"; scenario: ImpactScenario; months: number; own_data_count: number }
   | { event: "showroom_quote_updated"; mode: "services" | "package"; plan: PricingPlanId | "none"; services_count: number; months: number }
+  | { event: "showroom_proposal_requested"; has_config: boolean }
   | { event: "showroom_whatsapp_click"; intent: ShowroomIntent };
 
 type DataLayerWindow = Window & { dataLayer?: unknown[] };

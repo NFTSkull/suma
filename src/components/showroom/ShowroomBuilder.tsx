@@ -105,13 +105,30 @@ export function ShowroomBuilder() {
   const hiddenCount = availableServices.length - shownServices.length;
 
   // GA4: solo identificadores de catálogo; el nombre, las notas y los importes no salen del navegador.
+  const visitTracked = useRef(false);
   const personalizedSent = useRef(false);
+  const demoStartedSent = useRef(false);
+  
+  // Track showroom visit on mount
+  useEffect(() => {
+    if (!visitTracked.current) {
+      visitTracked.current = true;
+      track({ event: "showroom_visit" });
+    }
+  }, []);
+  
   const personalized = (next: { industry?: ShowroomIndustryId; style?: ShowroomPaletteId }) => {
     if (personalizedSent.current) return;
     personalizedSent.current = true;
     track({ event: "showroom_personalized", industry: next.industry ?? industry, style: next.style ?? paletteId });
   };
+  
   const showDemo = (goal: GuidedGoalId, id: ShowroomExperienceId) => {
+    // Track first demo interaction
+    if (!demoStartedSent.current) {
+      demoStartedSent.current = true;
+      track({ event: "showroom_demo_started", experience: id });
+    }
     if (id !== experience) track({ event: "showroom_demo_viewed", goal, experience: id });
     setExperience(id);
   };

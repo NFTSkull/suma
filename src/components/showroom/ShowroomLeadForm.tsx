@@ -56,13 +56,19 @@ export function ShowroomLeadForm({ selection, quote }: Props) {
   const [quieroDemoPersonalizada, setQuieroDemoPersonalizada] = useState(false);
   const [privacidad, setPrivacidad] = useState(false);
   const startedAt = useRef(0);
+  const proposalRequestTracked = useRef(false);
   
-  // Inicializar timestamp en mount
+  // Inicializar timestamp y trackear visualización de formulario en mount
   useEffect(() => {
     if (startedAt.current === 0) {
       startedAt.current = Date.now();
     }
-  }, []);
+    // Track cuando el formulario se hace visible
+    if (!proposalRequestTracked.current) {
+      proposalRequestTracked.current = true;
+      track({ event: "showroom_proposal_requested", has_config: !quote.isEmpty });
+    }
+  }, [quote.isEmpty]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
