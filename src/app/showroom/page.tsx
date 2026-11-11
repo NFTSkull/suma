@@ -7,8 +7,8 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
-  title: "SUMA Vision Studio: demo, impacto y precio",
-  description: "Experimenta CRM, chatbots y reservas con tu marca. Simula ingresos potenciales, tiempo recuperable, inversión y punto de equilibrio con supuestos transparentes.",
+  title: "SUMA Vision Studio: prueba una solución para tu negocio",
+  description: "Empieza con tres preguntas, prueba una demo a tu ritmo y conoce cuánto costaría la solución que elijas. Sin registro ni compromiso.",
   path: "/showroom",
   keywords: [
     "demo CRM pilates Monterrey", "showroom chatbot WhatsApp wellness",
@@ -19,10 +19,10 @@ const crumbs = [{ name: "Showroom", path: "/showroom" }];
 export const metadata: Metadata = buildMetadata(seo);
 
 const steps = [
-  { href: "#showroom-construir", number: "01", title: "Personaliza", text: "Tu nombre y estilo en la demo" },
-  { href: "#showroom-explorar", number: "02", title: "Pruébalo", text: "Demo interactiva de cada servicio" },
-  { href: "#showroom-impacto", number: "03", title: "Calcula", text: "Qué tendría que pasar, con tus números" },
-  { href: "#showroom-cotizar", number: "04", title: "Tu propuesta", text: "Precio, qué incluye y WhatsApp" },
+  { number: "01", title: "Tu negocio", text: "Tres preguntas fáciles" },
+  { number: "02", title: "Prueba", text: "Explora una solución" },
+  { number: "03", title: "Calcula", text: "Solo si quieres" },
+  { number: "04", title: "Tu propuesta", text: "Precio y contacto" },
 ];
 
 export default function ShowroomPage() {
@@ -33,23 +33,22 @@ export default function ShowroomPage() {
         accent="purple"
         dark
         crumbs={crumbs}
-        title={<>Tu idea, <span className="text-suma-orange">a la vista.</span></>}
-        lead="En cuatro pasos ves cómo funcionaría SUMA en tu negocio, estimas qué tendría que pasar para que la inversión te convenga y armas tu propuesta con precios «desde» y rangos orientativos. Sin registro ni compromiso."
+        title={<>Prueba cómo SUMA podría <span className="text-suma-orange">ayudar a tu negocio.</span></>}
+        lead="Empieza con tres preguntas sencillas, prueba las herramientas con tu negocio y conoce un precio de referencia. Tú avanzas paso a paso; el cálculo es opcional y no tienes que registrarte."
       >
         <ol aria-label="Cómo funciona" className="grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-4">
           {steps.map((step) => (
-            <li key={step.href}>
-              <a href={step.href}
-                className="flex h-full flex-col rounded-2xl border border-white/20 bg-white/5 p-3 transition-colors hover:border-suma-orange focus-visible:outline-2 focus-visible:outline-suma-orange md:p-4">
+            <li key={step.number}>
+              <div className="flex h-full flex-col rounded-2xl border border-white/20 bg-white/5 p-3 md:p-4">
                 <span className="font-display text-sm font-extrabold text-suma-orange">{step.number}</span>
                 <span className="mt-1 font-display text-base font-bold text-suma-cream">{step.title}</span>
                 <span className="mt-1 text-xs leading-snug text-suma-cream/65">{step.text}</span>
-              </a>
+              </div>
             </li>
           ))}
         </ol>
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <ButtonLink href="#showroom-construir" variant="light" size="lg" arrow>Empezar</ButtonLink>
+          <ButtonLink href="#showroom-wizard" variant="light" size="lg" arrow>Comenzar experiencia</ButtonLink>
           <ButtonLink href="/precios" variant="link-light">Ver precios base</ButtonLink>
         </div>
       </PageHero>
