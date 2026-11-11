@@ -20,10 +20,38 @@ const IVA_RATE = 0.16;
 const field = "mt-2 min-h-12 w-full rounded-xl border border-suma-line bg-white px-4 text-base text-suma-navy focus-visible:outline-2 focus-visible:outline-suma-orange";
 const categories = ["Captación", "Atención", "Operación", "Presencia", "Desarrollo"] as const;
 const guidedGoals = [
-  { id: "captar", name: "Atraer más clientes", experience: "ads", recommendations: ["ads", "web", "seo"] },
-  { id: "responder", name: "Responder mejor", experience: "crm", recommendations: ["crm", "chatbot", "automatizacion"] },
-  { id: "operar", name: "Ordenar mi operación", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
+  { id: "captar", name: "Quiero que más personas me conozcan", experience: "ads", recommendations: ["ads", "web", "seo"] },
+  { id: "responder", name: "Quiero organizar los mensajes", experience: "crm", recommendations: ["crm", "chatbot", "automatizacion"] },
+  { id: "operar", name: "Quiero facilitar las reservas", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
 ] as const;
+
+const paletteDescriptions: Record<ShowroomPaletteId, string> = {
+  suma: "Azul oscuro, crema y naranja. Moderno y con contraste.",
+  almendra: "Café, beige y arena. Cálido y natural.",
+  salvia: "Verde, blanco suave y salvia. Tranquilo y fresco.",
+};
+const friendlyDemoTitles: Record<ShowroomExperienceId, string> = {
+  crm: "Ordenar mensajes de clientes",
+  chatbot: "Responder dudas por WhatsApp",
+  ads: "Crear anuncios para mi negocio",
+  reservas: "Mostrar horarios y reservas",
+  web: "Cómo se vería mi página",
+  automatizacion: "Avisos y recordatorios",
+  app: "Aplicación para alumnos",
+  seo: "Aparecer en búsquedas de Google",
+  "crm-medida": "Un programa propio para mi negocio",
+};
+const simpleDemoExplanations: Record<ShowroomExperienceId, string> = {
+  crm: "Mira cómo tu equipo sabría quién preguntó por una clase y quién falta por atender.",
+  chatbot: "Prueba qué respuestas podría recibir alguien que pregunta por WhatsApp.",
+  ads: "Mira un anuncio de ejemplo para invitar a personas a conocer tu negocio.",
+  reservas: "Prueba cómo una persona podría escoger un horario disponible.",
+  web: "Mira cómo podría verse una página sencilla con tu marca.",
+  automatizacion: "Descubre cómo se podría crear un aviso cuando alguien necesita seguimiento.",
+  app: "Explora cómo una alumna podría consultar sus clases.",
+  seo: "Mira cómo podría aparecer la información de tu negocio en Google.",
+  "crm-medida": "Explora un ejemplo de sistema propio para organizar tu operación.",
+};
 type GuidedGoalId = (typeof guidedGoals)[number]["id"];
 type WizardStage = "welcome" | "personalize" | "explore" | "impact" | "quote";
 const demoHints: Record<ShowroomExperienceId, string> = {
@@ -38,10 +66,10 @@ const demoHints: Record<ShowroomExperienceId, string> = {
   "crm-medida": "Explora las vistas de interesados y operación del panel de ejemplo.",
 };
 const wizardLabels = [
-  { stage: "personalize", title: "Tu negocio", detail: "Personaliza el ejemplo" },
-  { stage: "explore", title: "Prueba", detail: "Elige y usa una demo" },
-  { stage: "impact", title: "Calcula", detail: "Opcional, con tus datos" },
-  { stage: "quote", title: "Tu propuesta", detail: "Precio y contacto" },
+  { stage: "personalize", title: "Tu negocio", detail: "Pon tu nombre y colores" },
+  { stage: "explore", title: "Prueba una idea", detail: "Toca y ve qué pasa" },
+  { stage: "impact", title: "Calcula (opcional)", detail: "Estima un posible resultado" },
+  { stage: "quote", title: "Tu propuesta", detail: "Ve precios y pide información" },
 ] as const;
 
 const priceLine = (service: (typeof individualServices)[number]) =>
@@ -51,6 +79,17 @@ const priceLine = (service: (typeof individualServices)[number]) =>
 
 export function ShowroomBuilder() {
   const [stage, setStage] = useState<WizardStage>("welcome");
+  // El botón de la portada inicia el tutorial directamente, sin pedir un segundo clic.
+  useEffect(() => {
+    const startFromHero = () => {
+      if (window.location.hash === "#showroom-wizard") {
+        setStage((current) => current === "welcome" ? "personalize" : current);
+      }
+    };
+    startFromHero();
+    window.addEventListener("hashchange", startFromHero);
+    return () => window.removeEventListener("hashchange", startFromHero);
+  }, []);
   const [personalizeField, setPersonalizeField] = useState(0);
   const activeWizardIndex = wizardLabels.findIndex((item) => item.stage === stage);
   const goTo = (next: WizardStage) => setStage(next);
@@ -71,6 +110,8 @@ export function ShowroomBuilder() {
   const [guidedGoal, setGuidedGoal] = useState<GuidedGoalId>("responder");
   const [showAllExperiences, setShowAllExperiences] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
+  const [showImpactCalculator, setShowImpactCalculator] = useState(false);
+  const [hasChosenGoal, setHasChosenGoal] = useState(false);
   const [mode, setMode] = useState<"services" | "package">("services");
   const [planId, setPlanId] = useState<PricingPlanId>("flow");
   // La demo inicial es ilustrativa, no una selección de compra.
@@ -91,6 +132,7 @@ export function ShowroomBuilder() {
   };
   const quote = showroomEstimate(selection);
   const paymentOptions = availableSetupPayments(quote.setup);
+  const selectedPalette = showroomPalettes.find((item) => item.id === paletteId) ?? showroomPalettes[0];
   const active = showroomExperiences.find((item) => item.id === experience) ?? showroomExperiences[0];
   const activeGoal = guidedGoals.find((goal) => goal.id === guidedGoal) ?? guidedGoals[1];
   const visibleExperiences = showroomExperiences.filter((item) =>
@@ -106,6 +148,11 @@ export function ShowroomBuilder() {
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
     : [];
   const selectedCurrent = serviceIds.includes(active.serviceId) || included.includes(active.serviceId);
+  const chosenDescription = quote.isEmpty
+    ? "Solo estás probando una demostración. No has elegido ningún servicio para pagar."
+    : mode === "package"
+      ? "Elegiste " + quote.plan.name + (quote.services.length ? " con " + quote.services.length + " extras." : ".")
+      : "Has elegido " + quote.services.length + (quote.services.length === 1 ? " servicio." : " servicios.");
   const addCurrent = () => {
     if (included.includes(active.serviceId)) return;
     if (!serviceIds.includes(active.serviceId)) setServiceIds((items) => toggleShowroomService(items, active.serviceId));
@@ -151,7 +198,7 @@ export function ShowroomBuilder() {
               Descubre cómo podría funcionar SUMA en tu negocio.
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-suma-navy/75">
-              Responde tres preguntas sencillas, prueba una herramienta de ejemplo y conoce el precio de lo que elijas. Sin saber de sistemas ni registrarte.
+              Te guiaremos con preguntas fáciles. Verás una pantalla de ejemplo, podrás tocar sus botones y decidir si quieres incluir esa solución en tu propuesta. Sin registro ni pagos.
             </p>
             <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {wizardLabels.map((item, index) => (
@@ -166,11 +213,17 @@ export function ShowroomBuilder() {
               className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-8 text-base font-extrabold text-suma-navy transition-colors hover:bg-suma-navy hover:text-white focus-visible:outline-2 focus-visible:outline-suma-purple">
               Iniciar experiencia →
             </button>
-            <p className="mt-3 text-xs text-suma-navy/60">Tú decides qué probar. Nada se contrata ni se envía automáticamente.</p>
+            <p className="mt-3 text-sm font-medium text-suma-navy/75">No necesitas saber de tecnología. Te explicaremos cada elección y siempre podrás regresar.</p>
           </section>
         ) : (
           <nav aria-label="Avance de la experiencia" className="mb-7 rounded-2xl border border-suma-line bg-white px-4 py-4 md:px-6">
-            <p aria-live="polite" className="text-xs font-bold text-suma-purple">Paso {activeWizardIndex + 1} de 4 · {wizardLabels[activeWizardIndex]?.title}</p>
+            <p aria-live="polite" className="text-sm font-extrabold text-suma-navy">Estás en el paso {activeWizardIndex + 1} de 4: {wizardLabels[activeWizardIndex]?.title}</p>
+            <p className="mt-1 text-xs leading-relaxed text-suma-navy/70">
+              {stage === "personalize" ? "Aquí eliges cómo se verá el ejemplo. Todavía no estás contratando nada." :
+                stage === "explore" ? "Aquí pruebas una herramienta ficticia. Solo se añade a tu propuesta cuando tú lo indicas." :
+                stage === "impact" ? "Aquí puedes hacer un cálculo hipotético o saltarlo sin problema." :
+                "Aquí revisas lo que elegiste, cuánto costaría y cómo pedir información."}
+            </p>
             <ol className="mt-3 grid grid-cols-4 gap-2">
               {wizardLabels.map((item, index) => (
                 <li key={item.stage} className="min-w-0">
@@ -185,16 +238,16 @@ export function ShowroomBuilder() {
 
       {stage === "personalize" && (
         <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
-          <p className="text-eyebrow text-suma-orange-ink">01 · PERSONALIZA</p>
+          <p className="text-eyebrow text-suma-orange-ink">01 · HAZ QUE EL EJEMPLO SE PAREZCA A TU NEGOCIO</p>
           <h2 id="showroom-custom-title" data-wizard-heading tabIndex={-1} className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">
             {personalizeField === 0 ? "¿Cómo se llama tu negocio?" :
               personalizeField === 1 ? "¿A qué se dedica tu negocio?" : "¿Qué estilo te gusta más?"}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/70">
             {personalizeField === 0 ? "Es opcional. Si lo escribes, aparecerá en tu demostración." :
-              personalizeField === 1 ? "Así adaptamos los ejemplos a lo que haces." : "Solo cambia los colores del ejemplo. Podrás modificarlos después."}
+              personalizeField === 1 ? "Usaremos situaciones parecidas a tu negocio, como clases, consultas o reservas." : "Los colores se muestran abajo: tócalos y mira cómo se ve la pantalla antes de seguir."}
           </p>
-          <p className="mt-5 text-xs font-bold text-suma-purple">Pregunta {personalizeField + 1} de 3</p>
+          <p className="mt-5 text-sm font-bold text-suma-purple">Pregunta {personalizeField + 1} de 3 · Solo estamos preparando tu demo</p>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-suma-navy/10">
             <div className="h-full rounded-full bg-suma-orange transition-all" style={{ width: ((personalizeField + 1) / 3 * 100) + "%" }} />
           </div>
@@ -203,7 +256,7 @@ export function ShowroomBuilder() {
               <div>
                 <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio (opcional)</label>
                 <input id="showroom-name" maxLength={45} value={businessName}
-                  onChange={(e) => { personalized({}); setBusinessName(e.target.value); }}
+                  onChange={(e) => setBusinessName(e.target.value)}
                   className={field} placeholder="Ej. Mi estudio de Pilates" autoComplete="organization" />
               </div>
             )}
@@ -211,7 +264,7 @@ export function ShowroomBuilder() {
               <div>
                 <label htmlFor="showroom-industry" className="text-sm font-bold text-suma-navy">Tipo de negocio</label>
                 <select id="showroom-industry" value={industry}
-                  onChange={(e) => { personalized({ industry: e.target.value as ShowroomIndustryId }); setIndustry(e.target.value as ShowroomIndustryId); }}
+                  onChange={(e) => setIndustry(e.target.value as ShowroomIndustryId)}
                   className={field}>
                   {showroomIndustries.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                 </select>
@@ -219,20 +272,52 @@ export function ShowroomBuilder() {
             )}
             {personalizeField === 2 && (
               <div>
-                <label htmlFor="showroom-palette" className="text-sm font-bold text-suma-navy">Estilo de colores</label>
-                <select id="showroom-palette" value={paletteId}
-                  onChange={(e) => { personalized({ style: e.target.value as ShowroomPaletteId }); setPaletteId(e.target.value as ShowroomPaletteId); }}
-                  className={field}>
-                  {showroomPalettes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-                </select>
-                <p className="mt-2 text-xs text-suma-navy/60">Tu elección se reflejará en la pantalla del siguiente paso.</p>
+                <p id="showroom-color-label" className="text-sm font-bold text-suma-navy">Toca los colores que más te gusten</p>
+                <div role="group" aria-labelledby="showroom-color-label" className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+                  {showroomPalettes.map((item) => {
+                    const selected = item.id === paletteId;
+                    return (
+                      <button key={item.id} type="button" aria-label={"Elegir colores " + item.label}
+                        aria-pressed={selected} onClick={() => setPaletteId(item.id)}
+                        className={cn("min-h-28 rounded-2xl border-2 bg-white p-2 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-suma-orange sm:min-h-32 sm:p-3",
+                          selected ? "border-suma-purple shadow-md ring-2 ring-suma-purple/15" : "border-suma-line hover:border-suma-purple/60")}>
+                        <span className="flex gap-1.5" aria-hidden="true">
+                          <span className={item.base + " h-9 min-w-0 flex-1 rounded-lg border border-black/10"} />
+                          <span className={item.light + " h-9 min-w-0 flex-1 rounded-lg border border-black/10"} />
+                          <span className={item.accent + " h-9 min-w-0 flex-1 rounded-lg border border-black/10"} />
+                        </span>
+                        <span className="mt-3 block text-sm font-extrabold text-suma-navy">
+                          {item.label} {selected ? "✓" : ""}
+                        </span>
+                        <span className="mt-1 hidden text-xs leading-relaxed text-suma-navy/65 sm:block">{paletteDescriptions[item.id]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p aria-live="polite" className="mt-3 text-xs font-medium text-suma-navy/75">
+                  Elegiste <strong>{selectedPalette.label}</strong>: {paletteDescriptions[paletteId]}
+                </p>
+                <div aria-live="polite" className="mt-5 overflow-hidden rounded-2xl border border-suma-line bg-white">
+                  <div className={selectedPalette.base + " px-5 py-4 text-white"}>
+                    <p className="text-[0.7rem] font-semibold uppercase tracking-wider text-white/75">Vista previa de los colores elegidos</p>
+                    <p className="mt-1 font-display text-lg font-extrabold">{businessName.trim() || "Tu negocio · ejemplo"}</p>
+                  </div>
+                  <div className={selectedPalette.light + " flex items-center justify-between gap-3 p-4"}>
+                    <p className={selectedPalette.text + " text-xs font-bold"}>Así se verá tu demostración</p>
+                    <span className={selectedPalette.text + " flex items-center gap-2 text-xs font-bold"}>
+                      <span aria-hidden="true" className={selectedPalette.accent + " size-8 rounded-lg border border-black/10"} />
+                      Color de botones
+                    </span>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-suma-navy/60">Esto solo cambia el aspecto de la demo; no modifica tu página ni contrata un diseño.</p>
               </div>
             )}
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
             <button type="button"
               onClick={() => personalizeField === 0 ? goTo("welcome") : setPersonalizeField((value) => value - 1)}
-              className="min-h-12 rounded-full border border-suma-line bg-white px-6 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              className="min-h-12 w-full rounded-full border-2 border-suma-navy/30 bg-white px-6 text-sm font-bold text-suma-navy hover:border-suma-purple sm:w-auto">
               ← Atrás
             </button>
             <button type="button"
@@ -240,7 +325,7 @@ export function ShowroomBuilder() {
                 if (personalizeField < 2) setPersonalizeField((value) => value + 1);
                 else { personalized({}); goTo("explore"); }
               }}
-              className="min-h-12 rounded-full bg-suma-navy px-7 text-sm font-bold text-white hover:bg-suma-purple">
+              className="min-h-12 w-full rounded-full bg-suma-orange px-7 text-sm font-extrabold text-suma-navy shadow-sm hover:bg-suma-navy hover:text-white sm:w-auto">
               {personalizeField < 2 ? personalizeField === 0 && !businessName.trim() ? "Omitir nombre y seguir →" : "Siguiente →" : "Probar mi demo →"}
             </button>
           </div>
@@ -252,46 +337,59 @@ export function ShowroomBuilder() {
       <section id="showroom-explorar" aria-labelledby="showroom-preview-title"
         className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7 lg:col-start-1 lg:row-start-1">
-          <p className="text-eyebrow text-suma-orange">02 · Pruébalo</p>
-          <h2 id="showroom-preview-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold">Elige algo y pruébalo.</h2>
-          <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
-            Toca una opción. La pantalla de la derecha cambia al instante y puedes interactuar con ella.
+          <p className="text-eyebrow text-suma-orange">02 · PRUEBA CÓMO FUNCIONARÍA</p>
+          <h2 id="showroom-preview-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold">¿En qué te gustaría mejorar?</h2>
+          <p className="mt-3 text-sm leading-relaxed text-suma-cream/85">
+            No hace falta que sepas qué programa necesitas. Elige tu problema y te mostramos un ejemplo.
           </p>
-          <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">¿Qué quieres mejorar primero?</p>
+          <div className="mt-5 space-y-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm leading-relaxed text-suma-cream">
+            <p><strong className="text-suma-orange">1.</strong> Elige qué quieres mejorar.</p>
+            <p><strong className="text-suma-orange">2.</strong> Prueba los botones de la pantalla de ejemplo.</p>
+            <p><strong className="text-suma-orange">3.</strong> Si te interesa, añádelo a tu propuesta. Sin compromiso.</p>
+          </div>
+          <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">1 · Elige tu objetivo</p>
           <div role="group" aria-label="Objetivo principal del negocio" className="mt-3 flex flex-wrap gap-2">
             {guidedGoals.map((goal) => (
               <button key={goal.id} type="button" aria-pressed={guidedGoal === goal.id}
                 onClick={() => {
+                  setHasChosenGoal(true);
                   setGuidedGoal(goal.id);
                   showDemo(goal.id, goal.experience as ShowroomExperienceId);
                 }}
-                className={"min-h-11 rounded-full border px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-suma-orange " +
+                className={"min-h-12 w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-extrabold transition-colors focus-visible:outline-suma-orange sm:w-auto " +
                   (guidedGoal === goal.id ? "border-suma-orange bg-suma-orange text-suma-navy" : "border-white/30 bg-white/5 text-white hover:border-white")}>
                 {goal.name}
               </button>
             ))}
           </div>
-          <div role="group" aria-label="Experiencias para probar" className="mt-5 grid grid-cols-2 gap-2">
+          <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">2 · Elige qué ejemplo quieres ver</p>
+          <p className="mt-2 text-xs leading-relaxed text-suma-cream/75">
+            {hasChosenGoal ? "Estos ejemplos se relacionan con lo que quieres mejorar." : "Empezamos con ejemplos para organizar mensajes. Puedes elegir otro objetivo arriba."}
+          </p>
+          <div role="group" aria-label="Experiencias para probar" className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {visibleExperiences.map((item) => (
               <button key={item.id} type="button" aria-pressed={experience === item.id}
                 onClick={() => showDemo(guidedGoal, item.id)}
-                className={"min-h-[4.5rem] rounded-2xl border px-3 py-3 text-left transition-colors focus-visible:outline-suma-orange " +
+                className={"min-h-[4.5rem] rounded-2xl border-2 px-4 py-3 text-left transition-colors focus-visible:outline-suma-orange " +
                   (experience === item.id
                     ? "border-suma-orange bg-suma-orange text-suma-navy"
                     : "border-white/20 bg-white/5 text-white hover:border-white/60")}>
-                <span className="block text-xs font-semibold opacity-65">{item.category}</span>
-                <span className="mt-1 block text-sm font-bold leading-tight">{item.title}</span>
+                <span className="block text-xs font-semibold opacity-75">{experience === item.id ? "✓ Estás viendo esta opción" : "Toca para ver el ejemplo"}</span>
+                <span className="mt-1 block text-sm font-bold leading-tight">{friendlyDemoTitles[item.id]}</span>
               </button>
             ))}
           </div>
           <button type="button" onClick={() => setShowAllExperiences((current) => !current)}
             aria-expanded={showAllExperiences}
-            className="mt-3 min-h-11 w-full rounded-xl border border-white/25 px-4 text-sm font-bold text-suma-cream transition-colors hover:border-suma-orange">
+            className="mt-3 min-h-12 w-full rounded-xl border-2 border-white/50 bg-white/10 px-4 text-sm font-bold text-suma-cream transition-colors hover:border-suma-orange hover:bg-white/15">
             {showAllExperiences ? "Ver solo las 3 sugeridas ↑" : "Ver las 9 demos ↓"}
           </button>
         </div>
 
         <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <p aria-live="polite" className="mb-3 rounded-xl border border-suma-purple/20 bg-white px-4 py-3 text-sm font-bold leading-relaxed text-suma-navy">
+            Prueba esto en la pantalla: {demoHints[experience]}
+          </p>
           <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
           <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
             Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
@@ -299,13 +397,12 @@ export function ShowroomBuilder() {
         </div>
 
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
-          <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
-          <p className="mt-3 rounded-xl bg-suma-purple/5 p-3 text-sm font-semibold leading-relaxed text-suma-purple">
-            Pruébalo tú: {demoHints[experience]}
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{active.lead}</p>
-          <p className="mt-2 text-xs text-suma-navy/55">{active.detail}</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">3 · AHORA ESTÁS PROBANDO</p>
+          <p className="mt-2 font-display text-xl font-bold text-suma-navy">{friendlyDemoTitles[experience]}</p>
+          <p className="mt-2 text-sm leading-relaxed text-suma-navy/80">{simpleDemoExplanations[experience]}</p>
+
+          <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">Es una prueba con información inventada: los botones no envían mensajes ni reservan clases.</p>
+          <p className="mt-3 text-xs font-bold text-suma-purple">Si te gusta, usa el botón de abajo para incluirlo en tu propuesta. Probarlo no tiene costo.</p>
           {selectedCurrent ? (
             <div role="status" className="mt-5 flex min-h-12 flex-wrap items-center justify-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
               <span>✓ Añadido a tu propuesta</span>
@@ -318,8 +415,8 @@ export function ShowroomBuilder() {
             </div>
           ) : (
             <button type="button" onClick={addCurrent}
-              className="mt-5 min-h-12 w-full rounded-full bg-suma-navy px-5 text-sm font-bold text-suma-cream transition-colors hover:bg-suma-purple">
-              Quiero incluir esta solución +
+              className="mt-5 min-h-14 w-full rounded-full bg-suma-orange px-5 text-base font-extrabold text-suma-navy shadow-sm transition-colors hover:bg-suma-navy hover:text-white">
+              Sí, añadir esta solución a mi propuesta +
             </button>
           )}
           <Link href={active.href} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-suma-navy underline decoration-suma-orange underline-offset-4">
@@ -327,26 +424,21 @@ export function ShowroomBuilder() {
           </Link>
         </div>
         <div className="lg:col-span-2 rounded-2xl border border-suma-line bg-white px-5 py-5 md:px-7">
-          <p aria-live="polite" className="text-sm font-semibold text-suma-navy">
-            {quote.isEmpty
-              ? "Todavía no has añadido ninguna solución. Puedes probar las demos sin contratar nada."
-              : mode === "package"
-                ? "Tu propuesta incluye " + quote.plan.name + (quote.services.length ? " y " + quote.services.length + " extras." : ".")
-                : "Has elegido " + quote.services.length + (quote.services.length === 1 ? " servicio." : " servicios.")}
-          </p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-suma-purple">Tu selección hasta ahora</p>
+          <p aria-live="polite" className="text-sm font-semibold text-suma-navy">{chosenDescription}</p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <button type="button" onClick={() => { setPersonalizeField(0); goTo("personalize"); }}
-              className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              className="min-h-12 w-full rounded-full border-2 border-suma-navy/30 px-5 text-sm font-bold text-suma-navy hover:border-suma-purple sm:w-auto">
               ← Cambiar datos de mi negocio
             </button>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex w-full flex-wrap gap-2 sm:w-auto">
               <button type="button" onClick={() => goTo("quote")}
-                className="min-h-12 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-suma-purple/5">
-                Ir directo a mi propuesta
+                className="min-h-12 w-full rounded-full bg-suma-orange px-5 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white sm:w-auto">
+                Ver mi propuesta sin calcular
               </button>
               <button type="button" onClick={() => goTo("impact")}
-                className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
-                Siguiente: calcular →
+                className="min-h-12 w-full rounded-full border-2 border-suma-purple bg-white px-6 text-sm font-extrabold text-suma-purple hover:bg-suma-purple hover:text-white sm:w-auto">
+                Opcional: hacer un cálculo →
               </button>
             </div>
           </div>
@@ -356,10 +448,20 @@ export function ShowroomBuilder() {
 
       {stage === "impact" && (
       <div className="space-y-3">
-        <p className="mx-auto max-w-4xl text-center text-sm leading-relaxed text-suma-navy/70">
-          El cálculo es opcional. Primero elige una solución; si aún no sabes cuál, puedes solicitar una recomendación.
-        </p>
-        <h2 data-wizard-heading tabIndex={-1} className="sr-only">Paso 3: Calcula con tus números</h2>
+        <div className="rounded-2xl border border-suma-line bg-white p-5 shadow-soft md:p-7">
+          <p className="text-eyebrow text-suma-orange-ink">PASO 3 · TOTALMENTE OPCIONAL</p>
+          <h2 data-wizard-heading tabIndex={-1} className="mt-2 font-display text-2xl font-extrabold text-suma-navy">¿Te gustaría hacer un cálculo de ejemplo?</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-suma-navy/75">
+            Podemos estimar cuántos clientes adicionales necesitarías para cubrir el costo. Los resultados son ejemplos, no promesas de venta.
+            Si prefieres, pasa directo a tu propuesta.
+          </p>
+          {!quote.isEmpty && !showImpactCalculator && (
+            <button type="button" onClick={() => setShowImpactCalculator(true)}
+              className="mt-5 min-h-12 w-full rounded-full border-2 border-suma-purple bg-white px-6 text-sm font-extrabold text-suma-purple hover:bg-suma-purple hover:text-white sm:w-auto">
+              Sí, quiero ver el cálculo →
+            </button>
+          )}
+        </div>
         {quote.isEmpty ? (
           <div className="rounded-[2rem] border border-suma-line bg-white p-6 text-suma-navy shadow-soft md:p-9">
             <p className="text-eyebrow text-suma-orange-ink">03 · CALCULA</p>
@@ -369,17 +471,17 @@ export function ShowroomBuilder() {
               También puedes pedirnos una recomendación sin hacer ningún cálculo.
             </p>
           </div>
-        ) : (
+        ) : showImpactCalculator ? (
           <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
-        )}
+        ) : null}
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-suma-line bg-white p-5">
           <button type="button" onClick={() => goTo("explore")}
             className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
             ← Volver a las demos
           </button>
           <button type="button" onClick={() => goTo("quote")}
-            className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
-            {quote.isEmpty ? "Pedir una recomendación →" : "Siguiente: mi propuesta →"}
+            className="min-h-12 w-full rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white sm:w-auto">
+            {quote.isEmpty ? "Pedir una recomendación →" : "Ver mi propuesta →"}
           </button>
         </div>
       </div>
@@ -390,8 +492,11 @@ export function ShowroomBuilder() {
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
           <h2 id="showroom-price-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Esta es tu propuesta.</h2>
-          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">
-            Revisa lo que elegiste y cuánto costaría. Puedes cambiar cualquier opción sin volver a empezar.
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-suma-navy/75">
+            Este es el resumen de los servicios que tú decidiste incluir. Aquí verás el pago inicial, la mensualidad y los gastos que van aparte. Todavía no estás contratando nada.
+          </p>
+          <p className="mt-3 rounded-xl border border-suma-purple/20 bg-white px-4 py-3 text-sm font-bold text-suma-navy">
+            {chosenDescription}
           </p>
           <button type="button" onClick={() => goTo("explore")}
             className="mt-4 min-h-11 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-white">
@@ -605,9 +710,9 @@ export function ShowroomBuilder() {
 
               <a href={showroomWhatsAppHref(selection, "quote")} target="_blank" rel="noopener noreferrer" {...showroomWhatsAppAttrs("quote")}
                 className="mt-6 flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-4 text-center text-sm font-extrabold text-suma-navy transition-colors hover:bg-suma-cream">
-                Enviar mi propuesta por WhatsApp →
+                {quote.isEmpty ? "Pedir una recomendación por WhatsApp →" : "Enviar mi propuesta por WhatsApp →"}
               </a>
-              <p className="mt-2 text-center text-xs text-suma-cream/60">Abre WhatsApp con un mensaje que puedes editar. Nada se envía sin ti.</p>
+              <p className="mt-2 text-center text-xs leading-relaxed text-suma-cream/75">Al tocar el botón se abre WhatsApp con un mensaje preparado. Tú decides si lo envías; no se realiza ningún pago.</p>
 
               <details className="mt-4 rounded-2xl border border-white/20 p-4">
                 <summary className="cursor-pointer text-sm font-bold text-suma-cream">¿Tienes un presupuesto definido?</summary>
