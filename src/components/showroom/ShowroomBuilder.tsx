@@ -359,13 +359,14 @@ export function ShowroomBuilder() {
         </div>
 
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">3 · AHORA ESTÁS PROBANDO</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
+          <p className="mt-2 text-sm leading-relaxed text-suma-navy/80">{simpleDemoExplanations[experience]}</p>
           <p className="mt-3 rounded-xl bg-suma-purple/5 p-3 text-sm font-semibold leading-relaxed text-suma-purple">
             Pruébalo tú: {demoHints[experience]}
           </p>
-          <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{active.lead}</p>
-          <p className="mt-2 text-xs text-suma-navy/55">{active.detail}</p>
+          <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">Es una prueba con información inventada: los botones no envían mensajes ni reservan clases.</p>
+          <p className="mt-3 text-xs font-bold text-suma-purple">Si te gusta, usa el botón de abajo para incluirlo en tu propuesta. Probarlo no tiene costo.</p>
           {selectedCurrent ? (
             <div role="status" className="mt-5 flex min-h-12 flex-wrap items-center justify-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
               <span>✓ Añadido a tu propuesta</span>
@@ -378,8 +379,8 @@ export function ShowroomBuilder() {
             </div>
           ) : (
             <button type="button" onClick={addCurrent}
-              className="mt-5 min-h-12 w-full rounded-full bg-suma-navy px-5 text-sm font-bold text-suma-cream transition-colors hover:bg-suma-purple">
-              Quiero incluir esta solución +
+              className="mt-5 min-h-14 w-full rounded-full bg-suma-orange px-5 text-base font-extrabold text-suma-navy shadow-sm transition-colors hover:bg-suma-navy hover:text-white">
+              Sí, añadir esta solución a mi propuesta +
             </button>
           )}
           <Link href={active.href} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-suma-navy underline decoration-suma-orange underline-offset-4">
@@ -403,17 +404,17 @@ export function ShowroomBuilder() {
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <button type="button" onClick={() => { setPersonalizeField(0); goTo("personalize"); }}
-              className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              className="min-h-12 w-full rounded-full border-2 border-suma-navy/30 px-5 text-sm font-bold text-suma-navy hover:border-suma-purple sm:w-auto">
               ← Cambiar datos de mi negocio
             </button>
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={() => goTo("quote")}
-                className="min-h-12 rounded-full border border-suma-purple px-5 text-sm font-bold text-suma-purple hover:bg-suma-purple/5">
-                Ir directo a mi propuesta
+                className="min-h-12 w-full rounded-full bg-suma-orange px-5 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white sm:w-auto">
+                Ver mi propuesta sin calcular
               </button>
               <button type="button" onClick={() => goTo("impact")}
-                className="min-h-12 rounded-full bg-suma-orange px-6 text-sm font-extrabold text-suma-navy hover:bg-suma-navy hover:text-white">
-                Siguiente: calcular →
+                className="min-h-12 w-full rounded-full border-2 border-suma-purple bg-white px-6 text-sm font-extrabold text-suma-purple hover:bg-suma-purple hover:text-white sm:w-auto">
+                Opcional: hacer un cálculo →
               </button>
             </div>
           </div>
