@@ -360,7 +360,18 @@ export function ShowroomBuilder() {
           El cálculo es opcional. Primero elige una solución; si aún no sabes cuál, puedes solicitar una recomendación.
         </p>
         <h2 data-wizard-heading tabIndex={-1} className="sr-only">Paso 3: Calcula con tus números</h2>
-        <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
+        {quote.isEmpty ? (
+          <div className="rounded-[2rem] border border-suma-line bg-white p-6 text-suma-navy shadow-soft md:p-9">
+            <p className="text-eyebrow text-suma-orange-ink">03 · CALCULA</p>
+            <h3 className="mt-2 font-display text-2xl font-extrabold">¿Quieres calcular el impacto?</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-suma-navy/75">
+              Todavía no has elegido una solución. Para evitar resultados engañosos, primero elige qué te interesa.
+              También puedes pedirnos una recomendación sin hacer ningún cálculo.
+            </p>
+          </div>
+        ) : (
+          <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
+        )}
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-suma-line bg-white p-5">
           <button type="button" onClick={() => goTo("explore")}
             className="min-h-12 rounded-full border border-suma-line px-5 text-sm font-bold text-suma-navy hover:border-suma-purple">
