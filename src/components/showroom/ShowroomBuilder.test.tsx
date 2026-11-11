@@ -21,14 +21,13 @@ describe("ShowroomBuilder", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Ya está en tu propuesta");
     expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).toBeChecked();
     expect(within(summary()).getByText("Asistente con IA para WhatsApp")).toBeInTheDocument();
-    expect(screen.getAllByText(formatMXNExact(6610)).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(formatMXNExact(4290)).length).toBeGreaterThan(0);
   });
 
   it("no duplica CRM al pasar al paquete Flow, y no eleva la cuota por equipo", () => {
     render(<ShowroomBuilder />);
-    expect(screen.getAllByText(formatMXNExact(2320)).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Elige al menos un módulo para ver cuánto pagarías/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Personas del equipo"), { target: { value: "50" } });
-    expect(screen.getAllByText(formatMXNExact(2320)).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
     expect(screen.getAllByText(formatMXNExact(2320)).length).toBeGreaterThan(0);
     expect(screen.queryByRole("checkbox", { name: "Organizar clientes (CRM)" })).not.toBeInTheDocument();
@@ -37,8 +36,9 @@ describe("ShowroomBuilder", () => {
 
   it("desglosa lo que se compra, muestra el IVA y explica qué incluye cada módulo elegido", () => {
     render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" }));
     expect(within(summary()).getByText("Organizar clientes (CRM)")).toBeInTheDocument();
-    expect(screen.getByText(/Ordenamos consultas, seguimiento/)).toBeInTheDocument();
+    expect(screen.getByText(/Sabes quién preguntó/)).toBeInTheDocument();
     // ($2,490 / 3 + $1,490) × 1.16
     expect(screen.getByText(formatMXNExact(2691.20))).toBeInTheDocument();
     for (const step of ["Descubrimos", "Diseñamos", "Construimos", "Evolucionamos"]) {
@@ -58,6 +58,7 @@ describe("ShowroomBuilder", () => {
 
   it("el periodo del simulador y el de la propuesta son el mismo", () => {
     render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" }));
     fireEvent.click(within(screen.getByRole("group", { name: "Periodo a evaluar" })).getByRole("button", { name: "6 m" }));
     expect(screen.getByLabelText("Periodo")).toHaveValue("6");
     expect(screen.getByText(/Total mínimo: pago inicial \+ 6 meses de servicio/)).toBeInTheDocument();
@@ -67,20 +68,45 @@ describe("ShowroomBuilder", () => {
 
   it("permite pagar la implementación en 1 o 3 abonos y conserva el costo completo", () => {
     render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" }));
     expect(screen.getAllByText(formatMXNExact(2320)).length).toBeGreaterThan(0);
     fireEvent.click(within(screen.getByRole("group", { name: "Pagar implementación" })).getByRole("button", { name: "Un pago" }));
     expect(screen.getAllByText(formatMXNExact(3980)).length).toBeGreaterThan(0);
     fireEvent.click(within(screen.getByRole("group", { name: "Pagar implementación" })).getByRole("button", { name: "3 mensualidades" }));
     const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
-    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("3 abonos mensuales");
+    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("referencia desde");
   });
 
   it("genera un enlace WhatsApp con los detalles, pero no envía ni agenda una cita", () => {
     render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" }));
     const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
     expect(href).toMatch(/^https:\/\/wa\.me\/528114688882\?text=/);
     expect(decodeURIComponent(href!.split("?text=")[1])).toContain("Organizar clientes (CRM)");
     expect(screen.getByText(/Esta solicitud no agenda automáticamente una cita/i)).toBeInTheDocument();
+  });
+
+  it("no agrega CRM sin permiso al elegir Ads, ni lo envía en WhatsApp", () => {
+    render(<ShowroomBuilder />);
+    expect(screen.queryByRole("list", { name: "Lo que estás eligiendo" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
+    fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
+    expect(within(summary()).getByText(/SUMA Ads/)).toBeInTheDocument();
+    expect(within(summary()).queryByText("Organizar clientes (CRM)")).not.toBeInTheDocument();
+    const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
+    const msg = decodeURIComponent(href!.split("?text=")[1]);
+    expect(msg).toContain("SUMA Ads");
+    expect(msg).not.toContain("Asistente con IA para WhatsApp");
+    expect(msg).not.toContain("Organizar clientes (CRM)");
+  });
+
+  it("limpia extras del paquete anterior al cambiar de Flow a Growth", () => {
+    render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" }));
+    expect(within(summary()).getByText("Asistente con IA para WhatsApp")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /SUMA Growth/ }));
+    expect(within(summary()).queryByText("Asistente con IA para WhatsApp")).not.toBeInTheDocument();
   });
 
   it("recomienda tres experiencias sin esconder el catálogo completo", () => {
@@ -132,7 +158,7 @@ describe("ShowroomBuilder · analítica GA4", () => {
     fireEvent.change(screen.getByLabelText("Algo más (opcional)"), { target: { value: "Tengo Fitco" } });
     expect(layer()).toEqual([]);
     act(() => vi.advanceTimersByTime(1600));
-    expect(layer()).toEqual([{ event: "showroom_quote_updated", mode: "services", plan: "none", services_count: 2, months: 6 }]);
+    expect(layer()).toEqual([{ event: "showroom_quote_updated", mode: "services", plan: "none", services_count: 1, months: 6 }]);
     expect(JSON.stringify((window as DL).dataLayer)).not.toContain("Fitco");
   });
 
@@ -141,7 +167,7 @@ describe("ShowroomBuilder · analítica GA4", () => {
     render(<ShowroomBuilder />);
     fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
     act(() => vi.advanceTimersByTime(1600));
-    expect(layer()).toEqual([{ event: "showroom_quote_updated", mode: "package", plan: "flow", services_count: 0, months: 1 }]);
+    expect(layer()).toEqual([{ event: "showroom_quote_updated", mode: "package", plan: "flow", services_count: 0, months: 3 }]);
   });
 
   it("sin consentimiento no se registra nada", () => {

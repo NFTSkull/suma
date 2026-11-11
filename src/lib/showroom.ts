@@ -1,7 +1,7 @@
 import type { IndividualServiceId, PricingPlanId } from "@/content/pricing";
 import { showroomExperiences, showroomIndustries, type ShowroomExperienceId, type ShowroomIndustryId } from "@/content/showroom";
 import { site } from "@/content/site";
-import { estimatePricing, formatMXN, formatMXNExact, type SetupPayments } from "@/lib/pricing";
+import { estimatePricing, formatMXN, type SetupPayments } from "@/lib/pricing";
 
 export type ShowroomIntent = "quote" | "budget" | "diagnostic" | "impact";
 export type ShowroomSelection = {
@@ -44,48 +44,34 @@ export function getShowroomExperience(id: string) {
   return showroomExperiences.find((experience) => experience.id === id) ?? showroomExperiences[0];
 }
 
-/** This prepares an editable WhatsApp message; it never submits a lead or books a meeting. */
+/** Mensaje breve y fiel a lo que la persona eligió. No envía ni reserva nada. */
 export function showroomWhatsAppHref(selection: ShowroomSelection, intent: ShowroomIntent) {
   const q = showroomEstimate(selection);
-  const selectedExperience = getShowroomExperience(selection.experience);
-  const industry = getShowroomIndustry(selection.industry);
-  const safe = (value: string | undefined, length: number) =>
-    (value ?? "").trim().replace(/[\r\n\t]+/g, " ").slice(0, length);
-  const subjects: Record<ShowroomIntent, string> = {
-    diagnostic: "Quiero solicitar una sesión de diagnóstico para revisar funciones más avanzadas.",
-    budget: "Quiero ajustar la propuesta según mi presupuesto; sé que eso puede modificar el alcance.",
-    impact: "Quiero revisar con SUMA mi simulación de impacto y validar los supuestos con mis datos reales.",
-    quote: "Quiero revisar mi propuesta personalizada del Showroom de SUMA.",
+  const safe = (value: string | undefined, limit: number) =>
+    (value ?? "").trim().replace(/[\r\n\t]+/g, " ").slice(0, limit);
+  const businessName = safe(selection.businessName, 55);
+  const extras = q.services.map((s) => s.name);
+  const selected = q.mode === "package"
+    ? q.plan.name + (extras.length ? " + " + extras.join(", ") : "")
+    : extras.length ? extras.join(", ") : "una recomendación";
+  const goal: Record<ShowroomIntent, string> = {
+    quote: "Quiero una propuesta",
+    budget: "Quiero ajustar el alcance a mi presupuesto",
+    diagnostic: "Quiero revisar las opciones para mi negocio",
+    impact: "Quiero revisar una simulación con datos reales",
   };
-  const subject = subjects[intent];
   const lines = [
-    "Hola, SUMA STUDIO.",
-    subject,
-    "Negocio: " + safe(selection.businessName || industry.example, 55) + ".",
-    "Giro: " + industry.name + ".",
-    "Experiencia vista: " + selectedExperience.title + " (demo con datos ficticios).",
-    "Modelo: " + (q.mode === "package" ? q.plan.name : "Servicios individuales") + ".",
-    "Servicios adicionales: " + (q.services.length ? q.services.map((s) => s.name).join(", ") : "Sin complementos") + ".",
-    "Periodo de referencia: " + q.months + (q.months === 1 ? " mes." : " meses."),
-    ...(q.monthlyAds ? ["Presupuesto publicitario contemplado: " + formatMXN(q.monthlyAds) + "/mes (externo)."] : []),
-    "Equipo: " + q.teamUsers + " personas. Sedes: " + q.locations + ".",
-    ...(safe(selection.platform, 65) ? ["Herramientas actuales: " + safe(selection.platform, 65) + "."] : []),
-    ...(q.isEmpty ? ["Solicito recomendación de alcance y presupuesto."] : [
-      "Estimación desde para una sede: " + formatMXN(q.setup) + " de pago inicial + " + formatMXN(q.monthlySuma) + "/mes. Rango orientativo: " + formatMXN(q.setup) + "–" + formatMXN(q.setupMax) + " inicial y " + formatMXN(q.monthlySuma) + "–" + formatMXN(q.monthlyMax) + "/mes. Precio final según alcance.",
-      "Primer desembolso orientativo SUMA: " + formatMXNExact(q.firstPaymentSuma) + ".",
-      ...(q.setupPayments > 1
-        ? ["Implementación: " + q.setupPayments + " abonos mensuales, primero de " + formatMXNExact(q.setupInstallment) +
-          " y último de " + formatMXNExact(q.setupFinalInstallment) +
-          ". Total de implementación " + formatMXN(q.setup) + ", sin reducir la deuda pendiente."]
-        : []),
+    "Hola, SUMA. " + goal[intent] + (businessName ? " para " + businessName : "") + ".",
+    "Me interesa: " + selected + ".",
+    ...(q.isEmpty || q.locations > 1 ? [] : [
+      "Precio de referencia desde " + formatMXN(q.setup) + " de inicio + " +
+      formatMXN(q.monthlySuma) + "/mes, antes de IVA; terceros aparte.",
     ]),
-    ...(intent === "budget" && safe(selection.budget, 40) ? ["Presupuesto que tengo en mente: " + safe(selection.budget, 40) + "."] : []),
-    ...(intent === "diagnostic" && safe(selection.availability, 40) ? ["Horario preferido para coordinar: " + safe(selection.availability, 40) + "."] : []),
-    ...(intent === "impact" && safe(selection.impactSummary, 400) ? [safe(selection.impactSummary, 400)] : []),
-    ...(safe(selection.notes, 180) ? ["Quiero agregar o revisar: " + safe(selection.notes, 180).replace(/\.+$/, "") + "."] : []),
-    "Importes antes de IVA; costos de licencias, campañas, WhatsApp API, IA, hosting y terceros aparte.",
-    ...(q.locations > 1 ? ["Requiero validar costo multi-sede."] : []),
-    "Las parcialidades requieren confirmación comercial por escrito; no son financiación automática. La demostración no es software operativo ni confirma integraciones. Por favor validemos alcance y disponibilidad.",
+    ...(q.locations > 1 ? ["Necesito considerar varias sedes; el precio debe cotizarse."] : []),
+    ...(intent === "budget" && safe(selection.budget, 35)
+      ? ["Mi presupuesto aproximado: " + safe(selection.budget, 35) + "."] : []),
+    ...(safe(selection.notes, 100) ? ["Nota: " + safe(selection.notes, 100) + "."] : []),
+    "¿Podemos revisar lo que incluye?",
   ];
   return "https://wa.me/" + site.contact.whatsapp + "?text=" + encodeURIComponent(lines.join("\n"));
 }

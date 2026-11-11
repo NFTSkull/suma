@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { individualServices } from "@/content/pricing";
+import { individualServices, pricingSettings } from "@/content/pricing";
+import { estimatePricing } from "@/lib/pricing";
 import { showroomExperiences, showroomIndustries } from "@/content/showroom";
 import { showroomEstimate, showroomWhatsAppHref, toggleShowroomService, type ShowroomSelection } from "./showroom";
 
@@ -29,6 +30,17 @@ describe("Showroom SUMA", () => {
     expect(quote.setupMax).toBe(7900);
     expect(quote.monthlyMax).toBe(3900);
   });
+  it("la misma selección da el mismo total independientemente de la pantalla", () => {
+    const months = pricingSettings.defaultMonths;
+    const setupPayments = pricingSettings.defaultSetupPayments;
+    const adBudget = pricingSettings.defaultAdBudget;
+    const common = { mode: "package" as const, planId: "flow" as const, serviceIds: [] as [], months, setupPayments, adBudget, locations: 1, teamUsers: 5 };
+    const fromPricing = estimatePricing(common);
+    const fromShowroom = showroomEstimate({ ...initial, ...common });
+    expect(fromShowroom.totalSuma).toBe(fromPricing.totalSuma);
+    expect(fromShowroom.firstPaymentSuma).toBe(fromPricing.firstPaymentSuma);
+    expect(fromPricing.totalSuma).toBe(6960);
+  });
   it("puede combinar chatbot sin un descuento ficticio", () => {
     const quote = showroomEstimate({ ...initial, experience: "chatbot", serviceIds: ["crm-gestionado", "chatbot-ia"] });
     expect(quote.setup).toBe(9390);
@@ -42,7 +54,8 @@ describe("Showroom SUMA", () => {
     expect(quote.setup).toBe(2490);
     expect(quote.firstPaymentSuma).toBe(2320);
     const msg = decodeURIComponent(showroomWhatsAppHref(planned, "quote").split("?text=")[1]);
-    expect(msg).toContain("3 abonos mensuales");
+    expect(msg).not.toContain("deuda");
+    expect(msg.length).toBeLessThan(420);
     expect(msg).toContain("No quiero cambiar mi agenda");
   });
   it("no factura dos veces el módulo CRM dentro de Flow", () => {
@@ -68,25 +81,38 @@ describe("Showroom SUMA", () => {
     const url = showroomWhatsAppHref(proposal, "budget");
     expect(url).toMatch(/^https:\/\/wa\.me\/528114688882\?text=/);
     const text = decodeURIComponent(url.split("?text=")[1]);
-    expect(text).toContain("ajustar la propuesta según mi presupuesto");
+    expect(text).toContain("ajustar el alcance a mi presupuesto");
     expect(text).toContain("$4,000/mes");
     expect(text).toContain("antes de IVA");
-    expect(text).toContain("ficticios");
+    expect(text).not.toContain("Estudio Aurora");
   });
   it("el diagnóstico solo solicita coordinar una sesión, no promete reserva", () => {
     const text = decodeURIComponent(showroomWhatsAppHref({ ...initial, availability: "Entre semana, tardes" }, "diagnostic").split("?text=")[1]);
-    expect(text).toContain("solicitar una sesión");
-    expect(text).toContain("Entre semana, tardes");
-    expect(text).toContain("validemos alcance");
+    expect(text).toContain("revisar las opciones");
+    expect(text).not.toContain("Entre semana, tardes");
+    expect(text).toContain("¿Podemos revisar lo que incluye?");
     expect(text).not.toMatch(/cita confirmada/i);
   });
-  it("la revisión de impacto lleva la simulación aparte de las notas y nombra bien el periodo", () => {
+  it("la revisión de impacto propone validar datos sin añadir proyecciones ficticias", () => {
     const longNotes = "x".repeat(170);
     const summary = "Simulación base (supuestos por validar): diferencia de +$1,932/mes.";
     const text = decodeURIComponent(showroomWhatsAppHref({ ...initial, months: 6, notes: longNotes, impactSummary: summary }, "impact").split("?text=")[1]);
-    expect(text).toContain("Quiero revisar con SUMA mi simulación de impacto");
-    expect(text).toContain(summary);
-    expect(text).toContain("Periodo de referencia: 6 meses.");
-    expect(decodeURIComponent(showroomWhatsAppHref(initial, "quote").split("?text=")[1])).toContain("Periodo de referencia: 1 mes.");
+    expect(text).toContain("Quiero revisar una simulación con datos reales");
+    expect(text).not.toContain(summary);
+    expect(text).not.toContain("Periodo de referencia");
+    expect(text).not.toContain("Estudio Aurora");
+    expect(text.length).toBeLessThan(430);
+  });
+
+  it("no inventa el nombre del negocio, ni envía servicios no marcados", () => {
+    const text = decodeURIComponent(showroomWhatsAppHref({
+      ...initial, businessName: "", mode: "services", serviceIds: [],
+    }, "quote").split("?text=")[1]);
+    expect(text).toContain("una recomendación");
+    expect(text).not.toContain("Estudio Aurora");
+    expect(text).not.toContain("Organizar clientes (CRM)");
+    expect(text).not.toContain("Total de implementación");
+    expect(text).not.toContain("$0");
+    expect(text.length).toBeLessThan(300);
   });
 });

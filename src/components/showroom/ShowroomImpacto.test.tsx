@@ -83,7 +83,7 @@ describe("ShowroomImpacto · interacción", () => {
     expect(screen.queryByText(/cubriría la mensualidad/)).not.toBeInTheDocument();
     expect(screen.queryByText(/podrían liberarse/)).not.toBeInTheDocument();
     const text = decoded(screen.getByRole("link", { name: /Quiero que SUMA revise mis números/ }).getAttribute("href"));
-    expect(text).toContain("mi selección actual no incluye seguimiento");
+    expect(text).toContain("Me interesa: SUMA Ads");
     expect(text).not.toMatch(/diferencia de/);
   });
 
@@ -117,12 +117,10 @@ describe("ShowroomImpacto · interacción", () => {
     const withNotes = { ...selection, notes: "Tengo dos sedes en San Pedro" };
     render(<ShowroomImpacto selection={withNotes} quote={showroomEstimate(withNotes)} />);
     const text = decoded(screen.getByRole("link", { name: /Quiero que SUMA revise mis números/ }).getAttribute("href"));
-    expect(text).toContain("Quiero revisar con SUMA mi simulación de impacto");
-    expect(text).toContain("Quiero agregar o revisar: Tengo dos sedes en San Pedro.");
-    expect(text).toContain("Escenario base (supuestos por validar)");
-    expect(text).toContain(formatMXN(9720));
-    expect(text).toContain("diferencia de +" + formatMXN(4342) + "/mes");
-    expect(text).toContain("Mensualidad SUMA " + formatMXN(1490));
-    expect(text).not.toContain("..");
+    expect(text).toContain("Quiero revisar una simulación con datos reales");
+    expect(text).toContain("Nota: Tengo dos sedes en San Pedro.");
+    expect(text).not.toContain("Escenario base (supuestos por validar)");
+    expect(text).toContain("Estudio Aurora");
+    expect(text.length).toBeLessThan(430);
   });
 });

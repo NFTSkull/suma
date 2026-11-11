@@ -77,18 +77,18 @@ export const services: Service[] = [
   {
     slug: "crm",
     href: "/servicios/crm",
-    name: "Sistemas CRM personalizados",
+    name: "Organizar clientes y seguimiento (CRM)",
     shortName: "CRM",
-    navTagline: "Tu negocio en orden",
+    navTagline: "Que no se pierda ningún mensaje",
     color: "purple",
     home: {
-      title: "Todo en su lugar.",
-      text: "Organiza clientes, citas, membresías y oportunidades en un sistema diseñado alrededor de tu operación.",
+      title: "Sabe quién te escribió y qué falta responder.",
+      text: "Organizamos las consultas de tu negocio para que tu equipo sepa quién preguntó, quién respondió y qué sigue. Si necesitas un programa propio, también podemos crearlo."
     },
     hero: {
-      eyebrow: "Sistemas CRM personalizados",
-      title: "Más claridad para ti. Más orden para tu negocio.",
-      lead: "Un solo lugar para tus clientes, citas, membresías y seguimientos, diseñado según cómo trabaja tu negocio y no al revés.",
+      eyebrow: "Organización de clientes · CRM",
+      title: "Recuerda a quién responder, sin depender de tu memoria.",
+      lead: "Un CRM es una lista organizada de personas interesadas: ves quién preguntó, quién respondió y qué sigue. En SUMA Flow configuramos una herramienta existente; si necesitas una propia, la cotizamos por separado."
     },
     problem: {
       title: "Cuando la información vive en todas partes",
@@ -109,8 +109,8 @@ export const services: Service[] = [
       { title: "Productos", text: "Catálogo e inventario básico cuando tu negocio también vende productos." },
     ],
     showcase: {
-      title: "Un día en el CRM de un spa",
-      lead: "Cambia de pestaña y abre una cita para ver cómo se organiza la información.",
+      title: "Mira cómo se ordenan las consultas (demo de ejemplo)",
+      lead: "Prueba las pestañas y una cita ficticia. La demo muestra un spa, pero el proceso se adapta también a estudios de Pilates y yoga."
     },
     benefits: [
       { title: "Decisiones con claridad", text: "Sabes qué está pasando en tu negocio sin tener que reconstruirlo." },
@@ -125,17 +125,19 @@ export const services: Service[] = [
       { industry: "profesionales-bienestar", text: "Agenda personal, notas de sesión y recordatorios de seguimiento." },
     ],
     scopeNote: {
-      title: "Hecho a la medida de tu operación",
-      text: "No vendemos una licencia genérica. Cada CRM se diseña a partir de tus procesos reales; en algunos casos conviene construirlo desde cero y en otros configurar o integrar herramientas existentes. Lo decidimos juntos según tu presupuesto y tu momento.",
+      title: "Dos opciones: configurar un programa o crear uno propio",
+      text: "Con SUMA Flow organizamos tu seguimiento en una herramienta que ya existe; la licencia de ese proveedor se paga aparte. Sigues usando tu WhatsApp y tu equipo responde los mensajes: el CRM no contesta por sí solo. Si el programa actual de tu agenda permite una conexión, revisamos cómo aprovecharla; si no, pueden trabajar por separado. Para necesidades especiales cotizamos un sistema hecho a medida."
     },
     related: [
       { slug: "chatbots", why: "Las solicitudes que llegan por chat pueden registrarse automáticamente." },
       { slug: "aplicaciones-moviles", why: "Tus clientes pueden ver sus reservas y membresías desde una app conectada." },
     ],
     faqs: [
-      { q: "¿Por qué no usar un software que ya existe?", a: "A veces es la mejor opción y te lo diremos. Un CRM personalizado conviene cuando tus procesos no encajan en herramientas genéricas o cuando necesitas conectar varias piezas." },
+      { q: "¿El CRM contesta mis WhatsApps?", a: "No por sí solo. Tu equipo mantiene su WhatsApp y responde a las personas. El CRM permite ver qué consultas faltan atender; las respuestas automáticas se cotizan aparte y requieren permisos del canal." },
+      { q: "¿Se conecta con mi agenda de clases?", a: "Revisamos primero qué sistema usas. Si permite conexión y está dentro del alcance, la proponemos; si no, puedes mantener la agenda y usar el seguimiento por separado." },
+      { q: "¿Me dan un programa nuevo o uno existente?", a: "SUMA Flow configura un CRM que ya existe; su licencia puede cobrarse aparte. Solo proponemos crear un sistema propio cuando tus procesos lo necesitan y lo cotizamos por separado." },
       { q: "¿Puedo migrar la información que ya tengo?", a: "Sí. Revisamos tus archivos actuales (hojas de cálculo, exportaciones de otras herramientas) y planeamos cómo trasladarlos." },
-      { q: "¿Mi equipo podrá usarlo sin capacitación técnica?", a: "Ese es el objetivo de diseño. Probamos los flujos con tu equipo y simplificamos lo que haga falta." },
+      { q: "¿Mi equipo podrá usarlo sin capacitación técnica?", a: "Te enseñamos a manejar el seguimiento y las tareas básicas. SUMA no cobra un extra por cada integrante dentro del alcance acordado, aunque el proveedor del programa sí podría cobrar licencias por usuario." },
       { q: "¿Dónde se guardan los datos?", a: "En infraestructura en la nube con controles de acceso por usuario. Definimos contigo permisos y políticas de privacidad." },
     ],
     cta: {
