@@ -9,6 +9,30 @@ import { site } from "@/content/site";
 export const formatMXN = (amount: number) =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(amount);
 
+/** Mostrar centavos en las parcialidades evita redondeos comerciales engañosos. */
+export const formatMXNExact = (amount: number) =>
+  new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+
+export type SetupPayments = 1 | 3 | 6;
+export const availableSetupPayments = (setup: number): SetupPayments[] =>
+  setup <= 0 ? [1] : setup >= 10000 ? [1, 3, 6] : [1, 3];
+
+const asCents = (value: number) => Math.round(value * 100);
+export function setupPaymentSchedule(setup: number, selected: SetupPayments = 1) {
+  const amountCents = asCents(Math.max(0, setup));
+  const options = availableSetupPayments(setup);
+  const payments = options.includes(selected) ? selected : 1;
+  const firstCents = Math.round(amountCents / payments);
+  const lastCents = amountCents - firstCents * (payments - 1);
+  return {
+    payments,
+    firstPayment: firstCents / 100,
+    finalPayment: lastCents / 100,
+    schedule: Array.from({ length: payments }, (_, index) =>
+      (index === payments - 1 ? lastCents : firstCents) / 100),
+  };
+}
+
 export type PricingSelection = {
   mode?: "package" | "services";
   planId: PricingPlanId;
@@ -21,6 +45,8 @@ export type PricingSelection = {
   goal?: string;
   platform?: string;
   notes?: string;
+  /** Parcialidades simuladas de la implementación, NO una contratación ni financiación automática. */
+  setupPayments?: SetupPayments;
 };
 
 export function estimatePricing(selection: PricingSelection) {
@@ -42,11 +68,18 @@ export function estimatePricing(selection: PricingSelection) {
     services.some((s) => s.id === "meta-ads" || s.id === "google-ads");
   const monthlyAds = hasAds ? Math.max(0, Number.isFinite(selection.adBudget) ? selection.adBudget ?? 0 : 0) : 0;
   const isStartingPrice = services.some((s) => s.from) || locations > 1;
+  const paymentPlan = setupPaymentSchedule(setup, selection.setupPayments ?? 1);
   return {
     plan, mode, services, months, locations, teamUsers, isStartingPrice, hasAds,
     isEmpty: mode === "services" && services.length === 0,
     setup, monthlySuma, monthlyAds,
-    firstPaymentSuma: setup + monthlySuma,
+    setupPayments: paymentPlan.payments,
+    setupInstallment: paymentPlan.firstPayment,
+    setupFinalInstallment: paymentPlan.finalPayment,
+    setupSchedule: paymentPlan.schedule,
+    /** Desembolso inicial a SUMA, con primer abono del setup + primera mensualidad. */
+    firstPaymentSuma: Math.round((paymentPlan.firstPayment + monthlySuma) * 100) / 100,
+    /** Compromiso de costo total incluyendo TODO el setup, incluso parcialidades fuera del periodo elegido. */
     totalSuma: setup + months * monthlySuma,
     totalExternalAds: months * monthlyAds,
     totalWithAds: setup + months * (monthlySuma + monthlyAds),
@@ -68,11 +101,15 @@ export function pricingWhatsAppHref(selection: PricingSelection): string {
     "Equipo: " + q.teamUsers + " integrantes. Sedes: " + q.locations + ".",
     "Periodo estimado: " + q.months + (q.months === 1 ? " mes." : " meses."),
     "Referencia de SUMA" + (q.isStartingPrice ? " desde" : "") + ": implementación " + formatMXN(q.setup) + "; mensualidad " + formatMXN(q.monthlySuma) + ".",
-    "Referencia primer pago a SUMA: " + formatMXN(q.firstPaymentSuma) + " antes de IVA.",
+    "Modalidad de implementación: " + (q.setupPayments > 1
+      ? q.setupPayments + " pagos mensuales (sujetos a aprobación; primer pago " + formatMXNExact(q.setupInstallment) + ")."
+      : "pago único.") ,
+    "Referencia primer pago a SUMA: " + formatMXNExact(q.firstPaymentSuma) + " antes de IVA.",
+    ...(q.setupPayments > 1 ? ["Total de implementación sin descontar: " + formatMXN(q.setup) + ". Las parcialidades pendientes siguen debiéndose aunque el periodo de comparación sea menor."] : []),
     ...(q.monthlyAds ? ["Pauta considerada: " + formatMXN(q.monthlyAds) + "/mes, pagada aparte."] : []),
     ...(q.locations > 1 ? ["Solicito cotización adicional por sedes."] : []),
     ...(safe(selection.notes, 180) ? ["Nota: " + safe(selection.notes, 180) + "."] : []),
-    "Los importes son orientativos: sin IVA, licencias de terceros ni consumos API/IA. Validar alcance e integraciones antes de contratar.",
+    "Los importes son orientativos: sin IVA, licencias de terceros ni consumos API/IA. Las parcialidades requieren acuerdo comercial; no representan aprobación de crédito ni un cobro automático. Validar alcance e integraciones antes de contratar.",
     "¿Podemos revisar la propuesta?",
   ];
   return "https://wa.me/" + site.contact.whatsapp + "?text=" + encodeURIComponent(lines.join("\n"));

@@ -10,6 +10,7 @@ export const pricingSettings = {
   adBudgets: [3000, 6000, 9000, 12000],
   defaultAdBudget: 6000,
   websiteMaintenanceMonthly: 990,
+  flexiblePaymentsMinForSix: 10000,
 } as const;
 
 export const pricingPlans = [
@@ -20,8 +21,8 @@ export const pricingPlans = [
     label: "Más clientes",
     tagline: "Publicidad que lleva a una conversación o reserva.",
     audience: "Ya tienes WhatsApp, un reservador o una web; quieres que más personas conozcan tu negocio.",
-    setup: 4900,
-    monthly: 5900,
+    setup: 2900,
+    monthly: 3900,
     featured: false,
     includes: [
       "Una campaña activa en Meta Ads",
@@ -40,8 +41,8 @@ export const pricingPlans = [
     label: "CRM + seguimiento",
     tagline: "Organiza consultas, responsables y próximos pasos.",
     audience: "Para negocios que ya reciben interesados y necesitan orden y automatización sin crear un software desde cero.",
-    setup: 9900,
-    monthly: 3900,
+    setup: 5900,
+    monthly: 2900,
     featured: true,
     includes: [
       "Diagnóstico de un proceso comercial y una sede",
@@ -61,8 +62,8 @@ export const pricingPlans = [
     label: "Captar + convertir",
     tagline: "Publicidad y seguimiento trabajando juntos.",
     audience: "Para estudios y spas que buscan nuevos clientes y un proceso claro hasta su primera visita.",
-    setup: 19900,
-    monthly: 8900,
+    setup: 12900,
+    monthly: 6900,
     featured: false,
     includes: [
       "Alcance base de SUMA Flow para una sede",
@@ -83,52 +84,52 @@ export type PricingPlan = (typeof pricingPlans)[number];
 export const individualServices = [
   {
     id: "meta-ads", name: "Gestión de Meta Ads", category: "Captación",
-    setup: 4900, monthly: 5900, from: false,
+    setup: 2900, monthly: 3900, from: false,
     detail: "Una campaña, dos creativos estáticos/mes, medición y optimización. Pauta aparte.",
   },
   {
     id: "google-ads", name: "Gestión de Google Ads", category: "Captación",
-    setup: 4900, monthly: 5900, from: true,
+    setup: 3500, monthly: 4900, from: true,
     detail: "Una campaña de búsqueda, configuración y optimización. Inversión y terceros aparte; alcance por validar.",
   },
   {
     id: "crm-gestionado", name: "CRM + seguimiento administrado", category: "Atención",
-    setup: 9900, monthly: 3900, from: false,
+    setup: 5900, monthly: 2900, from: false,
     detail: "Configurar un CRM existente, un embudo y hasta dos automatizaciones. Licencias externas aparte.",
   },
   {
     id: "chatbot-guiado", name: "Chatbot guiado (sin IA)", category: "Atención",
-    setup: 6900, monthly: 1490, from: true,
+    setup: 3900, monthly: 1190, from: true,
     detail: "Preguntas frecuentes y transferencia al equipo, sujeto a viabilidad del canal y costos externos.",
   },
   {
     id: "chatbot-ia", name: "Asistente de WhatsApp con IA", category: "Atención",
-    setup: 19900, monthly: 4900, from: true,
+    setup: 14900, monthly: 3900, from: true,
     detail: "Atención con IA y escalamiento humano, sujeto a API oficial, integración y consumo externo.",
   },
   {
     id: "reservas", name: "Configurar reservador existente", category: "Operación",
-    setup: 4900, monthly: 0, from: false,
+    setup: 2900, monthly: 0, from: false,
     detail: "Configuración inicial de una plataforma y una sede, sin desarrollo propio.",
   },
   {
     id: "automatizacion", name: "Automatización puntual", category: "Operación",
-    setup: 6900, monthly: 0, from: true,
+    setup: 3900, monthly: 0, from: true,
     detail: "Un flujo definido de avisos, seguimiento o traspaso de datos. Herramientas aparte.",
   },
   {
     id: "seo-local", name: "SEO local y presencia en búsquedas", category: "Presencia",
-    setup: 4900, monthly: 2490, from: true,
+    setup: 2900, monthly: 1990, from: true,
     detail: "Revisión inicial, optimización local y seguimiento mensual. Sin garantía de posiciones.",
   },
   {
     id: "landing", name: "Landing page profesional", category: "Presencia",
-    setup: 8900, monthly: 0, from: false,
+    setup: 5900, monthly: 0, from: false,
     detail: "Diseño móvil, formulario o WhatsApp y SEO técnico inicial. Mantenimiento opcional.",
   },
   {
     id: "web", name: "Sitio web corporativo", category: "Presencia",
-    setup: 18900, monthly: 0, from: true,
+    setup: 14900, monthly: 0, from: true,
     detail: "De cuatro a seis páginas; diseño y funciones según alcance.",
   },
   {
@@ -153,6 +154,10 @@ export type IndividualService = (typeof individualServices)[number];
 
 export const pricingFaqs = [
   {
+    q: "¿Puedo pagar la implementación o un desarrollo único en mensualidades?",
+    a: "Sí, puedes solicitar dividir la implementación en 3 pagos mensuales, o en 6 cuando la implementación base es de al menos $10,000. El total de implementación no cambia en la simulación. Son parcialidades sujetas a confirmación comercial por escrito, NO financiamiento aprobado automáticamente ni cargos automáticos: por separado se cobra cualquier servicio mensual y las herramientas externas. En desarrollos a medida, los pagos también pueden organizarse por entregables aprobados.",
+  },
+  {
     q: "¿SUMA cobra por cada usuario de mi equipo?",
     a: "No añadimos un cargo propio por asiento en la configuración y el seguimiento de CRM de una misma empresa. Si tu CRM usa licencias externas, sus tarifas por usuario se presupuestan aparte. Un CRM desarrollado por SUMA puede cotizarse sin tarifa por usuario interno, con capacidad técnica y uso razonable acordados. Usuarios de equipo no significa mensajes, clientes ni operaciones ilimitadas.",
   },
@@ -162,7 +167,7 @@ export const pricingFaqs = [
   },
   {
     q: "¿Cuánto cuesta cada paquete?",
-    a: "SUMA Ads: $4,900 de implementación y $5,900/mes. SUMA Flow: $9,900 de implementación y $3,900/mes. SUMA Growth: $19,900 de implementación y $8,900/mes. Precios base para una empresa y una sede, antes de IVA, con implementación y primera mensualidad cobradas por separado.",
+    a: "SUMA Ads: $2,900 de implementación y $3,900/mes. SUMA Flow: $5,900 de implementación y $2,900/mes. SUMA Growth: $12,900 de implementación y $6,900/mes. Precios base para una empresa y una sede, antes de IVA, con implementación y primera mensualidad cobradas por separado.",
   },
   {
     q: "¿Puedo contratar solo un servicio?",
@@ -178,6 +183,6 @@ export const pricingFaqs = [
   },
   {
     q: "¿El chatbot de IA está incluido en Flow o Growth?",
-    a: "No. Los planes incluyen estructura de atención o automatizaciones sencillas según su ficha. Los chatbots se cotizan aparte: guiado desde $6,900 de implementación + $1,490/mes, o con IA desde $19,900 + $4,900/mes, más servicios externos.",
+    a: "No. Los planes incluyen estructura de atención o automatizaciones sencillas según su ficha. Los chatbots se cotizan aparte: guiado desde $3,900 de implementación + $1,190/mes, o con IA desde $14,900 + $3,900/mes, más servicios externos.",
   },
 ] as const;

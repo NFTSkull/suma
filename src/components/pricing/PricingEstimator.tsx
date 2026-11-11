@@ -9,7 +9,7 @@ import {
   type PricingPlanId,
 } from "@/content/pricing";
 import { track } from "@/lib/analytics";
-import { estimatePricing, formatMXN, pricingWhatsAppHref, type PricingSelection } from "@/lib/pricing";
+import { availableSetupPayments, estimatePricing, formatMXN, formatMXNExact, pricingWhatsAppHref, type PricingSelection, type SetupPayments } from "@/lib/pricing";
 
 const subscribeToLocation = (onChange: () => void) => {
   window.addEventListener("popstate", onChange);
@@ -42,6 +42,7 @@ export function PricingEstimator() {
   const planId = manualPlanId ?? routePlan;
   const serviceIds = manualServiceIds ?? (routeService ? [routeService] : []);
   const [months, setMonths] = useState(3);
+  const [setupPayments, setSetupPayments] = useState<SetupPayments>(3);
   const [adBudget, setAdBudget] = useState<number>(pricingSettings.defaultAdBudget);
   const [locations, setLocations] = useState(1);
   const [teamUsers, setTeamUsers] = useState(5);
@@ -51,10 +52,11 @@ export function PricingEstimator() {
   const [notes, setNotes] = useState("");
 
   const selection: PricingSelection = {
-    mode, planId, serviceIds, months, adBudget, locations, teamUsers,
+    mode, planId, serviceIds, months, setupPayments, adBudget, locations, teamUsers,
     businessType, goal, platform, notes,
   };
   const quote = estimatePricing(selection);
+  const paymentOptions = availableSetupPayments(quote.setup);
   const included = mode === "package"
     ? planId === "growth" ? ["meta-ads", "crm-gestionado"]
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
@@ -135,6 +137,29 @@ export function PricingEstimator() {
           })}
         </fieldset>
 
+        {quote.setup > 0 && (
+          <fieldset className="mt-7 rounded-2xl border border-white/20 bg-white/5 p-4">
+            <legend className="px-2 text-sm font-bold">Paga la implementación a tu ritmo</legend>
+            <div role="group" aria-label="Pago de implementación" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {paymentOptions.map((count) => (
+                <button key={count} type="button" aria-pressed={quote.setupPayments === count}
+                  onClick={() => setSetupPayments(count)}
+                  className={optionButton + (quote.setupPayments === count
+                    ? " border-suma-orange bg-suma-orange text-suma-navy"
+                    : " border-suma-cream/30 bg-suma-navy hover:border-suma-orange")}>
+                  {count === 1 ? "Un pago" : count + " mensualidades"}
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-suma-cream/70">
+              {quote.setupPayments === 1
+                ? "Una sola implementación, pagada al iniciar."
+                : "Primer abono de implementación " + formatMXNExact(quote.setupInstallment) + ". Último abono " + formatMXNExact(quote.setupFinalInstallment) + ". No cambia el precio total de implementación."}
+              {" "}Las parcialidades están sujetas a un acuerdo comercial por escrito; no son una financiación aprobada ni cobros automáticos.
+            </p>
+          </fieldset>
+        )}
+
         <div className="mt-7 grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="pricing-months" className="text-sm font-bold">Periodo de referencia</label>
@@ -205,13 +230,21 @@ export function PricingEstimator() {
               <p className="mt-7 rounded-xl bg-suma-navy/10 p-4 text-sm">Selecciona al menos un servicio para ver la inversión.</p>
             ) : (
               <>
-                <p className="mt-6 text-sm font-semibold text-suma-navy/65">{quote.isStartingPrice ? "Primer pago estimado desde" : "Primer pago estimado a SUMA"}</p>
-                <p className="mt-2 font-display text-[clamp(2.2rem,4vw,3.4rem)] font-extrabold leading-none tracking-tight tabular-nums">{formatMXN(quote.firstPaymentSuma)}</p>
-                <p className="mt-2 text-xs text-suma-navy/60">Implementación + primer mes de servicios. Antes de IVA.</p>
+                <p className="mt-6 text-sm font-semibold text-suma-navy/65">{quote.isStartingPrice ? "Primer desembolso estimado desde" : "Primer desembolso estimado a SUMA"}</p>
+                <p className="mt-2 font-display text-[clamp(2.2rem,4vw,3.4rem)] font-extrabold leading-none tracking-tight tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
+                <p className="mt-2 text-xs text-suma-navy/60">
+                  {quote.setupPayments === 1 ? "Implementación completa" : "Primera parcialidad de implementación"} + primer mes de servicio, antes de IVA.
+                </p>
+                <p className="mt-2 text-sm font-semibold text-suma-navy/80">
+                  Primer desembolso con IVA general del 16%, si aplica: {formatMXNExact(quote.firstPaymentSuma * 1.16)}
+                </p>
                 <dl className="mt-7 divide-y divide-suma-navy/15 border-y border-suma-navy/15">
                   <div className="flex items-center justify-between gap-3 py-3 text-sm">
                     <dt>Implementación única</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd>
                   </div>
+                  {quote.setupPayments > 1 && <div className="flex items-center justify-between gap-3 py-3 text-sm">
+                    <dt>Implementación: {quote.setupPayments} abonos (primero)</dt><dd className="font-bold tabular-nums">{formatMXNExact(quote.setupInstallment)}</dd>
+                  </div>}
                   <div className="flex items-center justify-between gap-3 py-3 text-sm">
                     <dt>Mensualidad SUMA</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd>
                   </div>
@@ -219,9 +252,13 @@ export function PricingEstimator() {
                     <dt>Pauta mensual externa</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd>
                   </div>}
                 </dl>
-                <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-navy/60">Total a SUMA en {quote.months} {quote.months === 1 ? "mes" : "meses"}</p>
+                <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-navy/60">Costo total SUMA: implementación íntegra + {quote.months} {quote.months === 1 ? "mes de servicio" : "meses de servicio"}</p>
                 <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatMXN(quote.totalSuma)}</p>
+                <p className="mt-2 text-xs text-suma-navy/70">Total de servicios SUMA incluyendo IVA general del 16%, si aplica: {formatMXNExact(quote.totalSuma * 1.16)}.</p>
                 {quote.hasAds && <p className="mt-1 text-xs text-suma-navy/65">+ {formatMXN(quote.totalExternalAds)} de pauta externa estimada en ese periodo.</p>}
+                {quote.setupPayments > 1 && <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">
+                  El costo total incluye todas las parcialidades de implementación, aunque alguna venza después de los {quote.months} {quote.months === 1 ? "mes" : "meses"} elegidos.
+                </p>}
                 {quote.services.length > 0 && <div className="mt-6 border-t border-suma-navy/15 pt-4">
                   <p className="text-xs font-bold uppercase tracking-widest text-suma-navy/60">Servicios elegidos</p>
                   <ul className="mt-2 space-y-1 text-xs text-suma-navy/75">{quote.services.map((s) => <li key={s.id}>✓ {s.name}{s.from ? " (desde)" : ""}</li>)}</ul>
@@ -240,7 +277,7 @@ export function PricingEstimator() {
             </a>
           )}
           <p className="mt-4 text-xs leading-relaxed text-suma-navy/65">
-            Referencia no vinculante, antes de IVA. No incluye licencias, pautas, costos WhatsApp API ni consumos de IA. En CRM de terceros puede haber licencias por usuario; SUMA no agrega tarifas por asiento. Multi-sede e integraciones personalizadas se cotizan tras diagnóstico.
+            Los importes con IVA son orientativos y no constituyen cálculo fiscal personalizado. Modalidad en abonos sujeta a acuerdo escrito; no se financia ni cobra automáticamente. Referencia no vinculante, antes de IVA. No incluye licencias, pautas, costos WhatsApp API ni consumos de IA. En CRM de terceros puede haber licencias por usuario; SUMA no agrega tarifas por asiento. Multi-sede e integraciones personalizadas se cotizan tras diagnóstico.
           </p>
         </div>
       </div>
