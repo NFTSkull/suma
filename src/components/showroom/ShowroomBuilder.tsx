@@ -10,7 +10,7 @@ import {
   type ShowroomExperienceId, type ShowroomIndustryId, type ShowroomPaletteId,
 } from "@/content/showroom";
 import { cn } from "@/lib/cn";
-import { formatMXN } from "@/lib/pricing";
+import { availableSetupPayments, formatMXN, formatMXNExact, type SetupPayments } from "@/lib/pricing";
 import { showroomEstimate, showroomWhatsAppHref, toggleShowroomService, type ShowroomSelection } from "@/lib/showroom";
 import { ShowroomLivePreview } from "./ShowroomLivePreview";
 import { ShowroomImpacto } from "./ShowroomImpacto";
@@ -45,6 +45,7 @@ export function ShowroomBuilder() {
   const [locations, setLocations] = useState(1);
   const [teamUsers, setTeamUsers] = useState(5);
   const [months, setMonths] = useState(1);
+  const [setupPayments, setSetupPayments] = useState<SetupPayments>(3);
   const [adBudget, setAdBudget] = useState(6000);
   const [platform, setPlatform] = useState("WhatsApp / Instagram");
   const [budget, setBudget] = useState("");
@@ -52,10 +53,11 @@ export function ShowroomBuilder() {
   const [availability, setAvailability] = useState("Por definir");
 
   const selection: ShowroomSelection = {
-    businessName, industry, experience, serviceIds, mode, planId, months, adBudget,
+    businessName, industry, experience, serviceIds, mode, planId, months, setupPayments, adBudget,
     locations, teamUsers, platform, budget, notes, availability,
   };
   const quote = showroomEstimate(selection);
+  const paymentOptions = availableSetupPayments(quote.setup);
   const active = showroomExperiences.find((item) => item.id === experience) ?? showroomExperiences[0];
   const activeGoal = guidedGoals.find((goal) => goal.id === guidedGoal) ?? guidedGoals[1];
   const visibleExperiences = showroomExperiences.filter((item) =>
@@ -295,6 +297,27 @@ export function ShowroomBuilder() {
                   {[1, 3, 6, 12].map((number) => <option value={number} key={number}>{number} {number === 1 ? "mes" : "meses"}</option>)}
                 </select></div>
             </div>
+            {quote.setup > 0 && (
+              <fieldset className="rounded-2xl border border-suma-line bg-white p-4 md:p-5">
+                <legend className="px-2 text-sm font-bold text-suma-navy">¿Cómo pagarías la implementación?</legend>
+                <div role="group" aria-label="Pagar implementación" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {paymentOptions.map((count) => (
+                    <button key={count} type="button" aria-pressed={quote.setupPayments === count}
+                      onClick={() => setSetupPayments(count)}
+                      className={"min-h-12 rounded-xl border px-3 text-sm font-bold " +
+                        (quote.setupPayments === count ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-suma-cream-soft text-suma-navy")}>
+                      {count === 1 ? "Un pago" : count + " mensualidades"}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">
+                  {quote.setupPayments === 1
+                    ? "Una sola implementación, pagada al iniciar."
+                    : "Primer abono " + formatMXNExact(quote.setupInstallment) + "; último " + formatMXNExact(quote.setupFinalInstallment) + ". Total de implementación " + formatMXN(quote.setup) + "."}
+                  {" "}Sujeto a acuerdo comercial, sin contratación o cargo automático. La mensualidad del servicio se cobra aparte.
+                </p>
+              </fieldset>
+            )}
             {quote.hasAds && (
               <div><label htmlFor="showroom-ads" className="text-sm font-bold text-suma-navy">Pauta mensual estimada (la pagas a Meta/Google)</label>
                 <select id="showroom-ads" value={adBudget} onChange={(e) => setAdBudget(Number(e.target.value))} className={field}>
@@ -349,11 +372,15 @@ export function ShowroomBuilder() {
                     </details>
                   )}
 
-                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Primer pago {quote.isStartingPrice ? "desde" : ""}</p>
-                  <p className="mt-2 font-display text-[clamp(2.4rem,5vw,3.5rem)] font-extrabold leading-none tabular-nums">{formatMXN(quote.firstPaymentSuma)}</p>
-                  <p className="mt-2 text-xs text-suma-cream/60">Implementación + primera mensualidad, antes de IVA</p>
+                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Primer desembolso {quote.isStartingPrice ? "desde" : ""}</p>
+                  <p className="mt-2 font-display text-[clamp(2.4rem,5vw,3.5rem)] font-extrabold leading-none tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
+                  <p className="mt-2 text-xs text-suma-cream/60">{quote.setupPayments === 1 ? "Implementación íntegra" : "Primer abono de implementación"} + primera mensualidad, antes de IVA.</p>
                   <dl className="mt-5 divide-y divide-white/15 border-y border-white/15 text-sm">
                     <div className="flex justify-between gap-4 py-3"><dt>Implementación (una vez)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd></div>
+                    {quote.setupPayments > 1 && <div className="flex justify-between gap-4 py-3">
+                      <dt>Implementación: abono 1 de {quote.setupPayments}</dt>
+                      <dd className="font-bold tabular-nums">{formatMXNExact(quote.setupInstallment)}</dd>
+                    </div>}
                     <div className="flex justify-between gap-4 py-3"><dt>Mensualidad SUMA</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd></div>
                     {quote.hasAds && <div className="flex justify-between gap-4 py-3"><dt>Pauta mensual (aparte, a Meta/Google)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd></div>}
                     <div className="flex justify-between gap-4 py-3">
@@ -361,11 +388,14 @@ export function ShowroomBuilder() {
                         Primer pago con IVA ({IVA_RATE * 100}%), si aplica{" "}
                         <a href="https://wwwmatnp.sat.gob.mx/articulo/19848/articulo-1" target="_blank" rel="noopener noreferrer" className="text-xs underline decoration-suma-orange underline-offset-4">SAT ↗</a>
                       </dt>
-                      <dd className="font-bold tabular-nums">{formatMXN(quote.firstPaymentSuma * (1 + IVA_RATE))}</dd>
+                      <dd className="font-bold tabular-nums">{formatMXNExact(quote.firstPaymentSuma * (1 + IVA_RATE))}</dd>
                     </div>
-                    <div className="flex justify-between gap-4 py-3"><dt>Total SUMA en {quote.months} {quote.months === 1 ? "mes" : "meses"}</dt><dd className="font-bold tabular-nums">{formatMXN(quote.totalSuma)}</dd></div>
+                    <div className="flex justify-between gap-4 py-3"><dt>SUMA: implementación íntegra + {quote.months} {quote.months === 1 ? "mes de servicio" : "meses de servicio"}</dt><dd className="font-bold tabular-nums">{formatMXN(quote.totalSuma)}</dd></div>
                   </dl>
                   {quote.hasAds && <p className="mt-2 text-xs text-suma-cream/70">+ {formatMXN(quote.totalExternalAds)} de pauta en {quote.months} {quote.months === 1 ? "mes" : "meses"}, pagada directo a la plataforma.</p>}
+                  {quote.setupPayments > 1 && <p className="mt-3 text-xs leading-relaxed text-suma-cream/70">
+                    El costo total incluye el 100% de la implementación, aunque algunos abonos venzan después del periodo elegido. El calendario exacto se confirma antes de contratar.
+                  </p>}
                 </>
               )}
               <p className="mt-4 text-xs leading-relaxed text-suma-cream/65">
