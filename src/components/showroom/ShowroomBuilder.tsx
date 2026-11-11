@@ -405,25 +405,25 @@ export function ShowroomBuilder() {
                 Cambiar mi plan o agregar funciones (opcional)
               </summary>
               <p className="mb-4 mt-2 text-xs text-suma-navy/65">
-                Solo abre esto si quieres comparar otras opciones. Las funciones que probaste se conservan.
+                Solo abre esto si quieres comparar otras opciones. Si cambias de plan, se reinician los extras para evitar cobros sorpresa.
               </p>
             <fieldset>
               <legend className="text-sm font-bold text-suma-navy">¿Cómo prefieres contratar?</legend>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setServiceIds([]); setMode("services"); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "services" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
-                  Por módulos
+                  Servicios por separado
                 </button>
                 <button type="button" aria-pressed={mode === "package"} onClick={() => { if (mode !== "package") setServiceIds([]); setMode("package"); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "package" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
-                  Paquete + extras
+                  Un plan completo
                 </button>
               </div>
             </fieldset>
 
             {mode === "package" && (
               <fieldset>
-                <legend className="text-sm font-bold text-suma-navy">Paquete base</legend>
+                <legend className="text-sm font-bold text-suma-navy">Elige un plan</legend>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {pricingPlans.map((plan) => (
                     <button key={plan.id} type="button" aria-pressed={planId === plan.id} onClick={() => { if (planId !== plan.id) setServiceIds([]); setPlanId(plan.id); }}
@@ -438,7 +438,7 @@ export function ShowroomBuilder() {
             )}
 
             <fieldset>
-              <legend className="text-sm font-bold text-suma-navy">{mode === "package" ? "Extras opcionales" : "Módulos"}</legend>
+              <legend className="text-sm font-bold text-suma-navy">{mode === "package" ? "Funciones adicionales (opcionales)" : "Servicios disponibles"}</legend>
               <p className="mt-1 text-xs text-suma-navy/60">
                 {showAllServices ? "Catálogo completo." : "Recomendados para «" + activeGoal.name.toLowerCase() + "»."} Los importes mínimos son para la versión sencilla de cada servicio.
               </p>
@@ -541,7 +541,7 @@ export function ShowroomBuilder() {
             <div className="rounded-[1.75rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-8">
               <p className="text-eyebrow text-suma-orange">Tu propuesta estimada</p>
               {quote.isEmpty ? (
-                <p className="mt-5 rounded-xl border border-white/15 p-4 text-sm">Elige al menos un módulo para ver cuánto pagarías.</p>
+                <p className="mt-5 rounded-xl border border-white/15 p-4 text-sm">Elige una solución o pídenos una recomendación para conocer el costo.</p>
               ) : (
                 <>
                   <ul aria-label="Lo que estás eligiendo" className="mt-4 space-y-2 text-sm">
@@ -568,17 +568,17 @@ export function ShowroomBuilder() {
                     </details>
                   )}
 
-                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Opción básica · primer pago estimado</p>
+                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Primer pago estimado · desde</p>
                   <p className="mt-2 font-display text-[clamp(2.4rem,5vw,3.5rem)] font-extrabold leading-none tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
                   <p className="mt-2 text-xs text-suma-cream/60">{quote.setupPayments === 1 ? "Implementación íntegra" : "Primer abono de implementación"} + primera mensualidad, antes de IVA.</p>
                   <dl className="mt-5 divide-y divide-white/15 border-y border-white/15 text-sm">
-                    <div className="flex justify-between gap-4 py-3"><dt>Pago inicial (una vez)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd></div>
+                    <div className="flex justify-between gap-4 py-3"><dt>Configuración (pago único)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd></div>
                     {quote.setupPayments > 1 && <div className="flex justify-between gap-4 py-3">
-                      <dt>Implementación: abono 1 de {quote.setupPayments}</dt>
+                      <dt>Configuración: abono 1 de {quote.setupPayments}</dt>
                       <dd className="font-bold tabular-nums">{formatMXNExact(quote.setupInstallment)}</dd>
                     </div>}
-                    <div className="flex justify-between gap-4 py-3"><dt>Servicio mensual</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd></div>
-                    {quote.hasAds && <div className="flex justify-between gap-4 py-3"><dt>Pauta mensual (aparte, a Meta/Google)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd></div>}
+                    <div className="flex justify-between gap-4 py-3"><dt>Servicio mensual de SUMA</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd></div>
+                    {quote.hasAds && <div className="flex justify-between gap-4 py-3"><dt>Presupuesto de anuncios (aparte)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd></div>}
                     <div className="flex justify-between gap-4 py-3">
                       <dt>
                         Primer pago con IVA ({IVA_RATE * 100}%), si aplica{" "}
