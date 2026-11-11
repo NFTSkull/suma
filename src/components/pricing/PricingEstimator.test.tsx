@@ -14,7 +14,7 @@ describe("PricingEstimator", () => {
 
   it("inicia en Flow, cotiza instalación y mensualidad y permite WhatsApp", () => {
     render(<PricingEstimator />);
-    expect(screen.getByRole("button", { name: "SUMA Flow" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /SUMA Flow/ })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(formatMXNExact(4866.67))).toBeInTheDocument();
     expect(screen.getByText(formatMXN(14600))).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "flow");
@@ -22,7 +22,7 @@ describe("PricingEstimator", () => {
 
   it("al elegir Ads separa la pauta del cobro a SUMA", () => {
     render(<PricingEstimator />);
-    fireEvent.click(screen.getByRole("button", { name: "SUMA Ads" }));
+    fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
     expect(screen.getByText(formatMXNExact(4866.67))).toBeInTheDocument();
     expect(screen.getAllByText(formatMXN(6000), { exact: false }).length).toBeGreaterThan(0);
     expect((window as DL).dataLayer).toContainEqual({ event: "pricing_plan_selected", plan: "ads" });
@@ -30,11 +30,38 @@ describe("PricingEstimator", () => {
 
   it("se puede contratar solo una herramienta y seleccionarla en el configurador", () => {
     render(<PricingEstimator />);
-    fireEvent.click(screen.getByRole("button", { name: "Solo servicios" }));
-    expect(screen.getByText(/selecciona al menos un servicio/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("checkbox", { name: "Configurar reservador existente" }));
+    fireEvent.click(screen.getByRole("button", { name: "Elegir funciones" }));
+    expect(screen.getByText(/Elige al menos una función y aquí verás qué incluye/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Configurar tus reservas actuales" }));
     expect(screen.getAllByText(formatMXN(2900), { exact: true }).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
+  });
+
+  it("explica en lenguaje cotidiano qué pasa al cambiar de plan", () => {
+    render(<PricingEstimator />);
+    expect(screen.getAllByText("De una consulta a un siguiente paso claro").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/CRM significa un lugar para organizar/).length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Ver funciones opcionales" })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("checkbox", { name: "Asistente de WhatsApp con IA" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
+    expect(screen.getAllByText("De un anuncio a una consulta").length).toBeGreaterThan(0);
+    expect(screen.getByText(/SUMA no responde los mensajes/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Ver funciones opcionales" }));
+    expect(screen.getByRole("checkbox", { name: "Organizar clientes y dar seguimiento (CRM)" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes y dar seguimiento (CRM)" }));
+    expect(screen.getByText(/También elegiste:/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1 extra seleccionado" })).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("reinicia extras al cambiar de plan para comparar precios base sin sorpresas", () => {
+    render(<PricingEstimator />);
+    fireEvent.click(screen.getByRole("button", { name: "Ver funciones opcionales" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" }));
+    expect(screen.getByRole("button", { name: "1 extra seleccionado" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
+    expect(screen.queryByRole("button", { name: "0 extra seleccionado" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ver funciones opcionales" })).toBeInTheDocument();
+    expect(screen.getAllByText(/De un anuncio a una consulta/).length).toBeGreaterThan(0);
   });
 
   it("ofrece un pago o 3 abonos y aclara el total del contrato", () => {
@@ -57,7 +84,7 @@ describe("PricingEstimator", () => {
   it("entra al configurador con el servicio elegido desde la tarjeta", () => {
     window.history.replaceState({}, "", "/precios?servicio=chatbot-ia#simulador");
     render(<PricingEstimator />);
-    expect(screen.getByRole("button", { name: "Solo servicios" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Elegir funciones" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" })).toBeChecked();
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
   });

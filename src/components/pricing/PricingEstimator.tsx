@@ -9,6 +9,7 @@ import {
   type PricingPlanId,
 } from "@/content/pricing";
 import { track } from "@/lib/analytics";
+import { describeSelectedServices, planStories } from "@/content/sales-clarity";
 import { availableSetupPayments, estimatePricing, formatMXN, formatMXNExact, pricingWhatsAppHref, type PricingSelection, type SetupPayments } from "@/lib/pricing";
 
 const subscribeToLocation = (onChange: () => void) => {
@@ -38,6 +39,7 @@ export function PricingEstimator() {
   const [manualMode, setManualMode] = useState<"package" | "services" | null>(null);
   const [manualPlanId, setManualPlanId] = useState<PricingPlanId | null>(null);
   const [manualServiceIds, setManualServiceIds] = useState<IndividualServiceId[] | null>(null);
+  const [showExtras, setShowExtras] = useState(false);
   const mode = manualMode ?? (routeService ? "services" : "package");
   const planId = manualPlanId ?? routePlan;
   const serviceIds = manualServiceIds ?? (routeService ? [routeService] : []);
@@ -47,7 +49,7 @@ export function PricingEstimator() {
   const [locations, setLocations] = useState(1);
   const [teamUsers, setTeamUsers] = useState(5);
   const [businessType, setBusinessType] = useState("Pilates / yoga");
-  const [goal, setGoal] = useState("Atraer más clientes");
+  const [goal, setGoal] = useState(planStories.flow.goal);
   const [platform, setPlatform] = useState("WhatsApp");
   const [notes, setNotes] = useState("");
 
@@ -57,6 +59,9 @@ export function PricingEstimator() {
   };
   const quote = estimatePricing(selection);
   const paymentOptions = availableSetupPayments(quote.setup);
+  const story = planStories[planId];
+  const chosenDetails = describeSelectedServices(quote.services.map((service) => service.id));
+  const selectedExtras = quote.services.length;
   const included = mode === "package"
     ? planId === "growth" ? ["meta-ads", "crm-gestionado"]
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
@@ -69,50 +74,79 @@ export function PricingEstimator() {
     });
 
   return (
-    <div className="grid gap-8 rounded-[2rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-9 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 lg:p-12">
-      <div>
+    <div className="grid min-w-0 gap-8 rounded-[2rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-9 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] xl:gap-10 xl:p-10">
+      <div className="min-w-0">
         <p className="text-eyebrow text-suma-orange">Tu solución, a tu medida</p>
         <h3 className="mt-3 font-display text-3xl font-bold leading-tight md:text-4xl">Elige lo que necesitas. Conoce la inversión.</h3>
         <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
-          Paquete completo o servicios individuales. El precio se actualiza aquí y llevamos tu selección a WhatsApp para afinar el alcance.
+          Primero elige qué quieres resolver. Al cambiar tu plan o agregar una función, verás cómo cambia la propuesta y cuánto pagarías. Sin contratar todavía.
         </p>
 
         <fieldset className="mt-8">
-          <legend className="mb-3 text-sm font-bold">1. ¿Cómo prefieres contratar?</legend>
+          <legend className="mb-3 text-sm font-bold">1. ¿Prefieres una solución lista o elegir cada función?</legend>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" aria-pressed={mode === "package"} onClick={() => setManualMode("package")}
+            <button type="button" aria-pressed={mode === "package"} onClick={() => { if (mode !== "package") setManualServiceIds([]); setManualMode("package"); }}
               className={optionButton + (mode === "package" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
-              Elegir un paquete
+              Un plan recomendado
             </button>
-            <button type="button" aria-pressed={mode === "services"} onClick={() => setManualMode("services")}
+            <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setManualServiceIds([]); setManualMode("services"); }}
               className={optionButton + (mode === "services" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
-              Solo servicios
+              Elegir funciones
             </button>
           </div>
         </fieldset>
 
         {mode === "package" && (
           <fieldset className="mt-6">
-            <legend className="mb-3 text-sm font-bold">2. Punto de partida</legend>
+            <legend className="mb-3 text-sm font-bold">2. ¿Qué necesitas mejorar?</legend>
             <div className="grid gap-2 sm:grid-cols-3">
               {pricingPlans.map((plan) => (
                 <button key={plan.id} type="button" aria-pressed={planId === plan.id}
                   onClick={() => {
+                    if (plan.id !== planId) setManualServiceIds([]);
                     setManualPlanId(plan.id);
+                    setGoal(planStories[plan.id].goal);
                     track({ event: "pricing_plan_selected", plan: plan.id });
                   }}
                   className={optionButton + (planId === plan.id ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
-                  {plan.name}
+                  <span className="block">{plan.name}</span>
+                  <span className="mt-1 block text-xs font-normal leading-snug opacity-80">{planStories[plan.id].goal}</span>
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-xs text-suma-cream/65">Si cambias de plan, se reinician los complementos para comparar solo el precio base.</p>
           </fieldset>
         )}
 
+        <div aria-live="polite" className="mt-5 rounded-2xl border border-suma-cream/25 bg-white/10 p-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-suma-orange">En palabras sencillas</p>
+          {mode === "package" ? (
+            <>
+              <p className="mt-2 text-base font-bold text-white">{story.title}</p>
+              <p className="mt-1 text-sm leading-relaxed text-suma-cream/80">{story.intro}</p>
+            </>
+          ) : quote.isEmpty ? (
+            <p className="mt-2 text-sm leading-relaxed text-suma-cream/80">Marca una función y te explicaremos qué obtendrías con ella.</p>
+          ) : (
+            <p className="mt-2 text-sm leading-relaxed text-suma-cream/80">{chosenDetails.join(" ")}</p>
+          )}
+        </div>
+
         <fieldset className="mt-7">
-          <legend className="mb-1 text-sm font-bold">{mode === "package" ? "3. Complementa tu paquete (opcional)" : "2. Elige uno o varios servicios"}</legend>
-          <p className="mb-4 text-xs text-suma-cream/65">Los módulos incluidos en un paquete no se cobran de nuevo. Los importes «desde» son referencias mínimas.</p>
-          {categories.map((category) => {
+          <legend className="mb-1 text-sm font-bold">{mode === "package" ? "3. ¿Necesitas alguna función adicional?" : "2. ¿Qué quieres que hagamos por tu negocio?"}</legend>
+          <p className="mb-3 text-xs text-suma-cream/65">
+            {mode === "package"
+              ? "Tu paquete ya incluye lo esencial. Agrega algo solo si realmente lo necesitas; nunca cobramos dos veces lo incluido."
+              : "Selecciona una o varias opciones. La propuesta a la derecha cambia al momento."}
+          </p>
+          {mode === "package" && (
+            <button type="button" aria-expanded={showExtras} onClick={() => setShowExtras((value) => !value)}
+              className="mb-4 flex min-h-12 w-full items-center justify-between gap-2 rounded-xl border border-white/35 bg-white/10 px-4 text-left text-sm font-bold transition-colors hover:border-suma-orange">
+              <span>{selectedExtras > 0 ? selectedExtras + (selectedExtras === 1 ? " extra seleccionado" : " extras seleccionados") : "Ver funciones opcionales"}</span>
+              <span aria-hidden="true">{showExtras ? "−" : "+"}</span>
+            </button>
+          )}
+          {(mode === "services" || showExtras) && categories.map((category) => {
             const services = individualServices.filter((s) => s.category === category && !included.includes(s.id));
             if (!services.length) return null;
             return (
@@ -125,8 +159,11 @@ export function PricingEstimator() {
                         onChange={(e) => toggleService(s.id, e.target.checked)} aria-label={s.name}/>
                       <span className="text-sm">
                         <strong className="block leading-snug">{s.name}</strong>
-                        <span className="mt-1 block text-xs text-suma-cream/70">
-                          {s.from ? "Desde " : ""}{formatMXN(s.setup || s.monthly)}{s.setup === 0 ? "/mes" : s.monthly ? " inicial + " + formatMXN(s.monthly) + "/mes" : " · pago único"}
+                        <span className="mt-1 block text-xs text-suma-cream/75">
+                          {s.detail}
+                        </span>
+                        <span className="mt-2 block text-xs font-bold text-suma-orange">
+                          {s.from ? "Desde " : ""}{formatMXN(s.setup || s.monthly)}{s.setup === 0 ? "/mes" : s.monthly ? " una vez + " + formatMXN(s.monthly) + "/mes" : " · una vez"}
                         </span>
                       </span>
                     </label>
@@ -188,9 +225,9 @@ export function PricingEstimator() {
             </select>
           </div>
           <div>
-            <label htmlFor="pricing-goal" className="text-sm font-bold">Tu prioridad</label>
+            <label htmlFor="pricing-goal" className="text-sm font-bold">¿Cuál es tu prioridad?</label>
             <select id="pricing-goal" className={selectStyle} value={goal} onChange={(e) => setGoal(e.target.value)}>
-              {["Atraer más clientes", "Responder consultas", "Organizar clientes / CRM", "Evitar oportunidades sin seguimiento", "Publicidad + atención + seguimiento", "Desarrollo a medida"].map((n) => <option key={n}>{n}</option>)}
+              {["Quiero que más personas me conozcan", "Quiero ordenar los mensajes y no olvidar seguimientos", "Quiero atraer interesados y organizar su atención", "Atraer más clientes", "Responder consultas", "Organizar clientes / CRM", "Evitar oportunidades sin seguimiento", "Publicidad + atención + seguimiento", "Desarrollo a medida"].map((n) => <option key={n}>{n}</option>)}
             </select>
           </div>
           <div>
@@ -219,7 +256,7 @@ export function PricingEstimator() {
         </div>
       </div>
 
-      <div className="lg:sticky lg:top-24 lg:self-start">
+      <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
         <div className="rounded-[1.5rem] bg-suma-cream p-6 text-suma-navy md:p-8">
           <div aria-live="polite" aria-atomic="true">
             <p className="text-eyebrow text-suma-purple">{mode === "package" ? quote.plan.name : "Mi selección"}</p>
@@ -227,9 +264,41 @@ export function PricingEstimator() {
               {mode === "services" ? "Servicios independientes" : "Paquete base"} · {quote.locations} {quote.locations === 1 ? "sede" : "sedes"} · {quote.teamUsers} integrantes
             </p>
             {quote.isEmpty ? (
-              <p className="mt-7 rounded-xl bg-suma-navy/10 p-4 text-sm">Selecciona al menos un servicio para ver la inversión.</p>
+              <p className="mt-7 rounded-xl bg-suma-navy/10 p-4 text-sm">Elige al menos una función y aquí verás qué incluye y cuánto pagarías.</p>
             ) : (
               <>
+                <div className="mt-5 rounded-2xl border border-suma-navy/10 bg-white p-4">
+                  <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Así funcionaría lo que elegiste</p>
+                  {mode === "package" ? (
+                    <>
+                      <h4 className="mt-2 font-display text-base font-extrabold text-suma-navy">{story.title}</h4>
+                      <p className="mt-1 text-xs leading-relaxed text-suma-navy/70">{story.intro}</p>
+                      <ol className="mt-3 space-y-2">
+                        {story.steps.map((step, index) => (
+                          <li key={step} className="flex gap-2 text-xs leading-relaxed text-suma-navy/85">
+                            <span className="font-bold text-suma-purple">{index + 1}.</span>{step}
+                          </li>
+                        ))}
+                      </ol>
+                      {chosenDetails.length > 0 && (
+                        <p className="mt-3 border-t border-suma-line pt-3 text-xs text-suma-navy/75">
+                          <strong>También elegiste:</strong> {chosenDetails.join(" ")}
+                        </p>
+                      )}
+                      <p className="mt-3 text-xs leading-relaxed text-suma-navy/60">{story.boundary}</p>
+                    </>
+                  ) : (
+                    <>
+                      <h4 className="mt-2 font-display text-base font-extrabold text-suma-navy">Tu solución, sin complicaciones</h4>
+                      <ul className="mt-2 space-y-2">
+                        {chosenDetails.map((detail) => (
+                          <li key={detail} className="text-xs leading-relaxed text-suma-navy/80">✓ {detail}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-3 text-xs leading-relaxed text-suma-navy/60">Las conexiones reales dependen de permisos, herramientas y el alcance confirmado.</p>
+                    </>
+                  )}
+                </div>
                 <p className="mt-6 text-sm font-semibold text-suma-navy/65">{quote.isStartingPrice ? "Primer desembolso estimado desde" : "Primer desembolso estimado a SUMA"}</p>
                 <p className="mt-2 font-display text-[clamp(2.2rem,4vw,3.4rem)] font-extrabold leading-none tracking-tight tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
                 <p className="mt-2 text-xs text-suma-navy/60">

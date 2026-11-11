@@ -16,7 +16,7 @@ describe("ShowroomBuilder", () => {
     fireEvent.change(screen.getByLabelText("Nombre de tu negocio"), { target: { value: "Casa Luz" } });
     expect(screen.getByText("Casa Luz")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Chatbot para WhatsApp/i }));
-    expect(screen.getByText(/Prueba una conversación de ejemplo/i)).toBeInTheDocument();
+    expect(screen.getByText(/Haz clic en una pregunta/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Añadir a mi propuesta +" }));
     expect(screen.getByRole("status")).toHaveTextContent("Ya está en tu propuesta");
     expect(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" })).toBeChecked();
@@ -29,16 +29,16 @@ describe("ShowroomBuilder", () => {
     expect(screen.getAllByText(formatMXNExact(4866.67)).length).toBeGreaterThan(0);
     fireEvent.change(screen.getByLabelText("Personas del equipo"), { target: { value: "50" } });
     expect(screen.getAllByText(formatMXNExact(4866.67)).length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
+    fireEvent.click(screen.getByRole("button", { name: "Plan + opciones" }));
     expect(screen.getAllByText(formatMXNExact(4866.67)).length).toBeGreaterThan(0);
-    expect(screen.queryByRole("checkbox", { name: "CRM + seguimiento administrado" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "Organizar clientes y dar seguimiento (CRM)" })).not.toBeInTheDocument();
     expect(screen.getByText(/Qué incluye SUMA Flow/)).toBeInTheDocument();
   });
 
   it("desglosa lo que se compra, muestra el IVA y explica qué incluye cada módulo elegido", () => {
     render(<ShowroomBuilder />);
-    expect(within(summary()).getByText("CRM + seguimiento administrado")).toBeInTheDocument();
-    expect(screen.getByText(/Configurar un CRM existente, un embudo/)).toBeInTheDocument();
+    expect(within(summary()).getByText("Organizar clientes y dar seguimiento (CRM)")).toBeInTheDocument();
+    expect(screen.getByText(/Organizamos quién te escribe/)).toBeInTheDocument();
     // ($5,900 / 3 + $2,900) × 1.16, con redondeo de centavos
     expect(screen.getByText(formatMXNExact(5645.34))).toBeInTheDocument();
     for (const step of ["Descubrimos", "Diseñamos", "Construimos", "Evolucionamos"]) {
@@ -50,10 +50,34 @@ describe("ShowroomBuilder", () => {
     render(<ShowroomBuilder />);
     // «Responder mejor» → CRM, chatbot con IA y automatización.
     expect(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" })).not.toBeChecked();
-    expect(screen.getByRole("checkbox", { name: "Automatización puntual" })).toBeInTheDocument();
-    expect(screen.queryByRole("checkbox", { name: "Aplicación móvil a medida" })).not.toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Automatizar una tarea repetitiva" })).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "Aplicación móvil para tu negocio" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Ver los 13 módulos/ }));
-    expect(screen.getByRole("checkbox", { name: "Aplicación móvil a medida" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Aplicación móvil para tu negocio" })).toBeInTheDocument();
+  });
+
+  it("sincroniza automáticamente la demo al elegir otra función sin cambiar los precios base", () => {
+    render(<ShowroomBuilder />);
+    expect(screen.getByText("Tus consultas · ejemplo de CRM")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" }));
+    expect(screen.getByText(/Asistente · escenario ilustrativo/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Chatbot para WhatsApp/i })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Atraer más clientes" }));
+    expect(screen.getByRole("button", { name: /Campañas digitales/i })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.change(screen.getByLabelText("Personas del equipo"), { target: { value: "10" } });
+    fireEvent.click(screen.getByRole("button", { name: "Responder mejor" }));
+    expect(screen.getByText(/Equipo · 10 personas/)).toBeInTheDocument();
+  });
+
+  it("si elige un paquete, cambia lo que verá en la demo y la explicación de su propuesta", () => {
+    render(<ShowroomBuilder />);
+    fireEvent.click(screen.getByRole("button", { name: "Plan + opciones" }));
+    fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
+    expect(screen.getByText("De un anuncio a una consulta")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Campañas digitales/i })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: /SUMA Flow/ }));
+    expect(screen.getByText("De una consulta a un siguiente paso claro")).toBeInTheDocument();
+    expect(screen.getByText("Tus consultas · ejemplo de CRM")).toBeInTheDocument();
   });
 
   it("el periodo del simulador y el de la propuesta son el mismo", () => {
@@ -79,7 +103,7 @@ describe("ShowroomBuilder", () => {
     render(<ShowroomBuilder />);
     const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
     expect(href).toMatch(/^https:\/\/wa\.me\/528114688882\?text=/);
-    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("CRM + seguimiento administrado");
+    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("Organizar clientes y dar seguimiento (CRM)");
     expect(screen.getByText(/Esta solicitud no agenda automáticamente una cita/i)).toBeInTheDocument();
   });
 
@@ -127,7 +151,7 @@ describe("ShowroomBuilder · analítica GA4", () => {
   it("los cambios de propuesta se agrupan en un solo evento sin importes ni notas", () => {
     vi.useFakeTimers();
     render(<ShowroomBuilder />);
-    fireEvent.click(screen.getByRole("checkbox", { name: "Automatización puntual" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Automatizar una tarea repetitiva" }));
     fireEvent.change(screen.getByLabelText("Periodo"), { target: { value: "6" } });
     fireEvent.change(screen.getByLabelText("Algo más (opcional)"), { target: { value: "Tengo Fitco" } });
     expect(layer()).toEqual([]);
@@ -139,7 +163,7 @@ describe("ShowroomBuilder · analítica GA4", () => {
   it("en paquete solo cuenta los módulos extra que se cobran", () => {
     vi.useFakeTimers();
     render(<ShowroomBuilder />);
-    fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
+    fireEvent.click(screen.getByRole("button", { name: "Plan + opciones" }));
     act(() => vi.advanceTimersByTime(1600));
     expect(layer()).toEqual([{ event: "showroom_quote_updated", mode: "package", plan: "flow", services_count: 0, months: 1 }]);
   });
