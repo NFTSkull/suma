@@ -7,7 +7,7 @@ import type { Faq, Service } from "@/types/content";
 export const absoluteUrl = (path: string) => `${site.url}${path === "/" ? "" : path}`;
 
 export const HOME_SEO = {
-  title: "SUMA STUDIO · Tecnología para negocios de bienestar en Monterrey",
+  title: "CRM y automatización wellness en Monterrey | SUMA STUDIO",
   description:
     "Chatbots, CRM, apps, páginas web y publicidad digital para estudios de yoga y pilates, spas y marcas wellness. Desde Monterrey para todo México.",
   path: "/",
