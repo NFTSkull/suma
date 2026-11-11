@@ -49,7 +49,7 @@ export function PricingEstimator() {
   const [locations, setLocations] = useState(1);
   const [teamUsers, setTeamUsers] = useState(5);
   const [businessType, setBusinessType] = useState("Pilates / yoga");
-  const [goal, setGoal] = useState("Atraer más clientes");
+  const [goal, setGoal] = useState(planStories.flow.goal);
   const [platform, setPlatform] = useState("WhatsApp");
   const [notes, setNotes] = useState("");
 
@@ -74,8 +74,8 @@ export function PricingEstimator() {
     });
 
   return (
-    <div className="grid gap-8 rounded-[2rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-9 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 lg:p-12">
-      <div>
+    <div className="grid min-w-0 gap-8 rounded-[2rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-9 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] xl:gap-10 xl:p-10">
+      <div className="min-w-0">
         <p className="text-eyebrow text-suma-orange">Tu solución, a tu medida</p>
         <h3 className="mt-3 font-display text-3xl font-bold leading-tight md:text-4xl">Elige lo que necesitas. Conoce la inversión.</h3>
         <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
@@ -240,7 +240,7 @@ export function PricingEstimator() {
         </div>
       </div>
 
-      <div className="lg:sticky lg:top-24 lg:self-start">
+      <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
         <div className="rounded-[1.5rem] bg-suma-cream p-6 text-suma-navy md:p-8">
           <div aria-live="polite" aria-atomic="true">
             <p className="text-eyebrow text-suma-purple">{mode === "package" ? quote.plan.name : "Mi selección"}</p>
