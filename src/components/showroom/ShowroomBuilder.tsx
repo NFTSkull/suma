@@ -273,13 +273,13 @@ export function ShowroomBuilder() {
             {personalizeField === 2 && (
               <div>
                 <p id="showroom-color-label" className="text-sm font-bold text-suma-navy">Toca los colores que más te gusten</p>
-                <div role="group" aria-labelledby="showroom-color-label" className="mt-3 grid gap-3 sm:grid-cols-3">
+                <div role="group" aria-labelledby="showroom-color-label" className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
                   {showroomPalettes.map((item) => {
                     const selected = item.id === paletteId;
                     return (
                       <button key={item.id} type="button" aria-label={"Elegir colores " + item.label}
                         aria-pressed={selected} onClick={() => setPaletteId(item.id)}
-                        className={cn("min-h-32 rounded-2xl border-2 bg-white p-3 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-suma-orange",
+                        className={cn("min-h-28 rounded-2xl border-2 bg-white p-2 text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-suma-orange sm:min-h-32 sm:p-3",
                           selected ? "border-suma-purple shadow-md ring-2 ring-suma-purple/15" : "border-suma-line hover:border-suma-purple/60")}>
                         <span className="flex gap-1.5" aria-hidden="true">
                           <span className={item.base + " h-9 min-w-0 flex-1 rounded-lg border border-black/10"} />
@@ -289,11 +289,14 @@ export function ShowroomBuilder() {
                         <span className="mt-3 block text-sm font-extrabold text-suma-navy">
                           {item.label} {selected ? "✓" : ""}
                         </span>
-                        <span className="mt-1 block text-xs leading-relaxed text-suma-navy/65">{paletteDescriptions[item.id]}</span>
+                        <span className="mt-1 hidden text-xs leading-relaxed text-suma-navy/65 sm:block">{paletteDescriptions[item.id]}</span>
                       </button>
                     );
                   })}
                 </div>
+                <p aria-live="polite" className="mt-3 text-xs font-medium text-suma-navy/75">
+                  Elegiste <strong>{selectedPalette.label}</strong>: {paletteDescriptions[paletteId]}
+                </p>
                 <div aria-live="polite" className="mt-5 overflow-hidden rounded-2xl border border-suma-line bg-white">
                   <div className={selectedPalette.base + " px-5 py-4 text-white"}>
                     <p className="text-[0.7rem] font-semibold uppercase tracking-wider text-white/75">Vista previa de los colores elegidos</p>
