@@ -41,8 +41,8 @@ export function PricingEstimator() {
   const mode = manualMode ?? (routeService ? "services" : "package");
   const planId = manualPlanId ?? routePlan;
   const serviceIds = manualServiceIds ?? (routeService ? [routeService] : []);
-  const [months, setMonths] = useState(3);
-  const [setupPayments, setSetupPayments] = useState<SetupPayments>(3);
+  const [months, setMonths] = useState<number>(pricingSettings.defaultMonths);
+  const [setupPayments, setSetupPayments] = useState<SetupPayments>(pricingSettings.defaultSetupPayments);
   const [adBudget, setAdBudget] = useState<number>(pricingSettings.defaultAdBudget);
   const [locations, setLocations] = useState(1);
   const [teamUsers, setTeamUsers] = useState(5);
@@ -80,11 +80,11 @@ export function PricingEstimator() {
         <fieldset className="mt-8">
           <legend className="mb-3 text-sm font-bold">1. ¿Cómo prefieres contratar?</legend>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" aria-pressed={mode === "package"} onClick={() => setManualMode("package")}
+            <button type="button" aria-pressed={mode === "package"} onClick={() => { if (mode !== "package") setManualServiceIds([]); setManualMode("package"); }}
               className={optionButton + (mode === "package" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
               Elegir un paquete
             </button>
-            <button type="button" aria-pressed={mode === "services"} onClick={() => setManualMode("services")}
+            <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setManualServiceIds([]); setManualMode("services"); }}
               className={optionButton + (mode === "services" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
               Solo servicios
             </button>
@@ -98,6 +98,7 @@ export function PricingEstimator() {
               {pricingPlans.map((plan) => (
                 <button key={plan.id} type="button" aria-pressed={planId === plan.id}
                   onClick={() => {
+                    if (plan.id !== planId) setManualServiceIds([]);
                     setManualPlanId(plan.id);
                     track({ event: "pricing_plan_selected", plan: plan.id });
                   }}
