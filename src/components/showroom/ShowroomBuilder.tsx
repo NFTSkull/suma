@@ -41,12 +41,13 @@ export function ShowroomBuilder() {
   const [showAllServices, setShowAllServices] = useState(false);
   const [mode, setMode] = useState<"services" | "package">("services");
   const [planId, setPlanId] = useState<PricingPlanId>("flow");
-  const [serviceIds, setServiceIds] = useState<IndividualServiceId[]>(["crm-gestionado"]);
+  // La demo inicial es ilustrativa, no una selección de compra.
+  const [serviceIds, setServiceIds] = useState<IndividualServiceId[]>([]);
   const [locations, setLocations] = useState(1);
   const [teamUsers, setTeamUsers] = useState(5);
-  const [months, setMonths] = useState(1);
-  const [setupPayments, setSetupPayments] = useState<SetupPayments>(3);
-  const [adBudget, setAdBudget] = useState(6000);
+  const [months, setMonths] = useState<number>(pricingSettings.defaultMonths);
+  const [setupPayments, setSetupPayments] = useState<SetupPayments>(pricingSettings.defaultSetupPayments);
+  const [adBudget, setAdBudget] = useState<number>(pricingSettings.defaultAdBudget);
   const [platform, setPlatform] = useState("WhatsApp / Instagram");
   const [budget, setBudget] = useState("");
   const [notes, setNotes] = useState("");
@@ -202,7 +203,12 @@ export function ShowroomBuilder() {
         </div>
       </section>
 
-      <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
+      <div className="space-y-3">
+        <p className="mx-auto max-w-4xl text-center text-sm leading-relaxed text-suma-navy/70">
+          El cálculo es opcional. Primero elige una solución; si aún no sabes cuál, puedes solicitar una recomendación.
+        </p>
+        <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
+      </div>
 
       <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
         <div className="mb-7">
@@ -215,11 +221,11 @@ export function ShowroomBuilder() {
             <fieldset>
               <legend className="text-sm font-bold text-suma-navy">¿Cómo prefieres contratar?</legend>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}
+                <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setServiceIds([]); setMode("services"); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "services" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
                   Por módulos
                 </button>
-                <button type="button" aria-pressed={mode === "package"} onClick={() => setMode("package")}
+                <button type="button" aria-pressed={mode === "package"} onClick={() => { if (mode !== "package") setServiceIds([]); setMode("package"); }}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "package" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
                   Paquete + extras
                 </button>
@@ -231,7 +237,7 @@ export function ShowroomBuilder() {
                 <legend className="text-sm font-bold text-suma-navy">Paquete base</legend>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {pricingPlans.map((plan) => (
-                    <button key={plan.id} type="button" aria-pressed={planId === plan.id} onClick={() => setPlanId(plan.id)}
+                    <button key={plan.id} type="button" aria-pressed={planId === plan.id} onClick={() => { if (planId !== plan.id) setServiceIds([]); setPlanId(plan.id); }}
                       className={"min-h-14 rounded-xl border p-2 text-sm font-bold " + (planId === plan.id ? "border-suma-purple bg-suma-purple text-white" : "border-suma-line bg-white text-suma-navy")}>
                       <span className="block">{plan.name}</span>
                       <span className={"block text-[0.7rem] font-semibold " + (planId === plan.id ? "text-white/75" : "text-suma-navy/60")}>{plan.label}</span>
