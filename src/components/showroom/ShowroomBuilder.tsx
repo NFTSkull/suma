@@ -30,6 +30,17 @@ const paletteDescriptions: Record<ShowroomPaletteId, string> = {
   almendra: "Café, beige y arena. Cálido y natural.",
   salvia: "Verde, blanco suave y salvia. Tranquilo y fresco.",
 };
+const friendlyDemoTitles: Record<ShowroomExperienceId, string> = {
+  crm: "Ordenar mensajes de clientes",
+  chatbot: "Responder dudas por WhatsApp",
+  ads: "Crear anuncios para mi negocio",
+  reservas: "Mostrar horarios y reservas",
+  web: "Cómo se vería mi página",
+  automatizacion: "Avisos y recordatorios",
+  app: "Aplicación para alumnos",
+  seo: "Aparecer en búsquedas de Google",
+  "crm-medida": "Un programa propio para mi negocio",
+};
 const simpleDemoExplanations: Record<ShowroomExperienceId, string> = {
   crm: "Mira cómo tu equipo sabría quién preguntó por una clase y quién falta por atender.",
   chatbot: "Prueba qué respuestas podría recibir alguien que pregunta por WhatsApp.",
@@ -68,6 +79,17 @@ const priceLine = (service: (typeof individualServices)[number]) =>
 
 export function ShowroomBuilder() {
   const [stage, setStage] = useState<WizardStage>("welcome");
+  // El botón de la portada inicia el tutorial directamente, sin pedir un segundo clic.
+  useEffect(() => {
+    const startFromHero = () => {
+      if (window.location.hash === "#showroom-wizard") {
+        setStage((current) => current === "welcome" ? "personalize" : current);
+      }
+    };
+    startFromHero();
+    window.addEventListener("hashchange", startFromHero);
+    return () => window.removeEventListener("hashchange", startFromHero);
+  }, []);
   const [personalizeField, setPersonalizeField] = useState(0);
   const activeWizardIndex = wizardLabels.findIndex((item) => item.stage === stage);
   const goTo = (next: WizardStage) => setStage(next);
@@ -347,7 +369,7 @@ export function ShowroomBuilder() {
                     ? "border-suma-orange bg-suma-orange text-suma-navy"
                     : "border-white/20 bg-white/5 text-white hover:border-white/60")}>
                 <span className="block text-xs font-semibold opacity-75">{experience === item.id ? "✓ Estás viendo esta opción" : "Toca para ver el ejemplo"}</span>
-                <span className="mt-1 block text-sm font-bold leading-tight">{item.title}</span>
+                <span className="mt-1 block text-sm font-bold leading-tight">{friendlyDemoTitles[item.id]}</span>
               </button>
             ))}
           </div>
@@ -360,7 +382,7 @@ export function ShowroomBuilder() {
 
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">3 · AHORA ESTÁS PROBANDO</p>
-          <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
+          <p className="mt-2 font-display text-xl font-bold text-suma-navy">{friendlyDemoTitles[experience]}</p>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/80">{simpleDemoExplanations[experience]}</p>
           <p className="mt-3 rounded-xl bg-suma-purple/5 p-3 text-sm font-semibold leading-relaxed text-suma-purple">
             Pruébalo tú: {demoHints[experience]}
