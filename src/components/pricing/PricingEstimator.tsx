@@ -74,7 +74,7 @@ export function PricingEstimator() {
         <p className="text-eyebrow text-suma-orange">Tu solución, a tu medida</p>
         <h3 className="mt-3 font-display text-3xl font-bold leading-tight md:text-4xl">Elige lo que necesitas. Conoce la inversión.</h3>
         <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
-          Elige lo que necesitas. Mostramos cuánto cuesta empezar y un rango orientativo; antes de cobrarte confirmamos el precio final.
+          Elige un plan o servicio. Verás cuánto cuesta la opción básica y un rango según lo que necesites.
         </p>
 
         <fieldset className="mt-8">
@@ -111,7 +111,7 @@ export function PricingEstimator() {
 
         <fieldset className="mt-7">
           <legend className="mb-1 text-sm font-bold">{mode === "package" ? "3. Complementa tu paquete (opcional)" : "2. Elige uno o varios servicios"}</legend>
-          <p className="mb-4 text-xs text-suma-cream/65">No cobramos dos veces lo que ya incluye un plan. Todos los precios son «desde»: dependen de lo que necesites.</p>
+          <p className="mb-4 text-xs text-suma-cream/65">No cobramos dos veces lo que ya trae un plan. Los importes mostrados corresponden a una opción básica.</p>
           {categories.map((category) => {
             const services = individualServices.filter((s) => s.category === category && !included.includes(s.id));
             if (!services.length) return null;
@@ -126,7 +126,7 @@ export function PricingEstimator() {
                       <span className="text-sm">
                         <strong className="block leading-snug">{s.name}</strong>
                         <span className="mt-1 block text-xs text-suma-cream/70">
-                          Desde {formatMXN(s.setup || s.monthly)}{s.setup === 0 ? "/mes" : s.monthly ? " inicial + desde " + formatMXN(s.monthly) + "/mes" : " · pago único"}
+                          {formatMXN(s.setup || s.monthly)}{s.setup === 0 ? "/mes" : s.monthly ? " inicial · " + formatMXN(s.monthly) + "–" + formatMXN(s.monthlyMax) + "/mes" : " · pago único"}
                         </span>
                       </span>
                     </label>
@@ -230,7 +230,7 @@ export function PricingEstimator() {
               <p className="mt-7 rounded-xl bg-suma-navy/10 p-4 text-sm">Selecciona al menos un servicio para ver la inversión.</p>
             ) : (
               <>
-                <p className="mt-6 text-sm font-semibold text-suma-navy/65">{quote.isStartingPrice ? "Para empezar, desde" : "Para empezar, desde"}</p>
+                <p className="mt-6 text-sm font-semibold text-suma-navy/65">Opción básica · primer pago estimado</p>
                 <p className="mt-2 font-display text-[clamp(2.2rem,4vw,3.4rem)] font-extrabold leading-none tracking-tight tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
                 <p className="mt-2 text-xs text-suma-navy/60">
                   {quote.setupPayments === 1 ? "Implementación completa" : "Primera parcialidad de implementación"} + primer mes de servicio, antes de IVA.
@@ -240,34 +240,34 @@ export function PricingEstimator() {
                 </p>
                 <dl className="mt-7 divide-y divide-suma-navy/15 border-y border-suma-navy/15">
                   <div className="flex items-center justify-between gap-3 py-3 text-sm">
-                    <dt>Pago inicial · desde</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd>
+                    <dt>Pago inicial (una vez)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd>
                   </div>
                   {quote.setupPayments > 1 && <div className="flex items-center justify-between gap-3 py-3 text-sm">
                     <dt>Implementación: {quote.setupPayments} abonos (primero)</dt><dd className="font-bold tabular-nums">{formatMXNExact(quote.setupInstallment)}</dd>
                   </div>}
                   <div className="flex items-center justify-between gap-3 py-3 text-sm">
-                    <dt>Servicio mensual · desde</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd>
+                    <dt>Servicio mensual</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd>
                   </div>
                   {quote.hasAds && <div className="flex items-center justify-between gap-3 py-3 text-sm">
                     <dt>Pauta mensual externa</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd>
                   </div>}
                 </dl>
                 <div className="mt-6 rounded-xl bg-suma-navy/7 p-4">
-                  <p className="text-xs font-bold uppercase tracking-widest text-suma-navy/60">Rango orientativo · una sede, sin IVA</p>
-                  <p className="mt-2 text-sm">Pago inicial: <strong>{formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}</strong></p>
-                  {quote.monthlyMax > 0 && <p className="mt-1 text-sm">Cada mes: <strong>{formatMXN(quote.monthlySuma)}–{formatMXN(quote.monthlyMax)}</strong></p>}
-                  <p className="mt-2 text-xs text-suma-navy/65">Para servicios sencillos a medianos. Si necesitas más funciones o sedes, el precio puede ser mayor.</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-suma-navy/60">Rango estimado para tu selección · una sede</p>
+                  <p className="mt-2 text-sm">Pago inicial (una vez): <strong>{formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}</strong></p>
+                  {quote.monthlyMax > 0 && <p className="mt-1 text-sm">Servicio por mes: <strong>{formatMXN(quote.monthlySuma)}–{formatMXN(quote.monthlyMax)}</strong></p>}
+                  <p className="mt-2 text-xs text-suma-navy/65">La opción básica comienza en el primer importe. Los precios finales dependen de las funciones y pueden superar el rango.</p>
                 </div>
                 <p className="mt-5 text-xs font-bold uppercase tracking-widest text-suma-navy/60">Ejemplo de {quote.months} {quote.months === 1 ? "mes" : "meses"}: pago inicial completo + servicio mensual</p>
-                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">Desde {formatMXN(quote.totalSuma)}</p>
-                <p className="mt-1 text-sm text-suma-navy/65">Rango orientativo para una sede: {formatMXN(quote.totalSuma)}–{formatMXN(quote.totalSumaMax)}. No es cotización.</p>
+                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatMXN(quote.totalSuma)} <span className="text-sm font-normal">mínimo orientativo</span></p>
+                <p className="mt-1 text-sm text-suma-navy/65">Rango estimado del periodo: {formatMXN(quote.totalSuma)}–{formatMXN(quote.totalSumaMax)}. No es cotización definitiva.</p>
                 {quote.hasAds && <p className="mt-1 text-xs text-suma-navy/65">+ {formatMXN(quote.totalExternalAds)} de pauta externa estimada en ese periodo.</p>}
                 {quote.setupPayments > 1 && <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">
                   Este ejemplo incluye todo el pago inicial, aunque alguna parcialidad venza después de los {quote.months} {quote.months === 1 ? "mes" : "meses"} elegidos.
                 </p>}
                 {quote.services.length > 0 && <div className="mt-6 border-t border-suma-navy/15 pt-4">
                   <p className="text-xs font-bold uppercase tracking-widest text-suma-navy/60">Servicios elegidos</p>
-                  <ul className="mt-2 space-y-1 text-xs text-suma-navy/75">{quote.services.map((s) => <li key={s.id}>✓ {s.name}{s.from ? " (desde)" : ""}</li>)}</ul>
+                  <ul className="mt-2 space-y-1 text-xs text-suma-navy/75">{quote.services.map((s) => <li key={s.id}>✓ {s.name}</li>)}</ul>
                 </div>}
               </>
             )}

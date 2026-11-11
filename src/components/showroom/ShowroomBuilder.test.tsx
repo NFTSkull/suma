@@ -60,7 +60,7 @@ describe("ShowroomBuilder", () => {
     render(<ShowroomBuilder />);
     fireEvent.click(within(screen.getByRole("group", { name: "Periodo a evaluar" })).getByRole("button", { name: "6 m" }));
     expect(screen.getByLabelText("Periodo")).toHaveValue("6");
-    expect(screen.getByText(/Desde: pago inicial íntegro \+ 6 meses de servicio/)).toBeInTheDocument();
+    expect(screen.getByText(/Total mínimo: pago inicial \+ 6 meses de servicio/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Periodo"), { target: { value: "12" } });
     expect(within(screen.getByRole("group", { name: "Periodo a evaluar" })).getByRole("button", { name: "12 m" })).toHaveAttribute("aria-pressed", "true");
   });

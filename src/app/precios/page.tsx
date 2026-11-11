@@ -54,7 +54,7 @@ export default function PreciosPage() {
             id="planes-title"
             eyebrow="Tres planes de servicio · Para una sede"
             title={<>Precios claros. <span className="text-suma-purple">Sin servicios innecesarios.</span></>}
-            lead="Empieza con algo sencillo. Todos los precios dicen «desde» porque el costo cambia según lo que necesites. Consulta el rango y qué recibes."
+            lead="Elige lo que necesitas. Te mostramos la opción más económica, el rango habitual y exactamente qué incluye el precio de entrada."
           />
           <div className="mt-9 grid gap-3 md:grid-cols-3">
             {[
@@ -87,24 +87,33 @@ export default function PreciosPage() {
                   <p className="mt-2 max-w-sm text-lg font-semibold leading-snug">{plan.tagline}</p>
                   <p className={`mt-3 min-h-18 text-sm leading-relaxed ${dark ? "text-suma-cream/70" : "text-suma-navy/65"}`}>{plan.audience}</p>
 
-                  <div className={`mt-6 border-t pt-6 ${dark ? "border-suma-cream/20" : "border-suma-navy/15"}`}>
-                    <p className={`text-xs font-bold uppercase tracking-widest ${dark ? "text-suma-cream/70" : "text-suma-navy/60"}`}>Pago inicial · desde</p>
-                    <p className="mt-2 font-display text-[clamp(2rem,3.1vw,3rem)] font-extrabold leading-none tracking-tight tabular-nums">{formatMXN(plan.setup)}</p>
-                    <p className={`mt-4 text-sm ${dark ? "text-suma-cream/75" : "text-suma-navy/70"}`}>
-                      {plan.monthly > 0
-                        ? <>+ <strong className={dark ? "text-suma-cream" : "text-suma-navy"}>desde {formatMXN(plan.monthly)}/mes</strong> de servicio</>
-                        : <>Sin mensualidad obligatoria</>}
+                  <div className={`mt-6 rounded-[1.4rem] border p-5 ${dark ? "border-suma-cream/20 bg-suma-cream/5" : "border-suma-navy/10 bg-white/70"}`}>
+                    <p className={`text-xs font-bold uppercase tracking-widest ${dark ? "text-suma-orange" : "text-suma-purple"}`}>
+                      Opción básica · desde
                     </p>
-                    <p className={`mt-4 rounded-xl px-3 py-3 text-xs leading-relaxed ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
-                      <strong>Rango orientativo:</strong> pago inicial {formatMXN(plan.setup)}–{formatMXN(plan.setupMax)}.
-                      <span className="mt-1 block">Servicio mensual {formatMXN(plan.monthly)}–{formatMXN(plan.monthlyMax)}.</span>
-                      <span className="mt-1 block opacity-80">Versión sencilla al precio desde. Si tu negocio necesita más, cotizamos antes de empezar.</span>
+                    <p className="mt-2 font-display text-[clamp(2rem,3.1vw,3rem)] font-extrabold leading-none tracking-tight tabular-nums">
+                      {formatMXN(plan.setup)}
+                    </p>
+                    <p className={`mt-1 text-xs ${dark ? "text-suma-cream/75" : "text-suma-navy/65"}`}>
+                      Pago inicial, una sola vez para dejarlo listo
+                    </p>
+                    <div className={`mt-5 border-t pt-4 ${dark ? "border-suma-cream/20" : "border-suma-navy/10"}`}>
+                      <p className={`text-xs font-semibold uppercase tracking-wide ${dark ? "text-suma-cream/65" : "text-suma-navy/60"}`}>
+                        Servicio mensual
+                      </p>
+                      <p className="mt-1 font-display text-xl font-extrabold leading-snug tabular-nums">
+                        {formatMXN(plan.monthly)} – {formatMXN(plan.monthlyMax)} <span className="text-sm font-medium">/mes</span>
+                      </p>
+                    </div>
+                    <p className={`mt-3 text-xs leading-relaxed ${dark ? "text-suma-cream/70" : "text-suma-navy/65"}`}>
+                      El pago inicial varía entre {formatMXN(plan.setup)} y {formatMXN(plan.setupMax)} según lo que necesites.
                     </p>
                   </div>
 
                   <div className="mt-7 flex-1">
-                    <h3 className="font-display text-lg font-bold">¿Qué incluye el pago inicial desde este precio?</h3>
-                    <ul className={`mt-3 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
+                    <h3 className="font-display text-lg font-bold">¿Qué incluye la opción más económica?</h3>
+                    <p className={`mt-3 text-xs font-bold uppercase tracking-widest ${dark ? "text-suma-orange" : "text-suma-purple"}`}>Al comenzar</p>
+                    <ul className={`mt-2 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
                       {plan.setupIncludes.map((feature) => (
                         <li key={feature} className="flex items-start gap-2">
                           <span aria-hidden="true" className={dark ? "text-suma-orange" : "text-suma-purple"}>✓</span>
@@ -112,8 +121,8 @@ export default function PreciosPage() {
                         </li>
                       ))}
                     </ul>
-                    <h3 className="mt-6 font-display text-lg font-bold">¿Qué incluye la mensualidad desde este precio?</h3>
-                    <ul className={`mt-3 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
+                    <p className={`mt-5 text-xs font-bold uppercase tracking-widest ${dark ? "text-suma-orange" : "text-suma-purple"}`}>Cada mes, en el nivel básico</p>
+                    <ul className={`mt-2 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
                       {plan.monthlyIncludes.map((feature) => (
                         <li key={feature} className="flex items-start gap-2">
                           <span aria-hidden="true" className={dark ? "text-suma-orange" : "text-suma-purple"}>✓</span>
@@ -122,8 +131,8 @@ export default function PreciosPage() {
                       ))}
                     </ul>
                     <p className={`mt-5 rounded-xl px-3 py-3 text-sm ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
-                      <strong>Tiempo inicial estimado: {plan.launchWindow}.</strong>
-                      <span className="mt-1 block text-xs opacity-80">Cuenta desde que confirmamos alcance y recibimos materiales y accesos; no incluye demoras de plataformas externas.</span>
+                      <strong>Listo en unos {plan.launchWindow}.</strong>
+                      <span className="mt-1 block text-xs opacity-80">Estimado a partir de recibir tus accesos y materiales; las aprobaciones externas pueden tardar más.</span>
                     </p>
                   </div>
                   <p className={`mt-7 border-t pt-5 text-xs leading-relaxed ${dark ? "border-suma-cream/20 text-suma-cream/65" : "border-suma-navy/15 text-suma-navy/65"}`}>{plan.boundaries}</p>
@@ -147,7 +156,7 @@ export default function PreciosPage() {
             })}
           </div>
           <p className="mt-7 max-w-5xl text-sm leading-relaxed text-suma-navy/70">
-            Precios desde para una sede y tareas sencillas, antes de IVA. El rango es una guía, no un tope garantizado. La propuesta final depende de funciones y volumen. Flow incluye una regla automática inicial en el precio de entrada, no una nueva cada mes. La mensualidad cubre un mes de trabajo. Puedes consultar pagos divididos de la implementación; anuncios, licencias y otros proveedores se pagan aparte.
+            Los importes son orientativos para una sede y antes de IVA. La opción básica incluye solo lo indicado en cada tarjeta. El rango no es un precio máximo garantizado: más funciones, sedes o volumen requieren cotización. La mensualidad cubre un mes de trabajo y no incluye nuevas automatizaciones ilimitadas. Anuncios, licencias y herramientas externas se pagan aparte.
           </p>
         </div>
       </section>
@@ -169,9 +178,9 @@ export default function PreciosPage() {
             </div>
             <div className="rounded-[1.5rem] bg-suma-navy p-7 text-suma-cream">
               <p className="text-eyebrow text-suma-orange">CRM propio a medida</p>
-              <p className="mt-4 text-sm text-suma-cream/80">Desarrollo desde</p>
-              <p className="mt-1 font-display text-4xl font-extrabold">Desde $29,900</p>
-              <p className="mt-2 text-sm text-suma-cream/80">Para una función sencilla. Rango orientativo: $29,900–$129,000 para proyectos acotados; proyectos mayores a cotizar. Soporte opcional desde $1,490/mes. Pide un alcance por escrito.</p>
+              <p className="mt-4 text-sm text-suma-cream/80">Proyecto básico · desde</p>
+              <p className="mt-1 font-display text-4xl font-extrabold">$29,900</p>
+              <p className="mt-2 text-sm text-suma-cream/80">Incluye un módulo sencillo a medida. Proyectos acotados: $29,900–$129,000 como referencia. Mantenimiento opcional: $1,490–$6,900/mes. Confirmamos funciones y precio antes de empezar.</p>
               <ul className="mt-5 space-y-2 text-sm text-suma-cream/85">
                 <li>✓ Módulos según tu operación real</li>
                 <li>✓ Sin cobro de SUMA por usuario interno</li>
@@ -205,23 +214,32 @@ export default function PreciosPage() {
             id="independientes-title"
             eyebrow="Elige solo lo que necesitas"
             title="Cada servicio tiene un precio de referencia."
-            lead="Elige anuncios, atención, reservas o una web. Te decimos qué incluye la versión sencilla y cuánto suele variar el precio."
+            lead="Cada precio de entrada corresponde a una versión sencilla. Mira qué trae y el rango según el tamaño de tu proyecto."
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {individualServices.map((service) => (
               <div key={service.id} className="flex min-h-48 flex-col justify-between rounded-[1.6rem] border border-suma-line bg-suma-cream-soft p-6">
                 <h3 className="font-display text-xl font-bold">{service.name}</h3>
                 <div className="mt-6">
-                  <p className="font-display text-xl font-extrabold text-suma-purple">
-                    Desde {formatMXN(service.setup || service.monthly)}
+                  <p className="text-[0.7rem] font-bold uppercase tracking-wider text-suma-purple">Opción básica · desde</p>
+                  <p className="mt-1 font-display text-2xl font-extrabold text-suma-purple">
+                    {formatMXN(service.setup || service.monthly)}{service.setup === 0 ? <span className="text-base">/mes</span> : null}
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-suma-navy">
-                    {service.setup === 0 ? "/mes · servicio mensual" : service.monthly ? "+ desde " + formatMXN(service.monthly) + "/mes" : "Pago único · sin mensualidad de SUMA"}
+                  <p className="mt-1 text-xs font-medium text-suma-navy/70">
+                    {service.setup === 0 ? "Solo servicio mensual" : "Preparación y entrega · pago único"}
                   </p>
-                  <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">{service.detail}</p>
-                  <p className="mt-2 text-xs font-medium text-suma-navy/80">
-                    Rango orientativo: {service.setup > 0 ? formatMXN(service.setup) + "–" + formatMXN(service.setupMax) + " inicial" : formatMXN(service.monthly) + "–" + formatMXN(service.monthlyMax) + "/mes"}
-                    {service.setup > 0 && service.monthly > 0 ? " y " + formatMXN(service.monthly) + "–" + formatMXN(service.monthlyMax) + "/mes" : ""}.
+                  {service.monthly > 0 && service.setup > 0 ? (
+                    <p className="mt-3 text-sm font-bold text-suma-navy">
+                      Servicio al mes: {formatMXN(service.monthly)}–{formatMXN(service.monthlyMax)}
+                    </p>
+                  ) : null}
+                  <p className="mt-3 text-xs leading-relaxed text-suma-navy/75">
+                    <strong>Incluye lo básico:</strong> {service.detail}
+                  </p>
+                  <p className="mt-2 text-xs text-suma-navy/65">
+                    {service.setup > 0
+                      ? <>Pago inicial habitual: {formatMXN(service.setup)}–{formatMXN(service.setupMax)}.</>
+                      : <>Mensualidad orientativa: {formatMXN(service.monthly)}–{formatMXN(service.monthlyMax)}.</>}
                   </p>
                   <p className="mt-2 text-xs font-semibold text-suma-navy/80">Plazo orientativo: {individualServiceDeliveryTimes[service.id]}.</p>
                   <a href={"/precios?servicio=" + service.id + "#simulador"} className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-2 underline-offset-4">
