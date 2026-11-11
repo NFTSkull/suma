@@ -5,6 +5,7 @@ import Link from "next/link";
 import { showroomWhatsAppAttrs, track } from "@/lib/analytics";
 import { individualServices, pricingPlans, pricingSettings, type IndividualServiceId, type PricingPlanId } from "@/content/pricing";
 import { processSteps } from "@/content/process";
+import { describeSelectedServices, planStories } from "@/content/sales-clarity";
 import {
   showroomExperiences, showroomIndustries, showroomPalettes,
   type ShowroomExperienceId, type ShowroomIndustryId, type ShowroomPaletteId,
@@ -25,6 +26,22 @@ const guidedGoals = [
   { id: "operar", name: "Ordenar mi operación", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
 ] as const;
 type GuidedGoalId = (typeof guidedGoals)[number]["id"];
+
+const servicePreview: Partial<Record<IndividualServiceId, { experience: ShowroomExperienceId; goal: GuidedGoalId }>> = {
+  "meta-ads": { experience: "ads", goal: "captar" },
+  "google-ads": { experience: "ads", goal: "captar" },
+  "crm-gestionado": { experience: "crm", goal: "responder" },
+  "chatbot-guiado": { experience: "chatbot", goal: "responder" },
+  "chatbot-ia": { experience: "chatbot", goal: "responder" },
+  "reservas": { experience: "reservas", goal: "operar" },
+  "automatizacion": { experience: "automatizacion", goal: "responder" },
+  "seo-local": { experience: "seo", goal: "captar" },
+  "landing": { experience: "web", goal: "captar" },
+  "web": { experience: "web", goal: "captar" },
+  "crm-medida": { experience: "crm-medida", goal: "operar" },
+  "mantenimiento-crm": { experience: "crm", goal: "responder" },
+  "app": { experience: "app", goal: "operar" },
+};
 
 const priceLine = (service: (typeof individualServices)[number]) =>
   (service.from ? "Desde " : "") + (service.setup
@@ -57,6 +74,8 @@ export function ShowroomBuilder() {
     locations, teamUsers, platform, budget, notes, availability,
   };
   const quote = showroomEstimate(selection);
+  const proposalStory = planStories[planId];
+  const chosenDetails = describeSelectedServices(quote.services.map((service) => service.id));
   const paymentOptions = availableSetupPayments(quote.setup);
   const active = showroomExperiences.find((item) => item.id === experience) ?? showroomExperiences[0];
   const activeGoal = guidedGoals.find((goal) => goal.id === guidedGoal) ?? guidedGoals[1];
@@ -73,12 +92,30 @@ export function ShowroomBuilder() {
       : planId === "ads" ? ["meta-ads"] : ["crm-gestionado"]
     : [];
   const selectedCurrent = serviceIds.includes(active.serviceId) || included.includes(active.serviceId);
+  const showServicePreview = (serviceId: IndividualServiceId) => {
+    const next = servicePreview[serviceId];
+    if (!next) return;
+    setGuidedGoal(next.goal);
+    setExperience(next.experience);
+    setShowAllExperiences(false);
+  };
   const addCurrent = () => {
     if (included.includes(active.serviceId)) return;
-    if (!serviceIds.includes(active.serviceId)) setServiceIds((items) => toggleShowroomService(items, active.serviceId));
+    if (!serviceIds.includes(active.serviceId)) {
+      setServiceIds((items) => toggleShowroomService(items, active.serviceId));
+      showServicePreview(active.serviceId);
+    }
   };
-  const toggle = (id: IndividualServiceId) =>
+  const toggle = (id: IndividualServiceId) => {
+    const adding = !serviceIds.includes(id);
     setServiceIds((items) => toggleShowroomService(items, id));
+    if (adding) showServicePreview(id);
+  };
+  const choosePlan = (id: PricingPlanId) => {
+    setPlanId(id);
+    if (id === "ads") showServicePreview("meta-ads");
+    else showServicePreview("crm-gestionado");
+  };
   const availableServices = individualServices.filter((s) => !included.includes(s.id));
   const shownServices = showAllServices
     ? availableServices
@@ -112,7 +149,7 @@ export function ShowroomBuilder() {
     <div className="space-y-10">
       <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
         <p className="text-eyebrow text-suma-orange-ink">01 · Personaliza</p>
-        <h2 id="showroom-custom-title" className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">Pon tu marca en la demo.</h2>
+        <h2 id="showroom-custom-title" className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">Mira tu negocio con estas herramientas.</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div>
             <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio</label>
@@ -139,7 +176,8 @@ export function ShowroomBuilder() {
         className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7 lg:col-start-1 lg:row-start-1">
           <p className="text-eyebrow text-suma-orange">02 · Pruébalo</p>
-          <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Mira cómo podría funcionar.</h2>
+          <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Prueba algo realista, sin registrarte.</h2>
+          <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">Haz clic en una opción y prueba la pantalla de ejemplo con tu marca.</p>
           <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-orange">¿Qué quieres mejorar primero?</p>
           <div role="group" aria-label="Objetivo principal del negocio" className="mt-3 flex flex-wrap gap-2">
             {guidedGoals.map((goal) => (
@@ -154,6 +192,7 @@ export function ShowroomBuilder() {
               </button>
             ))}
           </div>
+          <p className="mt-3 text-xs text-suma-cream/65">Esto cambia qué demos te mostramos. Solo se suma al precio lo que elijas en el paso 4.</p>
           <div role="group" aria-label="Experiencias para probar" className="mt-5 grid grid-cols-2 gap-2">
             {visibleExperiences.map((item) => (
               <button key={item.id} type="button" aria-pressed={experience === item.id}
@@ -175,7 +214,7 @@ export function ShowroomBuilder() {
         </div>
 
         <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} />
+          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
           <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
             Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
           </p>
@@ -185,7 +224,7 @@ export function ShowroomBuilder() {
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{active.lead}</p>
-          <p className="mt-2 text-xs text-suma-navy/55">{active.detail}</p>
+          <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">{active.detail}</p>
           {selectedCurrent ? (
             <p role="status" className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-full bg-emerald-50 px-5 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
               <span aria-hidden="true">✓</span> Ya está en tu propuesta
@@ -207,8 +246,8 @@ export function ShowroomBuilder() {
       <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
-          <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Elige qué contratar y ve cuánto pagarías.</h2>
-          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">Precios del catálogo público de SUMA, antes de IVA y sin descuentos ocultos. Lo que eliges aquí también actualiza el cálculo del paso 3.</p>
+          <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Elige las funciones que necesitas y ve tu precio.</h2>
+          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">Marca o desmarca funciones: tu propuesta, su precio y la demo del paso 2 cambiarán. Los cálculos del paso 3 usarán el costo de lo elegido.</p>
         </div>
         <div className="grid gap-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="space-y-7">
@@ -217,11 +256,11 @@ export function ShowroomBuilder() {
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "services" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
-                  Por módulos
+                  Elegir funciones
                 </button>
                 <button type="button" aria-pressed={mode === "package"} onClick={() => setMode("package")}
                   className={"min-h-12 rounded-xl border px-4 text-sm font-bold " + (mode === "package" ? "border-suma-navy bg-suma-navy text-white" : "border-suma-line bg-white text-suma-navy")}>
-                  Paquete + extras
+                  Plan + opciones
                 </button>
               </div>
             </fieldset>
@@ -231,7 +270,7 @@ export function ShowroomBuilder() {
                 <legend className="text-sm font-bold text-suma-navy">Paquete base</legend>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {pricingPlans.map((plan) => (
-                    <button key={plan.id} type="button" aria-pressed={planId === plan.id} onClick={() => setPlanId(plan.id)}
+                    <button key={plan.id} type="button" aria-pressed={planId === plan.id} onClick={() => choosePlan(plan.id)}
                       className={"min-h-14 rounded-xl border p-2 text-sm font-bold " + (planId === plan.id ? "border-suma-purple bg-suma-purple text-white" : "border-suma-line bg-white text-suma-navy")}>
                       <span className="block">{plan.name}</span>
                       <span className={"block text-[0.7rem] font-semibold " + (planId === plan.id ? "text-white/75" : "text-suma-navy/60")}>{plan.label}</span>
@@ -243,9 +282,9 @@ export function ShowroomBuilder() {
             )}
 
             <fieldset>
-              <legend className="text-sm font-bold text-suma-navy">{mode === "package" ? "Extras opcionales" : "Módulos"}</legend>
+              <legend className="text-sm font-bold text-suma-navy">{mode === "package" ? "¿Quieres agregar alguna función?" : "¿Qué quieres que hagamos?"}</legend>
               <p className="mt-1 text-xs text-suma-navy/60">
-                {showAllServices ? "Catálogo completo." : "Recomendados para «" + activeGoal.name.toLowerCase() + "»."} «Desde» indica que el alcance puede cambiar el importe.
+                {showAllServices ? "Todas las opciones." : "Primero mostramos las relacionadas con «" + activeGoal.name.toLowerCase() + "»."} Solo las opciones marcadas afectan el precio.
               </p>
               <div className="mt-4 space-y-5">
                 {categories.map((category) => {
@@ -267,7 +306,8 @@ export function ShowroomBuilder() {
                               <span className="min-w-0">
                                 <span className="block text-sm font-bold text-suma-navy">{service.name}</span>
                                 <span className="mt-1 block text-xs text-suma-navy/60">{priceLine(service)}</span>
-                                {checked && <span className="mt-1.5 block text-xs leading-relaxed text-suma-navy/75">{service.detail}</span>}
+                                <span className="mt-1.5 block text-xs leading-relaxed text-suma-navy/70">{service.detail}</span>
+                                {checked && <span className="mt-1 block text-[0.7rem] font-bold text-suma-purple">✓ Incluido en tu cálculo · demo actualizada arriba</span>}
                               </span>
                             </label>
                           );
@@ -281,6 +321,9 @@ export function ShowroomBuilder() {
                 className="mt-4 min-h-11 w-full rounded-xl border border-suma-line bg-white px-4 text-sm font-bold text-suma-navy hover:border-suma-purple">
                 {showAllServices ? "Ver solo los recomendados ↑" : "Ver los " + availableServices.length + " módulos (" + hiddenCount + " más) ↓"}
               </button>
+              <a href="#showroom-explorar" className="mt-3 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-suma-orange underline-offset-4">
+                Volver a probar la demo de mi elección ↑
+              </a>
             </fieldset>
 
             <div className="grid grid-cols-2 items-end gap-3 sm:grid-cols-3 sm:gap-4">
@@ -344,6 +387,23 @@ export function ShowroomBuilder() {
           <div className="lg:sticky lg:top-24">
             <div className="rounded-[1.75rem] bg-suma-navy p-5 text-suma-cream shadow-lift md:p-8">
               <p className="text-eyebrow text-suma-orange">Tu propuesta estimada</p>
+              <div aria-live="polite" className="mt-4 rounded-xl border border-white/15 bg-white/5 p-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-suma-orange">Esto harías con tu selección</p>
+                {quote.isEmpty ? (
+                  <p className="mt-2 text-sm text-suma-cream/80">Selecciona una función y te explicamos para qué sirve.</p>
+                ) : quote.mode === "package" ? (
+                  <>
+                    <p className="mt-2 text-sm font-bold text-suma-cream">{proposalStory.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-suma-cream/75">{proposalStory.intro}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-suma-cream/75">{proposalStory.steps.join(" ")}</p>
+                    {chosenDetails.length > 0 && <p className="mt-2 text-xs text-suma-cream/75">Extras: {chosenDetails.join(" ")}</p>}
+                  </>
+                ) : (
+                  <ul className="mt-2 space-y-2 text-xs leading-relaxed text-suma-cream/85">
+                    {chosenDetails.map((detail) => <li key={detail}>✓ {detail}</li>)}
+                  </ul>
+                )}
+              </div>
               {quote.isEmpty ? (
                 <p className="mt-5 rounded-xl border border-white/15 p-4 text-sm">Elige al menos un módulo para ver cuánto pagarías.</p>
               ) : (
