@@ -7,8 +7,8 @@
  */
 export const pricingSettings = {
   currency: "MXN",
-  adBudgets: [3000, 6000, 9000, 12000],
-  defaultAdBudget: 6000,
+  adBudgets: [1500, 3000, 6000, 9000, 12000],
+  defaultAdBudget: 3000,
   websiteMaintenanceMonthly: 490,
   flexiblePaymentsMinForSix: 10000,
 } as const;
