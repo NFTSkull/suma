@@ -30,7 +30,7 @@ describe("PricingEstimator", () => {
 
   it("se puede contratar solo una herramienta y seleccionarla en el configurador", () => {
     render(<PricingEstimator />);
-    fireEvent.click(screen.getByRole("button", { name: "Solo una función" }));
+    fireEvent.click(screen.getByRole("button", { name: "Elegir servicios" }));
     expect(screen.getByText(/Marca una función para ver qué incluye/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("checkbox", { name: "Configurar agenda de reservas" }));
     expect(screen.getAllByText(formatMXN(990), { exact: true }).length).toBeGreaterThan(0);
@@ -90,7 +90,7 @@ describe("PricingEstimator", () => {
   it("entra al configurador con el servicio elegido desde la tarjeta", () => {
     window.history.replaceState({}, "", "/precios?servicio=chatbot-ia#simulador");
     render(<PricingEstimator />);
-    expect(screen.getByRole("button", { name: "Solo una función" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Elegir servicios" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).toBeChecked();
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
   });
