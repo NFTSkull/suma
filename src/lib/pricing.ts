@@ -89,32 +89,24 @@ export function estimatePricing(selection: PricingSelection) {
   };
 }
 
-/** Solo genera un enlace. No envía mensajes, crea leads ni realiza pagos. */
+/** Mensaje breve de contacto. La persona puede revisarlo antes de enviarlo. */
 export function pricingWhatsAppHref(selection: PricingSelection): string {
   const q = estimatePricing(selection);
-  const summary = q.mode === "package" ? q.plan.name : "servicios individuales";
-  const safe = (value: string | undefined, limit = 130) => (value ?? "").trim().slice(0, limit);
+  const safe = (value: string | undefined, limit = 110) =>
+    (value ?? "").trim().replace(/[\r\n\t]+/g, " ").slice(0, limit);
+  const selected = q.mode === "package"
+    ? q.plan.name + (q.services.length ? " + " + q.services.map((service) => service.name).join(", ") : "")
+    : q.services.length ? q.services.map((service) => service.name).join(", ") : "una recomendación";
   const lines = [
-    "Hola, SUMA STUDIO. Quiero personalizar una propuesta.",
-    "Modalidad: " + summary + ".",
-    ...(q.services.length ? ["Servicios adicionales: " + q.services.map((s) => s.name).join(", ") + "."] : []),
-    ...(safe(selection.businessType) ? ["Negocio: " + safe(selection.businessType) + "."] : []),
-    ...(safe(selection.goal) ? ["Prioridad: " + safe(selection.goal) + "."] : []),
-    ...(safe(selection.platform) ? ["Reservas/canales actuales: " + safe(selection.platform) + "."] : []),
-    "Equipo: " + q.teamUsers + " integrantes. Sedes: " + q.locations + ".",
-    "Periodo estimado: " + q.months + (q.months === 1 ? " mes." : " meses."),
-    "Precios desde: implementación " + formatMXN(q.setup) + "; servicio " + formatMXN(q.monthlySuma) + "/mes (una sede, alcance básico).",
-    "Rangos orientativos: implementación " + formatMXN(q.setup) + " a " + formatMXN(q.setupMax) + "; servicio " + formatMXN(q.monthlySuma) + " a " + formatMXN(q.monthlyMax) + "/mes. Para casos más grandes se cotiza aparte.",
-    "Modalidad de implementación: " + (q.setupPayments > 1
-      ? q.setupPayments + " pagos mensuales (sujetos a aprobación; primer pago " + formatMXNExact(q.setupInstallment) + ")."
-      : "pago único.") ,
-    "Primer pago mínimo orientativo a SUMA: " + formatMXNExact(q.firstPaymentSuma) + " antes de IVA; precio final sujeto a propuesta.",
-    ...(q.setupPayments > 1 ? ["Total de implementación sin descontar: " + formatMXN(q.setup) + ". Las parcialidades pendientes siguen debiéndose aunque el periodo de comparación sea menor."] : []),
-    ...(q.monthlyAds ? ["Pauta considerada: " + formatMXN(q.monthlyAds) + "/mes, pagada aparte."] : []),
-    ...(q.locations > 1 ? ["Solicito cotización adicional por sedes."] : []),
-    ...(safe(selection.notes, 180) ? ["Nota: " + safe(selection.notes, 180) + "."] : []),
-    "No es una cotización definitiva. Los precios desde son para un caso sencillo; el rango puede aumentar según funciones y sedes. IVA, licencias, publicidad y consumos API/IA aparte. Las parcialidades requieren acuerdo comercial, no son crédito ni cobro automático.",
-    "¿Podemos revisar la propuesta?",
+    "Hola, SUMA. Quiero conocer una propuesta.",
+    "Me interesa: " + selected + ".",
+    ...((q.isEmpty || q.locations > 1) ? [] : [
+      "Referencia desde " + formatMXN(q.setup) + " de inicio + " + formatMXN(q.monthlySuma) +
+      "/mes, antes de IVA; terceros aparte.",
+    ]),
+    ...(q.locations > 1 ? ["Tengo más de una sede; necesito una cotización adaptada."] : []),
+    ...(safe(selection.notes) ? ["Nota: " + safe(selection.notes) + "."] : []),
+    "¿Me ayudan a definir qué incluye?",
   ];
   return "https://wa.me/" + site.contact.whatsapp + "?text=" + encodeURIComponent(lines.join("\n"));
 }
