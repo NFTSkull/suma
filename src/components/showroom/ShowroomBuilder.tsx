@@ -11,7 +11,7 @@ import {
 } from "@/content/showroom";
 import { cn } from "@/lib/cn";
 import { availableSetupPayments, formatMXN, formatMXNExact, type SetupPayments } from "@/lib/pricing";
-import { showroomEstimate, showroomWhatsAppHref, toggleShowroomService, type ShowroomSelection } from "@/lib/showroom";
+import { showroomEstimate, showroomWhatsAppHref, toggleShowroomService, saveShowroomConfig, loadShowroomConfig, type ShowroomSelection } from "@/lib/showroom";
 import { ShowroomLivePreview } from "./ShowroomLivePreview";
 import { ShowroomImpacto } from "./ShowroomImpacto";
 
@@ -32,6 +32,7 @@ const priceLine = (service: (typeof individualServices)[number]) =>
     : formatMXN(service.monthly) + "/mes");
 
 export function ShowroomBuilder() {
+  const [initialized, setInitialized] = useState(false);
   const [industry, setIndustry] = useState<ShowroomIndustryId>("pilates");
   const [businessName, setBusinessName] = useState("");
   const [paletteId, setPaletteId] = useState<ShowroomPaletteId>("suma");
@@ -53,11 +54,46 @@ export function ShowroomBuilder() {
   const [notes, setNotes] = useState("");
   const [availability, setAvailability] = useState("Por definir");
 
+  // Cargar configuración guardada al montar
+  useEffect(() => {
+    const saved = loadShowroomConfig();
+    if (saved) {
+      if (saved.industry) setIndustry(saved.industry);
+      if (saved.businessName) setBusinessName(saved.businessName);
+      if (saved.experience) setExperience(saved.experience);
+      if (saved.mode) setMode(saved.mode);
+      if (saved.planId) setPlanId(saved.planId);
+      if (saved.serviceIds) setServiceIds(saved.serviceIds);
+      if (saved.locations) setLocations(saved.locations);
+      if (saved.teamUsers) setTeamUsers(saved.teamUsers);
+      if (saved.months) setMonths(saved.months);
+      if (saved.setupPayments) setSetupPayments(saved.setupPayments);
+      if (saved.adBudget !== undefined) setAdBudget(saved.adBudget);
+      if (saved.platform) setPlatform(saved.platform);
+      if (saved.budget) setBudget(saved.budget);
+      if (saved.notes) setNotes(saved.notes);
+      if (saved.availability) setAvailability(saved.availability);
+    }
+    setInitialized(true);
+  }, []);
+
   const selection: ShowroomSelection = {
     businessName, industry, experience, serviceIds, mode, planId, months, setupPayments, adBudget,
     locations, teamUsers, platform, budget, notes, availability,
   };
   const quote = showroomEstimate(selection);
+
+  // Guardar configuración cuando cambia (solo después de inicializar)
+  useEffect(() => {
+    if (!initialized) return;
+    saveShowroomConfig({
+      industry, businessName, experience, mode, planId, serviceIds,
+      locations, teamUsers, months, setupPayments, adBudget,
+      platform, budget, notes, availability,
+    });
+  }, [initialized, industry, businessName, experience, mode, planId, serviceIds, 
+      locations, teamUsers, months, setupPayments, adBudget,
+      platform, budget, notes, availability]);
   const paymentOptions = availableSetupPayments(quote.setup);
   const active = showroomExperiences.find((item) => item.id === experience) ?? showroomExperiences[0];
   const activeGoal = guidedGoals.find((goal) => goal.id === guidedGoal) ?? guidedGoals[1];

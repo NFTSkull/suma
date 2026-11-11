@@ -8,6 +8,7 @@ const summary = () => screen.getByRole("list", { name: "Lo que estás eligiendo"
 describe("ShowroomBuilder", () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it("permite personalizar nombre, elegir demo y añadir un módulo", () => {
@@ -74,7 +75,7 @@ describe("ShowroomBuilder", () => {
     expect(screen.getAllByText(formatMXNExact(3980)).length).toBeGreaterThan(0);
     fireEvent.click(within(screen.getByRole("group", { name: "Pagar implementación" })).getByRole("button", { name: "3 mensualidades" }));
     const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
-    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("referencia desde");
+    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("Referencia:");
   });
 
   it("genera un enlace WhatsApp con los detalles, pero no envía ni agenda una cita", () => {
@@ -119,6 +120,40 @@ describe("ShowroomBuilder", () => {
     fireEvent.click(screen.getByRole("button", { name: /Ver las 9 demos/i }));
     expect(screen.getByRole("button", { name: /Chatbot para WhatsApp/i })).toBeInTheDocument();
   });
+
+  it("persiste la configuración en sessionStorage y la recupera al volver", () => {
+    const { unmount } = render(<ShowroomBuilder />);
+    fireEvent.change(screen.getByLabelText("Nombre de tu negocio"), { target: { value: "Mi Estudio" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" }));
+    fireEvent.change(screen.getByLabelText("Periodo"), { target: { value: "6" } });
+    unmount();
+    
+    // Re-renderizar: debe recuperar los valores guardados
+    render(<ShowroomBuilder />);
+    expect(screen.getByLabelText("Nombre de tu negocio")).toHaveValue("Mi Estudio");
+    expect(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" })).toBeChecked();
+    expect(screen.getByLabelText("Periodo")).toHaveValue("6");
+  });
+
+  it("el mensaje de WhatsApp no excede ~800 caracteres con muchos servicios", () => {
+    render(<ShowroomBuilder />);
+    fireEvent.change(screen.getByLabelText("Nombre de tu negocio"), { target: { value: "Estudio de Bienestar" } });
+    fireEvent.click(screen.getByRole("button", { name: "Paquete + extras" }));
+    // Expandir para ver todos los módulos
+    const expandButton = screen.getByRole("button", { name: /Ver los.*módulos/ });
+    fireEvent.click(expandButton);
+    // Seleccionar varios módulos
+    fireEvent.click(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Una tarea automática" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Página sencilla para recibir clientes" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Anuncios en Google" }));
+    
+    const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
+    const msg = decodeURIComponent(href!.split("?text=")[1]);
+    expect(msg.length).toBeLessThan(850); // Margen de seguridad bajo 1000
+    expect(msg).toContain("SUMA Flow");
+    expect(msg).toContain("módulos adicionales"); // Debe abreviar la lista
+  });
 });
 
 describe("ShowroomBuilder · analítica GA4", () => {
@@ -126,6 +161,8 @@ describe("ShowroomBuilder · analítica GA4", () => {
   const layer = () => ((window as DL).dataLayer ?? []).filter((item) => String(item.event).startsWith("showroom_"));
 
   beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
     localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "granted" }));
     (window as DL).dataLayer = [];
   });

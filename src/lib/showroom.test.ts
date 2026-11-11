@@ -83,7 +83,7 @@ describe("Showroom SUMA", () => {
     const text = decodeURIComponent(url.split("?text=")[1]);
     expect(text).toContain("ajustar el alcance a mi presupuesto");
     expect(text).toContain("$4,000/mes");
-    expect(text).toContain("antes de IVA");
+    expect(text).toContain("sin IVA ni terceros");
     expect(text).not.toContain("Estudio Aurora");
   });
   it("el diagnóstico solo solicita coordinar una sesión, no promete reserva", () => {
@@ -114,5 +114,37 @@ describe("Showroom SUMA", () => {
     expect(text).not.toContain("Total de implementación");
     expect(text).not.toContain("$0");
     expect(text.length).toBeLessThan(300);
+  });
+
+  it("abrevia la lista de servicios cuando hay muchos para no exceder ~800 caracteres", () => {
+    // Seleccionar muchos servicios
+    const manyServices = individualServices.slice(0, 8).map(s => s.id);
+    const text = decodeURIComponent(showroomWhatsAppHref({
+      ...initial, 
+      businessName: "Estudio de Bienestar Integral",
+      mode: "services", 
+      serviceIds: manyServices,
+      notes: "Necesito integrar con Fitco y tener reportes mensuales de todas las métricas",
+      budget: "$8,000 - $12,000 mensuales",
+    }, "quote").split("?text=")[1]);
+    
+    // Debe truncar la lista de servicios
+    expect(text).toContain("y ");
+    expect(text).toContain(" más");
+    // Total debe ser menor a 850 chars (margen de seguridad)
+    expect(text.length).toBeLessThan(850);
+  });
+
+  it("en paquete con varios extras abrevia correctamente", () => {
+    const text = decodeURIComponent(showroomWhatsAppHref({
+      ...initial, 
+      mode: "package", 
+      planId: "growth",
+      serviceIds: ["chatbot-ia", "automatizacion", "landing", "seo-local"],
+    }, "quote").split("?text=")[1]);
+    
+    expect(text).toContain("SUMA Growth");
+    expect(text).toContain("módulos adicionales");
+    expect(text.length).toBeLessThan(500);
   });
 });
