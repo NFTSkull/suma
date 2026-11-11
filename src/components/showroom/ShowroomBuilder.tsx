@@ -61,6 +61,8 @@ export function ShowroomBuilder() {
     if (el && typeof el.scrollIntoView === "function") {
       el.scrollIntoView({ block: "start", behavior: "smooth" });
     }
+    const heading = el?.querySelector<HTMLElement>("[data-wizard-heading]");
+    heading?.focus({ preventScroll: true });
   }, [stage, personalizeField]);
   const [industry, setIndustry] = useState<ShowroomIndustryId>("pilates");
   const [businessName, setBusinessName] = useState("");
@@ -184,7 +186,7 @@ export function ShowroomBuilder() {
       {stage === "personalize" && (
         <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
           <p className="text-eyebrow text-suma-orange-ink">01 · PERSONALIZA</p>
-          <h2 id="showroom-custom-title" className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">
+          <h2 id="showroom-custom-title" data-wizard-heading tabIndex={-1} className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">
             {personalizeField === 0 ? "¿Cómo se llama tu negocio?" :
               personalizeField === 1 ? "¿A qué se dedica tu negocio?" : "¿Qué estilo te gusta más?"}
           </h2>
@@ -251,7 +253,7 @@ export function ShowroomBuilder() {
         className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
         <div className="rounded-[2rem] bg-suma-navy p-5 text-suma-cream md:p-7 lg:col-start-1 lg:row-start-1">
           <p className="text-eyebrow text-suma-orange">02 · Pruébalo</p>
-          <h2 id="showroom-preview-title" className="mt-3 font-display text-3xl font-extrabold">Elige algo y pruébalo.</h2>
+          <h2 id="showroom-preview-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold">Elige algo y pruébalo.</h2>
           <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
             Toca una opción. La pantalla de la derecha cambia al instante y puedes interactuar con ella.
           </p>
@@ -357,6 +359,7 @@ export function ShowroomBuilder() {
         <p className="mx-auto max-w-4xl text-center text-sm leading-relaxed text-suma-navy/70">
           El cálculo es opcional. Primero elige una solución; si aún no sabes cuál, puedes solicitar una recomendación.
         </p>
+        <h2 data-wizard-heading tabIndex={-1} className="sr-only">Paso 3: Calcula con tus números</h2>
         <ShowroomImpacto selection={selection} quote={quote} onMonthsChange={setMonths} />
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-suma-line bg-white p-5">
           <button type="button" onClick={() => goTo("explore")}
@@ -375,7 +378,7 @@ export function ShowroomBuilder() {
       <section id="showroom-cotizar" aria-labelledby="showroom-price-title" className="rounded-[2rem] bg-suma-cream-deep/60 p-5 md:p-8">
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
-          <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Esta es tu propuesta.</h2>
+          <h2 id="showroom-price-title" data-wizard-heading tabIndex={-1} className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Esta es tu propuesta.</h2>
           <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">
             Revisa lo que elegiste y cuánto costaría. Puedes cambiar cualquier opción sin volver a empezar.
           </p>
