@@ -55,10 +55,10 @@ const demoHints: Record<ShowroomExperienceId, string> = {
   "crm-medida": "Explora las vistas de interesados y operación del panel de ejemplo.",
 };
 const wizardLabels = [
-  { stage: "personalize", title: "Tu negocio", detail: "Personaliza el ejemplo" },
-  { stage: "explore", title: "Prueba", detail: "Elige y usa una demo" },
-  { stage: "impact", title: "Calcula", detail: "Opcional, con tus datos" },
-  { stage: "quote", title: "Tu propuesta", detail: "Precio y contacto" },
+  { stage: "personalize", title: "Tu negocio", detail: "Pon tu nombre y colores" },
+  { stage: "explore", title: "Prueba una idea", detail: "Toca y ve qué pasa" },
+  { stage: "impact", title: "Calcula (opcional)", detail: "Estima un posible resultado" },
+  { stage: "quote", title: "Tu propuesta", detail: "Ve precios y pide información" },
 ] as const;
 
 const priceLine = (service: (typeof individualServices)[number]) =>
@@ -89,6 +89,7 @@ export function ShowroomBuilder() {
   const [showAllExperiences, setShowAllExperiences] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
   const [showImpactCalculator, setShowImpactCalculator] = useState(false);
+  const [hasChosenGoal, setHasChosenGoal] = useState(false);
   const [mode, setMode] = useState<"services" | "package">("services");
   const [planId, setPlanId] = useState<PricingPlanId>("flow");
   // La demo inicial es ilustrativa, no una selección de compra.
@@ -175,7 +176,7 @@ export function ShowroomBuilder() {
               Descubre cómo podría funcionar SUMA en tu negocio.
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-suma-navy/75">
-              Responde tres preguntas sencillas, prueba una herramienta de ejemplo y conoce el precio de lo que elijas. Sin saber de sistemas ni registrarte.
+              Te guiaremos con preguntas fáciles. Verás una pantalla de ejemplo, podrás tocar sus botones y decidir si quieres incluir esa solución en tu propuesta. Sin registro ni pagos.
             </p>
             <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {wizardLabels.map((item, index) => (
@@ -190,11 +191,17 @@ export function ShowroomBuilder() {
               className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-8 text-base font-extrabold text-suma-navy transition-colors hover:bg-suma-navy hover:text-white focus-visible:outline-2 focus-visible:outline-suma-purple">
               Iniciar experiencia →
             </button>
-            <p className="mt-3 text-xs text-suma-navy/60">Tú decides qué probar. Nada se contrata ni se envía automáticamente.</p>
+            <p className="mt-3 text-sm font-medium text-suma-navy/75">No necesitas saber de tecnología. Te explicaremos cada elección y siempre podrás regresar.</p>
           </section>
         ) : (
           <nav aria-label="Avance de la experiencia" className="mb-7 rounded-2xl border border-suma-line bg-white px-4 py-4 md:px-6">
-            <p aria-live="polite" className="text-xs font-bold text-suma-purple">Paso {activeWizardIndex + 1} de 4 · {wizardLabels[activeWizardIndex]?.title}</p>
+            <p aria-live="polite" className="text-sm font-extrabold text-suma-navy">Estás en el paso {activeWizardIndex + 1} de 4: {wizardLabels[activeWizardIndex]?.title}</p>
+            <p className="mt-1 text-xs leading-relaxed text-suma-navy/70">
+              {stage === "personalize" ? "Aquí eliges cómo se verá el ejemplo. Todavía no estás contratando nada." :
+                stage === "explore" ? "Aquí pruebas una herramienta ficticia. Solo se añade a tu propuesta cuando tú lo indicas." :
+                stage === "impact" ? "Aquí puedes hacer un cálculo hipotético o saltarlo sin problema." :
+                "Aquí revisas lo que elegiste, cuánto costaría y cómo pedir información."}
+            </p>
             <ol className="mt-3 grid grid-cols-4 gap-2">
               {wizardLabels.map((item, index) => (
                 <li key={item.stage} className="min-w-0">
@@ -209,7 +216,7 @@ export function ShowroomBuilder() {
 
       {stage === "personalize" && (
         <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
-          <p className="text-eyebrow text-suma-orange-ink">01 · PERSONALIZA</p>
+          <p className="text-eyebrow text-suma-orange-ink">01 · HAZ QUE EL EJEMPLO SE PAREZCA A TU NEGOCIO</p>
           <h2 id="showroom-custom-title" data-wizard-heading tabIndex={-1} className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">
             {personalizeField === 0 ? "¿Cómo se llama tu negocio?" :
               personalizeField === 1 ? "¿A qué se dedica tu negocio?" : "¿Qué estilo te gusta más?"}
@@ -218,7 +225,7 @@ export function ShowroomBuilder() {
             {personalizeField === 0 ? "Es opcional. Si lo escribes, aparecerá en tu demostración." :
               personalizeField === 1 ? "Usaremos situaciones parecidas a tu negocio, como clases, consultas o reservas." : "Los colores se muestran abajo: tócalos y mira cómo se ve la pantalla antes de seguir."}
           </p>
-          <p className="mt-5 text-xs font-bold text-suma-purple">Pregunta {personalizeField + 1} de 3</p>
+          <p className="mt-5 text-sm font-bold text-suma-purple">Pregunta {personalizeField + 1} de 3 · Solo estamos preparando tu demo</p>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-suma-navy/10">
             <div className="h-full rounded-full bg-suma-orange transition-all" style={{ width: ((personalizeField + 1) / 3 * 100) + "%" }} />
           </div>
@@ -282,7 +289,7 @@ export function ShowroomBuilder() {
           <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
             <button type="button"
               onClick={() => personalizeField === 0 ? goTo("welcome") : setPersonalizeField((value) => value - 1)}
-              className="min-h-12 rounded-full border border-suma-line bg-white px-6 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              className="min-h-12 w-full rounded-full border-2 border-suma-navy/30 bg-white px-6 text-sm font-bold text-suma-navy hover:border-suma-purple sm:w-auto">
               ← Atrás
             </button>
             <button type="button"
@@ -290,7 +297,7 @@ export function ShowroomBuilder() {
                 if (personalizeField < 2) setPersonalizeField((value) => value + 1);
                 else { personalized({}); goTo("explore"); }
               }}
-              className="min-h-12 rounded-full bg-suma-navy px-7 text-sm font-bold text-white hover:bg-suma-purple">
+              className="min-h-12 w-full rounded-full bg-suma-orange px-7 text-sm font-extrabold text-suma-navy shadow-sm hover:bg-suma-navy hover:text-white sm:w-auto">
               {personalizeField < 2 ? personalizeField === 0 && !businessName.trim() ? "Omitir nombre y seguir →" : "Siguiente →" : "Probar mi demo →"}
             </button>
           </div>
