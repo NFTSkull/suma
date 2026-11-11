@@ -39,12 +39,12 @@ describe("PricingEstimator", () => {
 
   it("explica en lenguaje cotidiano qué pasa al cambiar de plan", () => {
     render(<PricingEstimator />);
-    expect(screen.getAllByText("De una consulta a un siguiente paso claro")).toBeInTheDocument();
-    expect(screen.getAllByText(/CRM significa un lugar para organizar/)).toBeInTheDocument();
+    expect(screen.getAllByText("De una consulta a un siguiente paso claro").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/CRM significa un lugar para organizar/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Ver funciones opcionales" })).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("checkbox", { name: "Asistente de WhatsApp con IA" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
-    expect(screen.getAllByText("De un anuncio a una consulta")).toBeInTheDocument();
+    expect(screen.getAllByText("De un anuncio a una consulta").length).toBeGreaterThan(0);
     expect(screen.getByText(/SUMA no responde los mensajes/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Ver funciones opcionales" }));
     expect(screen.getByRole("checkbox", { name: "Organizar clientes y dar seguimiento (CRM)" })).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe("PricingEstimator", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Asistente de WhatsApp con IA" }));
     expect(screen.getByRole("button", { name: "1 extra seleccionado" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /SUMA Ads/ }));
-    expect(screen.getByRole("button", { name: "0 extra seleccionado" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "0 extra seleccionado" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ver funciones opcionales" })).toBeInTheDocument();
     expect(screen.getAllByText(/De un anuncio a una consulta/).length).toBeGreaterThan(0);
   });
