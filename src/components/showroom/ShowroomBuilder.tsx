@@ -358,13 +358,6 @@ export function ShowroomBuilder() {
           </button>
         </div>
 
-        <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
-          <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
-            Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
-          </p>
-        </div>
-
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
@@ -393,6 +386,13 @@ export function ShowroomBuilder() {
             Ver detalles de este servicio →
           </Link>
         </div>
+        <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
+          <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
+            Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
+          </p>
+        </div>
+
         <div className="lg:col-span-2 rounded-2xl border border-suma-line bg-white px-5 py-5 md:px-7">
           <p aria-live="polite" className="text-sm font-semibold text-suma-navy">
             {quote.isEmpty
