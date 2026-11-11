@@ -17,13 +17,13 @@ function completePersonalization() {
   fireEvent.click(screen.getByRole("button", { name: /Probar mi demo/i }));
 }
 function openQuote() {
-  fireEvent.click(screen.getByRole("button", { name: /Ir directo a mi propuesta/i }));
+  fireEvent.click(screen.getByRole("button", { name: /Ver mi propuesta sin calcular/i }));
 }
 function openAdvanced() {
   fireEvent.click(screen.getByText(/Cambiar mi plan o agregar funciones/i));
 }
 function addCRM() {
-  fireEvent.click(screen.getByRole("button", { name: /Quiero incluir esta solución/i }));
+  fireEvent.click(screen.getByRole("button", { name: /Sí, añadir esta solución a mi propuesta/i }));
 }
 
 describe("ShowroomBuilder · recorrido guiado", () => {
@@ -48,18 +48,37 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     expect(screen.queryByLabelText("Tipo de negocio")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Siguiente/i }));
     expect(screen.getByLabelText("Tipo de negocio")).toHaveValue("pilates");
-    expect(screen.queryByLabelText("Estilo de colores")).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: /Toca los colores/i })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Siguiente/i }));
-    fireEvent.change(screen.getByLabelText("Estilo de colores"), { target: { value: "salvia" } });
+    fireEvent.click(screen.getByRole("button", { name: "Elegir colores Salvia" }));
     fireEvent.click(screen.getByRole("button", { name: /Atrás/i }));
     fireEvent.click(screen.getByRole("button", { name: /Atrás/i }));
     expect(screen.getByLabelText("Nombre de tu negocio (opcional)")).toHaveValue("Casa Luz Pilates");
     fireEvent.click(screen.getByRole("button", { name: /Siguiente/i }));
     fireEvent.click(screen.getByRole("button", { name: /Siguiente/i }));
-    expect(screen.getByLabelText("Estilo de colores")).toHaveValue("salvia");
+    expect(screen.getByRole("button", { name: "Elegir colores Salvia" })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByRole("button", { name: /Probar mi demo/i }));
     expect(screen.getByText("Casa Luz Pilates")).toBeInTheDocument();
-    expect(screen.getByText(/Paso 2 de 4/)).toBeInTheDocument();
+    expect(screen.getByText(/paso 2 de 4/i)).toBeInTheDocument();
+  });
+
+  it("muestra los tres colores reales y cambia la muestra visual al tocarlos", () => {
+    render(<ShowroomBuilder />);
+    startWizard();
+    fireEvent.click(screen.getByRole("button", { name: /Omitir nombre y seguir/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Siguiente/i }));
+    const choices = ["Azul editorial", "Almendra", "Salvia"];
+    for (const label of choices) {
+      const button = screen.getByRole("button", { name: "Elegir colores " + label });
+      expect(button.querySelectorAll('span[aria-hidden="true"] span')).toHaveLength(3);
+    }
+    expect(screen.getByRole("button", { name: "Elegir colores Azul editorial" })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Elegir colores Salvia" }));
+    expect(screen.getByRole("button", { name: "Elegir colores Salvia" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Así se verá tu demostración")).toBeInTheDocument();
+    expect(screen.getByText("Vista previa de los colores elegidos").parentElement).toHaveClass("bg-[#294E42]");
+    fireEvent.click(screen.getByRole("button", { name: "Elegir colores Almendra" }));
+    expect(screen.getByText("Vista previa de los colores elegidos").parentElement).toHaveClass("bg-[#4D453D]");
   });
 
   it("no inventa un nombre de negocio cuando lo omites", () => {
@@ -88,10 +107,10 @@ describe("ShowroomBuilder · recorrido guiado", () => {
   it("seleccionar una demo NO la cobra; añadirla sí actualiza la propuesta", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
-    expect(screen.getByText(/Todavía no has añadido ninguna solución/)).toBeInTheDocument();
+    expect(screen.getByText(/Solo estás probando una demostración/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Chatbot para WhatsApp/i }));
-    expect(screen.getByText(/Todavía no has añadido ninguna solución/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Quiero incluir esta solución/i }));
+    expect(screen.getByText(/Solo estás probando una demostración/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Sí, añadir esta solución a mi propuesta/i }));
     expect(screen.getByRole("status")).toHaveTextContent("Añadido a tu propuesta");
     openQuote();
     const summary = screen.getByRole("list", { name: "Lo que estás eligiendo" });
@@ -114,10 +133,12 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
     addCRM();
-    fireEvent.click(screen.getByRole("button", { name: /Siguiente: calcular/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Opcional: hacer un cálculo/i }));
+    expect(screen.queryByRole("group", { name: "Periodo a evaluar" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Sí, quiero ver el cálculo/i }));
     expect(screen.getByRole("group", { name: "Periodo a evaluar" })).toBeInTheDocument();
     fireEvent.click(within(screen.getByRole("group", { name: "Periodo a evaluar" })).getByRole("button", { name: "6 m" }));
-    fireEvent.click(screen.getByRole("button", { name: /Siguiente: mi propuesta/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Ver mi propuesta/i }));
     expect(screen.getByLabelText("Periodo")).toHaveValue("6");
     expect(screen.getByText(/Total mínimo: pago inicial \+ 6 meses de servicio/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Cambiar la solución que probé/i }));
@@ -127,7 +148,7 @@ describe("ShowroomBuilder · recorrido guiado", () => {
   it("sin ningún servicio evita mostrar cifras de rentabilidad ficticias", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
-    fireEvent.click(screen.getByRole("button", { name: /Siguiente: calcular/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Opcional: hacer un cálculo/i }));
     expect(screen.getByText(/Para evitar resultados engañosos/)).toBeInTheDocument();
     expect(screen.queryByRole("group", { name: "Periodo a evaluar" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Pedir una recomendación/i }));
@@ -196,10 +217,10 @@ describe("ShowroomBuilder · analítica sin datos personales", () => {
     fireEvent.change(screen.getByLabelText("Nombre de tu negocio (opcional)"), { target: { value: "Casa Luz Pilates" } });
     fireEvent.click(screen.getByRole("button", { name: /Siguiente/i }));
     fireEvent.click(screen.getByRole("button", { name: /Siguiente/i }));
-    fireEvent.change(screen.getByLabelText("Estilo de colores"), { target: { value: "salvia" } });
+    fireEvent.click(screen.getByRole("button", { name: "Elegir colores Salvia" }));
     fireEvent.click(screen.getByRole("button", { name: /Probar mi demo/i }));
     expect(layer().filter(x => x.event === "showroom_personalized")).toEqual([
-      { event: "showroom_personalized", industry: "pilates", style: "suma" },
+      { event: "showroom_personalized", industry: "pilates", style: "salvia" },
     ]);
     expect(JSON.stringify((window as DL).dataLayer)).not.toContain("Casa Luz");
   });
@@ -208,7 +229,7 @@ describe("ShowroomBuilder · analítica sin datos personales", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
     (window as DL).dataLayer = [];
-    fireEvent.click(screen.getByRole("button", { name: "Atraer más clientes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quiero que más personas me conozcan" }));
     fireEvent.click(screen.getByRole("button", { name: /Ver las 9 demos/i }));
     fireEvent.click(screen.getByRole("button", { name: /Chatbot para WhatsApp/i }));
     expect(layer()).toEqual([
@@ -235,7 +256,7 @@ describe("ShowroomBuilder · analítica sin datos personales", () => {
     localStorage.setItem("suma-consent", JSON.stringify({ v: 1, analytics: "denied" }));
     render(<ShowroomBuilder />);
     completePersonalization();
-    fireEvent.click(screen.getByRole("button", { name: "Atraer más clientes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quiero que más personas me conozcan" }));
     expect((window as DL).dataLayer).toEqual([]);
   });
 });
