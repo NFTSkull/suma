@@ -339,7 +339,7 @@ export function PricingEstimator() {
             </a>
           )}
           <p className="mt-4 text-xs leading-relaxed text-suma-navy/65">
-            Precios de referencia para una sede, antes de IVA. El precio final depende de lo que necesites; lo confirmamos antes de empezar. Anuncios, licencias, dominio, mensajes y uso de IA van aparte. Si eliges varias sedes, preparamos un presupuesto especial. Las parcialidades requieren acuerdo por escrito.
+            Precios base para 1 sucursal, antes de IVA. El costo final se confirma antes de contratar. Anuncios, licencias y herramientas de otras empresas van aparte. Si tienes más sucursales, cotizamos el proyecto completo. Los abonos se acuerdan por escrito.
           </p>
         </div>
       </div>
