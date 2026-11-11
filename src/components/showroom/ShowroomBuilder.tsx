@@ -38,7 +38,7 @@ export function ShowroomBuilder() {
   const [industry, setIndustry] = useState<ShowroomIndustryId>(() => loadShowroomConfig()?.industry || "pilates");
   const [businessName, setBusinessName] = useState(() => loadShowroomConfig()?.businessName || "");
   const [paletteId, setPaletteId] = useState<ShowroomPaletteId>("suma");
-  const [experience, setExperience] = useState<ShowroomExperienceId>(() => loadShowroomConfig()?.experience || "crm");
+  const [experience, setExperience] = useState<ShowroomExperienceId>(() => loadShowroomConfig()?.experience || "chatbot");
   const [guidedGoal, setGuidedGoal] = useState<GuidedGoalId>("responder");
   const [showAllExperiences, setShowAllExperiences] = useState(false);
   const [showAllServices, setShowAllServices] = useState(false);
