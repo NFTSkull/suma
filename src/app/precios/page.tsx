@@ -38,8 +38,8 @@ export default function PreciosPage() {
         accent="orange"
         dark
         crumbs={crumbs}
-        title={<>Tu negocio crece. <span className="text-suma-orange">Tu inversión sigue clara.</span></>}
-        lead="Paga por lo que tu negocio necesita: CRM y seguimiento, publicidad, chatbots o desarrollo personalizado. Sin web obligatoria ni recargos propios de SUMA por cada integrante de tu equipo."
+        title={<>Elige lo que tu negocio necesita. <span className="text-suma-orange">Sin complicarte.</span></>}
+        lead="¿Quieres atraer clientes, organizar los mensajes o ambas cosas? Te mostramos qué haríamos, cuánto pagarías al principio y qué va por mes."
       >
         <div className="flex flex-wrap items-center gap-4">
           <ButtonLink href="#planes" variant="light" size="lg" arrow>Explorar paquetes</ButtonLink>
@@ -53,8 +53,8 @@ export default function PreciosPage() {
           <SectionHeading
             id="planes-title"
             eyebrow="Tres planes de servicio · Para una sede"
-            title={<>Precios claros. <span className="text-suma-purple">Sin servicios innecesarios.</span></>}
-            lead="Ahora puedes solicitar la implementación en un pago o dividirla en 3 mensualidades (6 para proyectos mayores). El servicio mensual y los gastos externos se muestran por separado."
+            title={<>Entiende qué incluye. <span className="text-suma-purple">Después elige.</span></>}
+            lead="Elige un plan para una sede y conoce qué resolvería en tu negocio. Puedes solicitar la configuración en uno, tres o seis pagos según el importe; el servicio mensual va aparte."
           />
           <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
             {pricingPlans.map((plan) => {
@@ -178,8 +178,8 @@ export default function PreciosPage() {
           <SectionHeading
             id="independientes-title"
             eyebrow="Elige solo lo que necesitas"
-            title="Cada servicio tiene un precio de referencia."
-            lead="Campañas, chatbot guiado o con IA, CRM, automatizaciones, SEO, web y desarrollo. Combínalos en el cotizador; las tarifas «desde» requieren alcance acordado."
+            title="¿Solo necesitas una cosa? También puedes elegirla."
+            lead="Puedes contratar únicamente anuncios, organización de clientes, respuestas automáticas, una página o cualquier otro servicio. Selecciona lo necesario en el cotizador."
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {individualServices.map((service) => (
@@ -214,7 +214,7 @@ export default function PreciosPage() {
           <SectionHeading
             id="faq-precios-title"
             eyebrow="Sin letra pequeña"
-            title="Lo que necesitas saber antes de empezar."
+            title="Resolvemos tus dudas antes de contratar."
             lead="Cuánto se paga al inicio, qué se cobra aparte y cuándo conviene una solución personalizada."
           />
           <Accordion items={faqs} />
