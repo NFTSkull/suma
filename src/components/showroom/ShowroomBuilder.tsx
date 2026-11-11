@@ -28,7 +28,7 @@ type GuidedGoalId = (typeof guidedGoals)[number]["id"];
 
 const priceLine = (service: (typeof individualServices)[number]) =>
   (service.from ? "Desde " : "") + (service.setup
-    ? formatMXN(service.setup) + " inicial" + (service.monthly ? " + " + formatMXN(service.monthly) + "/mes" : " · pago único")
+    ? formatMXN(service.setup) + " inicial" + (service.monthly ? " · " + formatMXN(service.monthly) + "–" + formatMXN(service.monthlyMax) + "/mes" : " · pago único")
     : formatMXN(service.monthly) + "/mes");
 
 export function ShowroomBuilder() {
@@ -359,7 +359,7 @@ export function ShowroomBuilder() {
                       <li key={service.id} className="flex justify-between gap-3">
                         <span>{service.name}</span>
                         <span className="shrink-0 tabular-nums text-suma-cream/80">
-                          {service.from ? "desde " : ""}{service.setup ? formatMXN(service.setup) : ""}{service.setup && service.monthly ? " + " : ""}{service.monthly ? formatMXN(service.monthly) + "/mes" : ""}
+                          {service.setup ? formatMXN(service.setup) + " inicial" : ""}{service.setup && service.monthly ? " · " : ""}{service.monthly ? formatMXN(service.monthly) + "–" + formatMXN(service.monthlyMax) + "/mes" : ""}
                         </span>
                       </li>
                     ))}
