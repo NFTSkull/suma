@@ -32,6 +32,16 @@ describe("ShowroomBuilder · recorrido guiado", () => {
   });
   afterEach(() => vi.useRealTimers());
 
+  it("el botón de la portada puede iniciar directamente el primer paso", () => {
+    render(<ShowroomBuilder />);
+    act(() => {
+      window.location.hash = "#showroom-wizard";
+      window.dispatchEvent(new Event("hashchange"));
+    });
+    expect(screen.getByLabelText("Nombre de tu negocio (opcional)")).toBeInTheDocument();
+    window.history.replaceState({}, "", window.location.pathname);
+  });
+
   it("empieza con Iniciar y no muestra formularios ni precios antes de comenzar", () => {
     render(<ShowroomBuilder />);
     expect(screen.getByRole("button", { name: /Iniciar experiencia/i })).toBeInTheDocument();
@@ -109,7 +119,7 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     expect(screen.getByText("Tu negocio · ejemplo")).toBeInTheDocument();
     expect(screen.queryByText("Estudio Aurora")).not.toBeInTheDocument();
     openQuote();
-    const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
+    const href = screen.getByRole("link", { name: /Pedir una recomendación por WhatsApp/i }).getAttribute("href");
     expect(decodeURIComponent(href!.split("?text=")[1])).not.toContain("Estudio Aurora");
   });
 
