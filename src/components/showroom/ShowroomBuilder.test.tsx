@@ -124,6 +124,16 @@ describe("ShowroomBuilder · recorrido guiado", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Añadido a tu propuesta");
   });
 
+  it("sin ningún servicio evita mostrar cifras de rentabilidad ficticias", () => {
+    render(<ShowroomBuilder />);
+    completePersonalization();
+    fireEvent.click(screen.getByRole("button", { name: /Siguiente: calcular/i }));
+    expect(screen.getByText(/Para evitar resultados engañosos/)).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Periodo a evaluar" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Pedir una recomendación/i }));
+    expect(screen.getByText(/Elige al menos un módulo para ver cuánto pagarías/)).toBeInTheDocument();
+  });
+
   it("una propuesta de CRM muestra el IVA y el pago inicial completo sin duplicarlo", () => {
     render(<ShowroomBuilder />);
     completePersonalization();
