@@ -188,7 +188,7 @@ export default function PreciosPage() {
               <ul className="mt-5 space-y-2 text-sm text-suma-cream/85">
                 <li>✓ Módulos según tu operación real</li>
                 <li>✓ Sin cobro de SUMA por usuario interno</li>
-                <li>✓ Permisos, sedes e integraciones por alcance</li>
+                <li>✓ Accesos y conexiones definidos según tu proyecto</li>
               </ul>
               <a href="#simulador" className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-suma-orange px-5 text-center text-sm font-bold text-suma-navy hover:bg-suma-cream">
                 Personalizar un CRM →
@@ -277,7 +277,7 @@ export default function PreciosPage() {
 
       <ClosingCta
         title="Tu negocio merece una solución que sí le quede."
-        text="Personaliza tus servicios y sedes; te enviamos una propuesta clara para aprovechar lo que ya utilizas sin pagar por herramientas que no necesitas."
+        text="Cuéntanos qué necesita tu negocio. Te ayudamos a elegir solo los servicios que realmente usarías."
         secondary={{ label: "Ver cómo trabajamos", href: "/como-trabajamos" }}
       />
       <JsonLd data={pageGraph({
