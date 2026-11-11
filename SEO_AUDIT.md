@@ -173,6 +173,27 @@ Ver la sección 10, Recomendaciones de contenido.
 
 **`generate_lead` significa "correo aceptado por Resend", no "correo en el buzón".** Resend responde con el `id` del correo cuando lo acepta para envío; la llegada a la bandeja de entrada se confirma después y fuera del sitio (panel de Resend, con el `id` que queda en `action_log`, o webhooks `email.delivered`/`email.bounced` si se configuran). Un rebote posterior no revierte el `generate_lead`.
 
+### Eventos de SUMA Vision Studio (`/showroom`)
+
+Mismo canal (`track()` → `dataLayer`), solo con consentimiento y sin datos personales: nunca el nombre del negocio, las notas, el presupuesto escrito ni las cifras que la persona escribe en el simulador.
+
+| Evento | Qué representa | ¿Solo un clic? | Parámetros |
+|---|---|---|---|
+| `showroom_personalized` | Primer cambio de nombre, giro o estilo de la demo. Una vez por visita. | No: es una interacción con el formulario. | `industry` (id), `style` (id de paleta) |
+| `showroom_demo_viewed` | Elige un objetivo o una demo distinta de la que ya ve. | **Sí**: registra la selección; la demo se muestra, pero no mide tiempo ni uso dentro de ella. | `goal` (`captar` · `responder` · `operar`), `experience` (id) |
+| `showroom_impact_used` | Primera interacción con el simulador (dato, escenario o periodo); se envía 1.5 s después con el estado de ese momento. Una vez por visita. | No: es uso del simulador. | `scenario` (`conservative` · `base` · `optimistic`), `months`, `own_data_count` (cuántos datos cambió, sin sus valores) |
+| `showroom_quote_updated` | La propuesta cambió de modo, paquete, número de módulos cobrados o periodo; se agrupa 1.5 s para no enviar un evento por clic. | No: es un cambio de configuración. | `mode` (`services` · `package`), `plan` (id o `none`), `services_count` (extras cobrados), `months` |
+| `showroom_whatsapp_click` | Clic en un botón de WhatsApp del showroom. | **Sí**: abre WhatsApp con un mensaje editable; no confirma que se haya enviado. Se registra junto con `contact_click`. | `intent` (`quote` · `budget` · `diagnostic` · `impact`) |
+
+Ninguno es un lead. El único evento de conversión sigue siendo `generate_lead`.
+
+En la misma revisión se corrigió `pricing_cta_click`: comparaba contra un plan `start` que ya no existe, así que los clics del plan SUMA Ads de `/precios` no se registraban.
+
+### Estado del contenedor GTM (revisado en el `gtm.js` público, 2026-11-10)
+
+- **Configurado:** etiqueta de Google de GA4 `G-1WSGMR965K`, y etiquetas de evento de GA4 con activador de evento personalizado para `generate_lead`, `form_error`, `contact_click`, `service_cta_click` y `needs_selector_completed`. Producción carga una sola vez `GTM-W2CSD45N` y no hay otra instalación de GA4.
+- **Falta:** etiquetas y activadores para `pricing_plan_selected`, `pricing_cta_click` y los cinco `showroom_*`. El sitio ya los envía a `dataLayer`, pero GTM todavía no los reenvía a GA4. Se configuran igual que los existentes: activador de evento personalizado con el nombre exacto y etiqueta de evento de GA4 con los parámetros de la tabla como variables de capa de datos. No marcarlos como evento clave.
+
 ### Estado del contenedor GTM (revisado en el `gtm.js` público, 2026-11-09)
 
 - **Ya configurado:** etiqueta de Google de GA4 `G-1WSGMR965K` con medición mejorada (páginas vistas por historial, desplazamiento, clics salientes, formularios, etc.), redacción automática y `generate_lead` marcado como evento clave.

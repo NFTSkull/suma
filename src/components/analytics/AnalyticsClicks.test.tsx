@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { contactMethodOf, serviceCtaAttrs } from "@/lib/analytics";
+import { contactMethodOf, serviceCtaAttrs, showroomWhatsAppAttrs } from "@/lib/analytics";
 import { AnalyticsClicks } from "./AnalyticsClicks";
 
 type DL = Window & { dataLayer?: Record<string, unknown>[] };
@@ -21,6 +21,8 @@ function Page() {
       </a>
       <a href="https://wa.me/528114688882" {...serviceCtaAttrs("crm", "hero")}>CTA CRM por WhatsApp</a>
       <a href="https://wa.me/528114688882" data-pricing-plan="flow" data-pricing-source="card">Cotizar Flow</a>
+      <a href="https://wa.me/528114688882" data-pricing-plan="ads" data-pricing-source="card">Cotizar Ads</a>
+      <a href="https://wa.me/528114688882?text=Negocio%3A%20Estudio%20Aurora" {...showroomWhatsAppAttrs("impact")}>Revisar números</a>
       <a href="/servicios">Servicios</a>
     </>
   );
@@ -70,6 +72,22 @@ describe("AnalyticsClicks", () => {
       { event: "contact_click", contact_method: "whatsapp" },
       { event: "pricing_cta_click", plan: "flow", source: "card" },
     ]);
+  });
+
+  it("mide los tres paquetes vigentes, incluido SUMA Ads", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByText("Cotizar Ads"));
+    expect(layer()).toContainEqual({ event: "pricing_cta_click", plan: "ads", source: "card" });
+  });
+
+  it("WhatsApp del showroom: solo el clic y la intención, nunca el texto del mensaje", () => {
+    render(<Page />);
+    fireEvent.click(screen.getByText("Revisar números"));
+    expect(layer()).toEqual([
+      { event: "contact_click", contact_method: "whatsapp" },
+      { event: "showroom_whatsapp_click", intent: "impact" },
+    ]);
+    expect(JSON.stringify(layer())).not.toContain("Aurora");
   });
 
   it("ignora enlaces normales y genera un solo evento por clic", () => {

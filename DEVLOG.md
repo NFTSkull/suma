@@ -67,3 +67,33 @@
 **Compatibilidad con la configuración de Resend ya en producción.** El formulario empezó a funcionar en `main` con Resend antes de fusionar esta rama, así que la validación nueva no puede ser más estricta que lo que acepta Resend: la clave solo se exige con prefijo `re_` (sin otro patrón), el remitente puede ir con o sin nombre visible y el destinatario admite varios correos separados por comas. Se comprobó en Vercel (solo nombres y comentarios, sin descifrar) que existen las tres variables en Production y en DNS que `sumastudio.mx` tiene DKIM, SPF/MX en `send.` y DMARC; con eso la rama no cambia el comportamiento de entrega, solo cómo se confirma.
 
 **Consentimiento opt-in con GTM bloqueado.** Se pasó de exclusión voluntaria a consentimiento previo en todas las regiones. En lugar de cargar GTM con `analytics_storage: denied` (que con Consent Mode avanzado aún permite pings sin cookies), `GoogleTagManager` no renderiza el fragmento hasta que hay aceptación: sin permiso no se descarga `gtm.js`. Al aceptar se envía `consent update` y en el mismo ciclo se monta el script, así GTM arranca ya con `granted`; en visitas posteriores el default `beforeInteractive` lee la elección guardada. Se quitó el `<noscript>` porque sin JavaScript no se puede pedir permiso. Banner, footer y GTM comparten un almacén (`useSyncExternalStore` con evento propio + `storage`), con respaldo en memoria si `localStorage` no está disponible; en el servidor el estado es `pending` para no renderizar el banner antes de hidratar (sin parpadeo ni desajuste). Botones con el mismo peso visual y sin casillas premarcadas. El banner se ensanchó a 30rem en escritorio para que "Aceptar estadísticas" quepa en una línea. Se revisó el contenedor público: tiene la etiqueta de GA4 `G-1WSGMR965K` pero no activadores para los eventos personalizados; eso queda como configuración de GTM. El aviso de privacidad describe solo servicios comprobables y marca como pendiente todo dato legal; no se declara aprobado.
+
+## 2026-11-10 — Pulido de SUMA Vision Studio (PR #21)
+
+**Evaluación como dueña de un estudio de Pilates.** El objetivo era que en menos de un minuto se entienda qué es, se pueda empezar y se llegue a los números para decidir. Lo que lo impedía: pasos con nombres distintos en el hero y en las secciones, la tranquilidad ("sin registro, sin pagos, datos ficticios") repetida unas cinco veces, la vista previa a ~700 px de sus controles en móvil, un simulador de 3,200 px con el periodo lejos del resultado (mostraba "se paga sola" y un balance negativo sin explicar por qué) y una propuesta sin desglose ni pasos de implementación.
+
+**Un solo periodo.** El simulador y la propuesta comparten `months` (el simulador avisa con `onMonthsChange`); antes podían mostrar periodos distintos y contradecirse.
+
+**Origen de cada dato.** Se marca por campo ("Ejemplo" hasta que la persona lo cambia, después "Tu dato") en lugar de un aviso general, para que siempre se distinga dato real, ejemplo, supuesto y resultado no garantizado. La fórmula de clientes nuevos se muestra con los valores reales del cálculo.
+
+**Menos opciones a la vista, no menos opciones.** Los 13 módulos y las 9 demos siguen disponibles; se muestran primero los recomendados para el objetivo elegido. La herramienta actual se movió a la propuesta porque solo afecta al mensaje de WhatsApp.
+
+**WhatsApp del simulador.** Usaba la intención de diagnóstico y metía el resumen dentro de `notes`, que se recorta a 180 caracteres y pisaba lo que la persona había escrito. Ahora hay una intención `impact` y un campo `impactSummary` aparte; las notas se conservan.
+
+**Selectores en 360 px.** Tres columnas no caben con "12 meses" a 16 px, y bajar la fuente haría que iOS amplíe la pantalla al tocar el selector; en móvil quedan Equipo y Sedes en dos columnas y Periodo a lo ancho.
+
+**Columna fija en escritorio.** Los datos quedan a la vista mientras se lee el resultado. La sección usaba `overflow-hidden` para recortar las esquinas, lo que convierte al contenedor en caja de scroll y anula `position: sticky`; `overflow-clip` recorta igual sin ese efecto.
+
+**Hero compartido intacto.** `PageHero` lo usan 12 páginas; en `/showroom` solo se cambió el `accent` a morado.
+
+**Build local.** Durante esta sesión `next build` con Turbopack falló varias veces al resolver `next/font/google` ("queries have exactly one entry"), también sin cambios; CI y Vercel compilaban bien. En la revisión final volvió a compilar sin tocar nada, así que fue un fallo transitorio del entorno. Un build con webpack no sirve para validar: Tailwind solo está configurado como loader de Turbopack.
+
+## 2026-11-10 — Revisión final de SUMA Vision Studio (PR #21)
+
+**Atribución antes que redacción.** Cambiar «se paga sola» por condicional no bastaba: con solo publicidad, SEO o web, el simulador seguía restando la mensualidad a clientes «recuperados» de consultas sin respuesta, un beneficio que esos servicios no generan. El criterio es el mismo que ya usaba la advertencia: solo CRM gestionado o a medida, chatbots, automatización y los paquetes Flow o Growth atienden o dan seguimiento. Sin ellos se muestra la oportunidad (para que se entienda qué falta), pero no se compara contra el costo, no se da veredicto ni horas, y el WhatsApp lo aclara. Con selecciones mixtas se resta el costo total, lo que no sobreatribuye.
+
+**Eventos sin cifras.** Las cifras del simulador son datos de negocio que la persona escribe; se envía cuántos datos cambió, no sus valores. `showroom_impact_used` y `showroom_personalized` van una vez por visita; `showroom_quote_updated` se agrupa 1.5 s y solo cuando cambia la clave (modo, paquete, extras cobrados, periodo), así que StrictMode y los clics seguidos no lo duplican. `showroom_whatsapp_click` sigue el patrón de `service_cta_click`: atributos `data-*` y el listener único del layout, para no añadir otro listener ni convertir enlaces. GTM ya reenvía los cinco eventos generales; los del showroom y los de precios necesitan sus etiquetas en GTM, que no se tocaron.
+
+**`pricing_cta_click` y el plan Ads.** La lista de planes estaba escrita a mano con un `start` que ya no existe; ahora se valida contra `pricingPlans`.
+
+**Anclas.** `globals.css` ya reserva el header con `scroll-padding-top`; el `scroll-mt-24` de las secciones lo duplicaba.

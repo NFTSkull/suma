@@ -27,7 +27,7 @@ Comando de verificación por bloque: `npm run lint && npm run typecheck && npm t
 - "Lo que hacemos" + selector de necesidades: cinco opciones en orden, cada una desplaza a su tarjeta (`servicio-<slug>`), énfasis tras `scrollend` o respaldo y retirada posterior, una sola tarjeta enfatizada, movimiento reducido, foco con teclado vs. puntero, sin scroll al montar y enlaces de tarjetas intactos.
 - Demo chatbot: pregunta → horarios → confirmación de ejemplo.
 - Formulario: errores accesibles, no muestra éxito ante 503, sí ante 200, evita doble envío.
-- Analítica: `generate_lead` solo con entrega confirmada y sin datos personales; un 200 de descarte anti-spam no cuenta; `form_error` por tipo; `contact_click` y `service_cta_click` una vez por clic; `needs_selector_completed` una vez (StrictMode).
+- Analítica: `generate_lead` solo con entrega confirmada y sin datos personales; un 200 de descarte anti-spam no cuenta; `form_error` por tipo; `contact_click` y `service_cta_click` una vez por clic; `needs_selector_completed` una vez (StrictMode). Vision Studio: `showroom_personalized` e `showroom_impact_used` una vez por visita, `showroom_quote_updated` agrupado, `showroom_whatsapp_click` junto a `contact_click`; ninguno lleva nombre, notas ni cifras del simulador, y sin consentimiento no se registra nada.
 - Preferencias de privacidad: desactivar/guardar, reabrir con la elección guardada, cancelar sin cambios.
 
 ## Manual / navegador

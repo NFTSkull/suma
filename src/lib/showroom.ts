@@ -3,7 +3,7 @@ import { showroomExperiences, showroomIndustries, type ShowroomExperienceId, typ
 import { site } from "@/content/site";
 import { estimatePricing, formatMXN } from "@/lib/pricing";
 
-export type ShowroomIntent = "quote" | "budget" | "diagnostic";
+export type ShowroomIntent = "quote" | "budget" | "diagnostic" | "impact";
 export type ShowroomSelection = {
   businessName: string;
   industry: ShowroomIndustryId;
@@ -19,6 +19,7 @@ export type ShowroomSelection = {
   budget?: string;
   notes?: string;
   availability?: string;
+  impactSummary?: string;
 };
 
 /** Reuse the published catalog; no hidden discount, license assumption or price per seat. */
@@ -48,11 +49,13 @@ export function showroomWhatsAppHref(selection: ShowroomSelection, intent: Showr
   const industry = getShowroomIndustry(selection.industry);
   const safe = (value: string | undefined, length: number) =>
     (value ?? "").trim().replace(/[\r\n\t]+/g, " ").slice(0, length);
-  const subject = intent === "diagnostic"
-    ? "Quiero solicitar una sesión de diagnóstico para revisar funciones más avanzadas."
-    : intent === "budget"
-      ? "Quiero ajustar la propuesta según mi presupuesto; sé que eso puede modificar el alcance."
-      : "Quiero revisar mi propuesta personalizada del Showroom de SUMA.";
+  const subjects: Record<ShowroomIntent, string> = {
+    diagnostic: "Quiero solicitar una sesión de diagnóstico para revisar funciones más avanzadas.",
+    budget: "Quiero ajustar la propuesta según mi presupuesto; sé que eso puede modificar el alcance.",
+    impact: "Quiero revisar con SUMA mi simulación de impacto y validar los supuestos con mis datos reales.",
+    quote: "Quiero revisar mi propuesta personalizada del Showroom de SUMA.",
+  };
+  const subject = subjects[intent];
   const lines = [
     "Hola, SUMA STUDIO.",
     subject,
@@ -61,7 +64,7 @@ export function showroomWhatsAppHref(selection: ShowroomSelection, intent: Showr
     "Experiencia vista: " + selectedExperience.title + " (demo con datos ficticios).",
     "Modelo: " + (q.mode === "package" ? q.plan.name : "Servicios individuales") + ".",
     "Servicios adicionales: " + (q.services.length ? q.services.map((s) => s.name).join(", ") : "Sin complementos") + ".",
-    "Periodo de referencia: " + q.months + " mes(es).",
+    "Periodo de referencia: " + q.months + (q.months === 1 ? " mes." : " meses."),
     ...(q.monthlyAds ? ["Presupuesto publicitario contemplado: " + formatMXN(q.monthlyAds) + "/mes (externo)."] : []),
     "Equipo: " + q.teamUsers + " personas. Sedes: " + q.locations + ".",
     ...(safe(selection.platform, 65) ? ["Herramientas actuales: " + safe(selection.platform, 65) + "."] : []),
@@ -71,7 +74,8 @@ export function showroomWhatsAppHref(selection: ShowroomSelection, intent: Showr
     ]),
     ...(intent === "budget" && safe(selection.budget, 40) ? ["Presupuesto que tengo en mente: " + safe(selection.budget, 40) + "."] : []),
     ...(intent === "diagnostic" && safe(selection.availability, 40) ? ["Horario preferido para coordinar: " + safe(selection.availability, 40) + "."] : []),
-    ...(safe(selection.notes, 180) ? ["Quiero agregar o revisar: " + safe(selection.notes, 180) + "."] : []),
+    ...(intent === "impact" && safe(selection.impactSummary, 400) ? [safe(selection.impactSummary, 400)] : []),
+    ...(safe(selection.notes, 180) ? ["Quiero agregar o revisar: " + safe(selection.notes, 180).replace(/\.+$/, "") + "."] : []),
     "Importes antes de IVA; costos de licencias, campañas, WhatsApp API, IA, hosting y terceros aparte.",
     ...(q.locations > 1 ? ["Requiero validar costo multi-sede."] : []),
     "La demostración no es software operativo ni confirma integraciones. Por favor validemos alcance y disponibilidad.",

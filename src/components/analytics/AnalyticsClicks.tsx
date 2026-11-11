@@ -2,8 +2,11 @@
 
 import { useEffect } from "react";
 import { contactMethodOf, track } from "@/lib/analytics";
-import type { PricingPlanId } from "@/content/pricing";
+import { pricingPlans, type PricingPlanId } from "@/content/pricing";
+import type { ShowroomIntent } from "@/lib/showroom";
 import type { ServiceSlug } from "@/types/content";
+
+const showroomIntents: readonly ShowroomIntent[] = ["quote", "budget", "diagnostic", "impact"];
 
 /**
  * Un solo listener delegado (fase de captura) para clics en canales de contacto
@@ -23,7 +26,7 @@ export function AnalyticsClicks() {
 
       // La selección de precios se mide sin nombre, teléfono, importe variable ni texto libre.
       const pricingPlan = link.dataset.pricingPlan;
-      if (pricingPlan === "start" || pricingPlan === "flow" || pricingPlan === "growth") {
+      if (pricingPlans.some((plan) => plan.id === pricingPlan)) {
         track({
           event: "pricing_cta_click",
           plan: pricingPlan as PricingPlanId,
@@ -39,6 +42,11 @@ export function AnalyticsClicks() {
           service: link.dataset.service as ServiceSlug,
           cta_location: link.dataset.ctaLocation === "closing" ? "closing" : "hero",
         });
+      }
+
+      const intent = link.dataset.showroomIntent;
+      if (link.dataset.analytics === "showroom_whatsapp" && showroomIntents.some((id) => id === intent)) {
+        track({ event: "showroom_whatsapp_click", intent: intent as ShowroomIntent });
       }
     };
     document.addEventListener("click", onClick, true);
