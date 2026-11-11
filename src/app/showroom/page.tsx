@@ -8,7 +8,7 @@ import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
   title: "SUMA Vision Studio: prueba una solución para tu negocio",
-  description: "Empieza con tres preguntas, prueba una demo a tu ritmo y conoce cuánto costaría la solución que elijas. Sin registro ni compromiso.",
+  description: "Elige colores viendo cómo se aplican, descubre qué hace cada herramienta con ejemplos interactivos y consulta solo los servicios que necesitas. Sin registro.",
   path: "/showroom",
   keywords: [
     "demo CRM pilates Monterrey", "showroom chatbot WhatsApp wellness",
@@ -34,7 +34,7 @@ export default function ShowroomPage() {
         dark
         crumbs={crumbs}
         title={<>Prueba cómo SUMA podría <span className="text-suma-orange">ayudar a tu negocio.</span></>}
-        lead="Empieza con tres preguntas sencillas, prueba las herramientas con tu negocio y conoce un precio de referencia. Tú avanzas paso a paso; el cálculo es opcional y no tienes que registrarte."
+        lead="Te acompañamos en cada paso: pon el nombre de tu negocio, elige colores viéndolos en pantalla y prueba una herramienta ficticia. Tú decides qué incluir y cuánto quieres explorar. Sin registros ni cobros."
       >
         <ol aria-label="Cómo funciona" className="grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-4">
           {steps.map((step) => (
@@ -48,7 +48,7 @@ export default function ShowroomPage() {
           ))}
         </ol>
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <ButtonLink href="#showroom-wizard" variant="light" size="lg" arrow>Comenzar experiencia</ButtonLink>
+          <ButtonLink href="#showroom-wizard" variant="light" size="lg" arrow>Iniciar mi experiencia</ButtonLink>
           <ButtonLink href="/precios" variant="link-light">Ver precios base</ButtonLink>
         </div>
       </PageHero>
