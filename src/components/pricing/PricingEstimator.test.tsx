@@ -37,6 +37,18 @@ describe("PricingEstimator", () => {
     expect(screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i })).toHaveAttribute("data-pricing-plan", "individuales");
   });
 
+  it("no conserva servicios extra cuando cambia de Flow a Ads o Growth", () => {
+    render(<PricingEstimator />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" }));
+    expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "SUMA Ads" }));
+    expect(screen.getByRole("checkbox", { name: "Asistente con IA para WhatsApp" })).not.toBeChecked();
+    const href = screen.getByRole("link", { name: /personalizar y consultar por WhatsApp/i }).getAttribute("href");
+    const text = decodeURIComponent(href!.split("?text=")[1]);
+    expect(text).toContain("SUMA Ads");
+    expect(text).not.toContain("Asistente con IA para WhatsApp");
+  });
+
   it("ofrece un pago o 3 abonos y aclara el total del contrato", () => {
     render(<PricingEstimator />);
     expect(screen.getByRole("button", { name: "3 mensualidades" })).toHaveAttribute("aria-pressed", "true");
