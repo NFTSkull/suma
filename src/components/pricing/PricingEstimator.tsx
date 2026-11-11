@@ -85,11 +85,11 @@ export function PricingEstimator() {
         <fieldset className="mt-8">
           <legend className="mb-3 text-sm font-bold">1. ¿Prefieres una solución lista o elegir cada función?</legend>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" aria-pressed={mode === "package"} onClick={() => setManualMode("package")}
+            <button type="button" aria-pressed={mode === "package"} onClick={() => { if (mode !== "package") setManualServiceIds([]); setManualMode("package"); }}
               className={optionButton + (mode === "package" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
               Un plan recomendado
             </button>
-            <button type="button" aria-pressed={mode === "services"} onClick={() => setManualMode("services")}
+            <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setManualServiceIds([]); setManualMode("services"); }}
               className={optionButton + (mode === "services" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
               Elegir funciones
             </button>
@@ -103,6 +103,7 @@ export function PricingEstimator() {
               {pricingPlans.map((plan) => (
                 <button key={plan.id} type="button" aria-pressed={planId === plan.id}
                   onClick={() => {
+                    if (plan.id !== planId) setManualServiceIds([]);
                     setManualPlanId(plan.id);
                     setGoal(planStories[plan.id].goal);
                     track({ event: "pricing_plan_selected", plan: plan.id });
@@ -113,6 +114,7 @@ export function PricingEstimator() {
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-xs text-suma-cream/65">Si cambias de plan, se reinician los complementos para comparar solo el precio base.</p>
           </fieldset>
         )}
 
