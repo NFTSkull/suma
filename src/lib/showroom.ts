@@ -1,7 +1,7 @@
 import type { IndividualServiceId, PricingPlanId } from "@/content/pricing";
 import { showroomExperiences, showroomIndustries, type ShowroomExperienceId, type ShowroomIndustryId } from "@/content/showroom";
 import { site } from "@/content/site";
-import { estimatePricing, formatMXN } from "@/lib/pricing";
+import { estimatePricing, formatMXN, formatMXNExact, type SetupPayments } from "@/lib/pricing";
 
 export type ShowroomIntent = "quote" | "budget" | "diagnostic" | "impact";
 export type ShowroomSelection = {
@@ -12,6 +12,7 @@ export type ShowroomSelection = {
   mode?: "services" | "package";
   planId?: PricingPlanId;
   months?: number;
+  setupPayments?: SetupPayments;
   adBudget?: number;
   locations: number;
   teamUsers: number;
@@ -28,6 +29,7 @@ export function showroomEstimate(selection: ShowroomSelection) {
     mode: selection.mode ?? "services",
     planId: selection.planId ?? "flow",
     months: selection.months ?? 1,
+    setupPayments: selection.setupPayments ?? 1,
     adBudget: selection.adBudget ?? 0,
     serviceIds: selection.serviceIds,
     locations: selection.locations,
@@ -70,7 +72,12 @@ export function showroomWhatsAppHref(selection: ShowroomSelection, intent: Showr
     ...(safe(selection.platform, 65) ? ["Herramientas actuales: " + safe(selection.platform, 65) + "."] : []),
     ...(q.isEmpty ? ["Solicito recomendación de alcance y presupuesto."] : [
       "Estimación base SUMA" + (q.isStartingPrice ? " desde" : "") + ": " + formatMXN(q.setup) + " implementación + " + formatMXN(q.monthlySuma) + "/mes.",
-      "Primer pago orientativo SUMA: " + formatMXN(q.firstPaymentSuma) + ".",
+      "Primer desembolso orientativo SUMA: " + formatMXNExact(q.firstPaymentSuma) + ".",
+      ...(q.setupPayments > 1
+        ? ["Implementación: " + q.setupPayments + " abonos mensuales, primero de " + formatMXNExact(q.setupInstallment) +
+          " y último de " + formatMXNExact(q.setupFinalInstallment) +
+          ". Total de implementación " + formatMXN(q.setup) + ", sin reducir la deuda pendiente."]
+        : []),
     ]),
     ...(intent === "budget" && safe(selection.budget, 40) ? ["Presupuesto que tengo en mente: " + safe(selection.budget, 40) + "."] : []),
     ...(intent === "diagnostic" && safe(selection.availability, 40) ? ["Horario preferido para coordinar: " + safe(selection.availability, 40) + "."] : []),
@@ -78,7 +85,7 @@ export function showroomWhatsAppHref(selection: ShowroomSelection, intent: Showr
     ...(safe(selection.notes, 180) ? ["Quiero agregar o revisar: " + safe(selection.notes, 180).replace(/\.+$/, "") + "."] : []),
     "Importes antes de IVA; costos de licencias, campañas, WhatsApp API, IA, hosting y terceros aparte.",
     ...(q.locations > 1 ? ["Requiero validar costo multi-sede."] : []),
-    "La demostración no es software operativo ni confirma integraciones. Por favor validemos alcance y disponibilidad.",
+    "Las parcialidades requieren confirmación comercial por escrito; no son financiación automática. La demostración no es software operativo ni confirma integraciones. Por favor validemos alcance y disponibilidad.",
   ];
   return "https://wa.me/" + site.contact.whatsapp + "?text=" + encodeURIComponent(lines.join("\n"));
 }
