@@ -90,7 +90,7 @@ export function PricingEstimator() {
             </button>
             <button type="button" aria-pressed={mode === "services"} onClick={() => { if (mode !== "services") setManualServiceIds([]); setManualMode("services"); }}
               className={optionButton + (mode === "services" ? " border-suma-orange bg-suma-orange text-suma-navy" : " border-suma-cream/30 hover:border-suma-orange")}>
-              Solo una función
+              Elegir servicios
             </button>
           </div>
         </fieldset>
