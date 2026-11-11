@@ -26,6 +26,17 @@ const guidedGoals = [
 ] as const;
 type GuidedGoalId = (typeof guidedGoals)[number]["id"];
 type WizardStage = "welcome" | "personalize" | "explore" | "impact" | "quote";
+const demoHints: Record<ShowroomExperienceId, string> = {
+  crm: "Prueba marcar una consulta como respondida o cambia a la vista de operación.",
+  chatbot: "Elige una pregunta, como horarios o precios, y mira la respuesta de ejemplo.",
+  ads: "Cambia el tipo de anuncio y descubre cómo variaría el mensaje.",
+  reservas: "Elige un horario de ejemplo para ver qué sucede después.",
+  web: "Pulsa el botón de la página para ver qué encontraría el visitante.",
+  automatizacion: "Pulsa «Simular recorrido» para ver los avisos y tareas.",
+  app: "Prueba las pestañas de clases y membresía.",
+  seo: "Mira cómo podría presentarse tu negocio en un resultado de búsqueda.",
+  "crm-medida": "Explora las vistas de interesados y operación del panel de ejemplo.",
+};
 const wizardLabels = [
   { stage: "personalize", title: "Tu negocio", detail: "Personaliza el ejemplo" },
   { stage: "explore", title: "Prueba", detail: "Elige y usa una demo" },
@@ -288,8 +299,8 @@ export function ShowroomBuilder() {
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">Estás viendo</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{active.title}</p>
-          <p className="mt-2 text-xs font-semibold text-suma-purple">
-            Toca los botones de la demostración para ver cómo cambiaría la pantalla.
+          <p className="mt-3 rounded-xl bg-suma-purple/5 p-3 text-sm font-semibold leading-relaxed text-suma-purple">
+            Pruébalo tú: {demoHints[experience]}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/75">{active.lead}</p>
           <p className="mt-2 text-xs text-suma-navy/55">{active.detail}</p>
@@ -317,8 +328,9 @@ export function ShowroomBuilder() {
           <p aria-live="polite" className="text-sm font-semibold text-suma-navy">
             {quote.isEmpty
               ? "Todavía no has añadido ninguna solución. Puedes probar las demos sin contratar nada."
-              : "Tu propuesta ya incluye " + (mode === "package" ? quote.plan.name + " y " : "") + quote.services.length +
-                (quote.services.length === 1 ? " función adicional." : " funciones adicionales.")}
+              : mode === "package"
+                ? "Tu propuesta incluye " + quote.plan.name + (quote.services.length ? " y " + quote.services.length + " extras." : ".")
+                : "Has elegido " + quote.services.length + (quote.services.length === 1 ? " servicio." : " servicios.")}
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <button type="button" onClick={() => { setPersonalizeField(0); goTo("personalize"); }}
@@ -458,7 +470,7 @@ export function ShowroomBuilder() {
                 <select id="showroom-users" value={teamUsers} onChange={(e) => setTeamUsers(Number(e.target.value))} className={field}>
                   {[1, 5, 10, 25, 50, 100, 500].map((number) => <option value={number} key={number}>{number === 500 ? "500 o más" : number}</option>)}
                 </select></div>
-              <div><label htmlFor="showroom-locations" className="text-sm font-bold text-suma-navy">Sedes</label>
+              <div><label htmlFor="showroom-locations" className="text-sm font-bold text-suma-navy">Sucursales</label>
                 <select id="showroom-locations" value={locations} onChange={(e) => setLocations(Number(e.target.value))} className={field}>
                   {[1, 2, 3, 4, 5, 10].map((number) => <option value={number} key={number}>{number === 10 ? "10 o más" : number}</option>)}
                 </select></div>
@@ -469,7 +481,7 @@ export function ShowroomBuilder() {
             </div>
             {quote.setup > 0 && (
               <fieldset className="rounded-2xl border border-suma-line bg-white p-4 md:p-5">
-                <legend className="px-2 text-sm font-bold text-suma-navy">¿Cómo pagarías la implementación?</legend>
+                <legend className="px-2 text-sm font-bold text-suma-navy">¿Cómo prefieres pagar la configuración inicial?</legend>
                 <div role="group" aria-label="Pagar implementación" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {paymentOptions.map((count) => (
                     <button key={count} type="button" aria-pressed={quote.setupPayments === count}
@@ -563,7 +575,7 @@ export function ShowroomBuilder() {
                     <div className="flex justify-between gap-4 py-3"><dt>Total mínimo: pago inicial + {quote.months} {quote.months === 1 ? "mes de servicio" : "meses de servicio"}</dt><dd className="font-bold tabular-nums">{formatMXN(quote.totalSuma)}</dd></div>
                   </dl>
                   <p className="mt-4 rounded-xl bg-white/10 p-3 text-xs leading-relaxed text-suma-cream/85">
-                    <strong>Rango de referencia para una sede:</strong> pago inicial {formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}
+                    <strong>Rango de referencia para 1 sucursal:</strong> pago inicial {formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}
                     {quote.monthlyMax > 0 ? " y servicio mensual " + formatMXN(quote.monthlySuma) + "–" + formatMXN(quote.monthlyMax) : ""}.
                     Un proyecto más grande puede superar ese rango. Confirmamos el costo final antes de contratar.
                   </p>
@@ -574,7 +586,7 @@ export function ShowroomBuilder() {
                 </>
               )}
               <p className="mt-4 text-xs leading-relaxed text-suma-cream/65">
-                Sin cargo de SUMA por persona del equipo. Aparte: licencias de software, WhatsApp API, consumo de IA, hosting y publicidad. {locations > 1 ? "Con varias sedes revisamos el precio final." : ""}
+                Sin cargo de SUMA por persona del equipo. Aparte: licencias de software, WhatsApp API, consumo de IA, hosting y publicidad. {locations > 1 ? "Con varias sucursales revisamos el precio final." : ""}
               </p>
 
               <a href={showroomWhatsAppHref(selection, "quote")} target="_blank" rel="noopener noreferrer" {...showroomWhatsAppAttrs("quote")}
