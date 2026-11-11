@@ -20,6 +20,12 @@
 
 **Tipos extendidos, no duplicados.** En lugar de crear tipos nuevos para action_log o analytics, se extendieron los existentes: `ActionLogEntry["action"]` ahora acepta `"showroom_lead.submit"`, `AnalyticsEvent` acepta `form_name: "showroom_lead"`. Esto mantiene un solo tipo unión y permite que las funciones `actionLog` y `track` manejen ambos orígenes sin sobrecarga.
 
+**Limitación de persistencia.** El proyecto no tiene base de datos (ARQUITECTURA línea 15: "Sin base de datos ni autenticación no son necesarias en esta etapa"). Los leads se entregan por email a través de Resend con idempotencia SHA256. Limitaciones conocidas:
+- Rate limiting in-memory (5 req/IP/10min) no sobrevive instancias serverless distintas; un atacante puede eludirlo cambiando de región o esperando cold starts.
+- Idempotencia delegada a Resend (clave `showroom-lead/<sha256>` con 24h TTL); si el email falla antes de llegar a Resend, el lead se pierde (solo queda la entrada en action_log sin PII).
+- Sin deduplicación server-side persistente; leads duplicados legítimos (distinto email/whatsapp) no se detectan.
+Solución futura: añadir tabla `leads` en Postgres/Supabase con RLS, migración aditiva, deduplicación por fingerprint, y retry queue para entregas fallidas.
+
 ## 2026-10-12
 
 **Logotipo provisional.** No se recibieron archivos oficiales; las capturas disponibles no son assets de SUMA. Se usa un wordmark tipográfico marcado con `data-provisional="wordmark"` y un registro (`src/content/brand-assets.ts`) para que los SVG oficiales sustituyan todo el sitio al añadirse. No se dibujó ni se "recreó" ningún logo. Favicon y OG también son tipográficos y provisionales.
