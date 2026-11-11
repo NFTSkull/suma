@@ -9,6 +9,9 @@ export const pricingSettings = {
   currency: "MXN",
   adBudgets: [1500, 3000, 6000, 9000, 12000],
   defaultAdBudget: 3000,
+  /** Valores de referencia compartidos entre Precios y Showroom, no valores contractuales. */
+  defaultMonths: 3,
+  defaultSetupPayments: 3,
   websiteMaintenanceMonthly: 490,
   flexiblePaymentsMinForSix: 10000,
 } as const;
@@ -58,7 +61,7 @@ export const pricingPlans = [
     setupIncludes: [
       "Organizamos las consultas en un CRM existente (una lista de clientes con seguimiento).",
       "Definimos etapas y responsables para una sede.",
-      "Configuramos una regla automática sencilla y te enseñamos a usarla.",
+      "Configuramos hasta dos tareas automáticas sencillas, como avisos internos o recordatorios de seguimiento.",
     ],
     monthlyIncludes: [
       "Revisamos el proceso una vez al mes.",
@@ -67,10 +70,10 @@ export const pricingPlans = [
     featured: true,
     includes: [
       "Lista organizada de clientes y pasos para dar seguimiento",
-      "1 regla automática sencilla al inicio",
+      "Hasta 2 tareas automáticas sencillas al inicio",
       "Revisión mensual, 1 ajuste pequeño e informe",
     ],
-    boundaries: "Entrada para una sede y un proceso sencillo. Más reglas, canales o sedes requieren otra cotización. No incluye licencias ni un bot que conteste solo.",
+    boundaries: "Entrada para una sede y un proceso sencillo con hasta dos automatizaciones básicas. Conexiones especiales, mensajería automática, más canales o sedes se cotizan aparte. No incluye licencias ni un bot que conteste solo.",
     action: "Consultar seguimiento",
   },
   {
@@ -80,13 +83,13 @@ export const pricingPlans = [
     label: "Atraer y organizar",
     tagline: "Publicidad y seguimiento en un mismo plan.",
     audience: "Para atraer nuevos interesados y llevar el control de cada consulta.",
-    setup: 4990,
+    setup: 3290,
     setupMax: 14900,
-    monthly: 3990,
+    monthly: 3290,
     monthlyMax: 9900,
     launchWindow: "7 a 15 días hábiles",
     setupIncludes: [
-      "Configuramos el proceso básico de SUMA Flow para una sede.",
+      "Configuramos el proceso básico de SUMA Flow para una sede, con hasta dos tareas automáticas sencillas.",
       "Preparamos una campaña inicial en Facebook e Instagram.",
     ],
     monthlyIncludes: [
@@ -99,7 +102,7 @@ export const pricingPlans = [
       "Hasta 2 diseños sencillos al mes",
       "Revisiones y resumen mensual",
     ],
-    boundaries: "El precio desde es para una sede, una regla sencilla y una campaña. Más anuncios o automatizaciones elevan el presupuesto. Pauta, licencias y bot IA aparte.",
+    boundaries: "El precio desde cubre una sede, hasta dos tareas automáticas sencillas y una campaña. Más anuncios o conexiones especiales elevan el presupuesto. Publicidad, licencias y chatbot con IA aparte.",
     action: "Consultar plan completo",
   },
 ] as const;
@@ -121,7 +124,7 @@ export const individualServices = [
   {
     id: "crm-gestionado", name: "Organizar clientes (CRM)", category: "Atención",
     setup: 2490, setupMax: 7900, monthly: 1490, monthlyMax: 3900, from: true,
-    detail: "Ordenamos consultas, seguimiento y una regla automática sencilla en un CRM existente. Licencias aparte.",
+    detail: "Organizamos las consultas y hasta dos tareas automáticas sencillas en un programa de clientes existente. Licencias aparte.",
   },
   {
     id: "chatbot-guiado", name: "Menú de respuestas automáticas (sin IA)", category: "Atención",
@@ -217,8 +220,8 @@ export const pricingFaqs = [
     a: "No hay mensualidad obligatoria de SUMA por crear una landing o web. El dominio, el alojamiento (hosting), mantenimiento y futuras mejoras se pagan aparte cuando correspondan. Revisiones, garantía y entrega se confirman por escrito.",
   },
   {
-    q: "¿Si cancelo, qué pasa con mi información?",
-    a: "Antes de contratar acordamos por escrito el plazo, cancelación, accesos y entrega de información. Si usas un software de otra empresa, su licencia y sus reglas se pagan y aplican por separado.",
+    q: "¿Cómo funciona la cancelación?",
+    a: "Nuestra propuesta comercial es trabajar sin permanencia forzosa: podrás solicitar la cancelación antes de la próxima renovación mensual. El pago por servicios ya prestados y las parcialidades pendientes de configuración se detallarán en el acuerdo escrito; las licencias de otros proveedores tienen condiciones propias. Confirma las condiciones definitivas antes de contratar.",,
   },
   {
     q: "¿SUMA cobra por cada persona que usa el CRM?",
@@ -234,6 +237,6 @@ export const pricingFaqs = [
   },
   {
     q: "¿Flow o Growth incluyen un chatbot que contesta solo?",
-    a: "No. Incluyen organización de consultas y una regla automática sencilla en el nivel de entrada. Un menú de respuestas o un asistente con IA se cotiza aparte, según el canal y los mensajes necesarios.",
+    a: "No. Flow y Growth incluyen organización de consultas y hasta dos tareas automáticas sencillas al inicio, como avisos internos o recordatorios. Un menú de respuestas o un asistente con IA se cotiza aparte.",
   },
 ] as const;
