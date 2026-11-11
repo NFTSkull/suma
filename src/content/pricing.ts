@@ -23,6 +23,15 @@ export const pricingPlans = [
     audience: "Ya tienes WhatsApp, un reservador o una web; quieres que más personas conozcan tu negocio.",
     setup: 2900,
     monthly: 3900,
+    launchWindow: "3 a 5 días hábiles",
+    setupIncludes: [
+      "Configuración inicial de una campaña en Meta Ads y segmentación local.",
+      "Definimos la ruta de contacto hacia WhatsApp o tu reservador.",
+    ],
+    monthlyIncludes: [
+      "Gestión de una campaña activa y optimización semanal.",
+      "Hasta dos creativos estáticos al mes e informe mensual.",
+    ],
     featured: false,
     includes: [
       "Una campaña activa en Meta Ads",
@@ -43,6 +52,16 @@ export const pricingPlans = [
     audience: "Para negocios que ya reciben interesados y necesitan orden y automatización sin crear un software desde cero.",
     setup: 5900,
     monthly: 2900,
+    launchWindow: "7 a 12 días hábiles",
+    setupIncludes: [
+      "Diagnóstico de un proceso y configuración de un CRM existente para una sede.",
+      "Un embudo con responsables, hasta dos automatizaciones sencillas y capacitación inicial.",
+      "Guía de respuesta por WhatsApp para el equipo (no atención de mensajes por SUMA).",
+    ],
+    monthlyIncludes: [
+      "Revisión y seguimiento del embudo y las reglas configuradas.",
+      "Ajustes operativos menores dentro del alcance e informe mensual.",
+    ],
     featured: true,
     includes: [
       "Diagnóstico de un proceso comercial y una sede",
@@ -64,6 +83,16 @@ export const pricingPlans = [
     audience: "Para estudios y spas que buscan nuevos clientes y un proceso claro hasta su primera visita.",
     setup: 12900,
     monthly: 6900,
+    launchWindow: "10 a 15 días hábiles",
+    setupIncludes: [
+      "Todo el arranque de Flow: un CRM existente, embudo y hasta dos automatizaciones.",
+      "Preparación inicial de hasta dos campañas en Meta Ads y medición.",
+    ],
+    monthlyIncludes: [
+      "Seguimiento mensual del proceso configurado en Flow.",
+      "Gestión y optimización semanal de hasta dos campañas activas.",
+      "Hasta cuatro creativos estáticos al mes e informe comercial mensual.",
+    ],
     featured: false,
     includes: [
       "Alcance base de SUMA Flow para una sede",
@@ -149,10 +178,43 @@ export const individualServices = [
   },
 ] as const;
 
+/** Plazos orientativos, no comprometidos hasta confirmar alcance, insumos y accesos. */
+export const individualServiceDeliveryTimes: Record<(typeof individualServices)[number]["id"], string> = {
+  "meta-ads": "3 a 5 días hábiles",
+  "google-ads": "5 a 8 días hábiles",
+  "crm-gestionado": "7 a 12 días hábiles",
+  "chatbot-guiado": "5 a 10 días hábiles",
+  "chatbot-ia": "2 a 4 semanas, sujeto a integración y autorizaciones",
+  "reservas": "2 a 5 días hábiles",
+  "automatizacion": "3 a 7 días hábiles",
+  "seo-local": "5 a 10 días hábiles para el arranque",
+  "landing": "5 a 10 días hábiles",
+  "web": "15 a 25 días hábiles",
+  "crm-medida": "A definir después del diagnóstico técnico",
+  "mantenimiento-crm": "Inicio sujeto a revisión de la herramienta",
+  "app": "A definir después del diagnóstico técnico",
+};
+
 export type IndividualServiceId = (typeof individualServices)[number]["id"];
 export type IndividualService = (typeof individualServices)[number];
 
 export const pricingFaqs = [
+  {
+    q: "¿El pago único incluye varios meses de servicio?",
+    a: "No. La implementación se paga una vez para configurar o construir el alcance acordado; la mensualidad se cobra por cada mes de servicio activo. Dividir la implementación en 3 o 6 abonos no regala meses de servicio ni modifica el precio total.",
+  },
+  {
+    q: "¿En cuánto tiempo queda listo?",
+    a: "Plazos orientativos de arranque: Ads 3 a 5 días hábiles, Flow 7 a 12 y Growth 10 a 15. El plazo empieza cuando se confirma el alcance y recibimos los accesos, materiales y aprobaciones necesarios. La aprobación de anuncios, permisos e integraciones externas puede demorar más. La fecha se confirma por escrito en cada propuesta.",
+  },
+  {
+    q: "¿Qué cubre la mensualidad y qué pasa al cancelar?",
+    a: "La mensualidad cubre el trabajo mensual descrito en el paquete, no una cantidad ilimitada de cambios, consultas ni automatizaciones nuevas. La permanencia, el aviso de cancelación, accesos y traspaso se establecen por escrito antes de contratar. Las licencias externas continúan sujetas a las condiciones de sus proveedores.",
+  },
+  {
+    q: "¿Una landing o página de pago único incluye hosting y mantenimiento para siempre?",
+    a: "No. El pago único cubre la creación y entrega del sitio acordado. Dominio, hosting, licencias, mantenimiento opcional y futuras funciones se especifican y cotizan por separado. El plazo de revisiones y corrección de errores se confirma en la propuesta.",
+  },
   {
     q: "¿Puedo pagar la implementación o un desarrollo único en mensualidades?",
     a: "Sí, puedes solicitar dividir la implementación en 3 pagos mensuales, o en 6 cuando la implementación base es de al menos $10,000. El total de implementación no cambia en la simulación. Son parcialidades sujetas a confirmación comercial por escrito, NO financiamiento aprobado automáticamente ni cargos automáticos: por separado se cobra cualquier servicio mensual y las herramientas externas. En desarrollos a medida, los pagos también pueden organizarse por entregables aprobados.",
