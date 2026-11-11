@@ -383,13 +383,21 @@ export function ShowroomBuilder() {
           </button>
         </div>
 
+        <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <p aria-live="polite" className="mb-3 rounded-xl border border-suma-purple/20 bg-white px-4 py-3 text-sm font-bold leading-relaxed text-suma-navy">
+            Prueba esto en la pantalla: {demoHints[experience]}
+          </p>
+          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
+          <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
+            Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
+          </p>
+        </div>
+
         <div className="rounded-[2rem] border border-suma-line bg-white p-5 md:p-6 lg:col-start-1 lg:row-start-2">
           <p className="text-xs font-bold uppercase tracking-widest text-suma-purple">3 · AHORA ESTÁS PROBANDO</p>
           <p className="mt-2 font-display text-xl font-bold text-suma-navy">{friendlyDemoTitles[experience]}</p>
           <p className="mt-2 text-sm leading-relaxed text-suma-navy/80">{simpleDemoExplanations[experience]}</p>
-          <p className="mt-3 rounded-xl bg-suma-purple/5 p-3 text-sm font-semibold leading-relaxed text-suma-purple">
-            Pruébalo tú: {demoHints[experience]}
-          </p>
+
           <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">Es una prueba con información inventada: los botones no envían mensajes ni reservan clases.</p>
           <p className="mt-3 text-xs font-bold text-suma-purple">Si te gusta, usa el botón de abajo para incluirlo en tu propuesta. Probarlo no tiene costo.</p>
           {selectedCurrent ? (
@@ -412,13 +420,6 @@ export function ShowroomBuilder() {
             Ver detalles de este servicio →
           </Link>
         </div>
-        <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <ShowroomLivePreview experience={experience} industry={industry} brandName={businessName} paletteId={paletteId} teamUsers={teamUsers} locations={locations} />
-          <p className="mt-3 text-center text-xs leading-relaxed text-suma-navy/60">
-            Prototipo con datos ficticios: no envía mensajes, no crea reservas ni se conecta a otras plataformas.
-          </p>
-        </div>
-
         <div className="lg:col-span-2 rounded-2xl border border-suma-line bg-white px-5 py-5 md:px-7">
           <p className="mb-2 text-xs font-bold uppercase tracking-wider text-suma-purple">Tu selección hasta ahora</p>
           <p aria-live="polite" className="text-sm font-semibold text-suma-navy">{chosenDescription}</p>
