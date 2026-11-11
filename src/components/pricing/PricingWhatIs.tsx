@@ -22,7 +22,7 @@ export function PricingWhatIs({ explanation, subject, dark = false, compact = fa
         (dark ? "border-white/15 text-suma-cream/85" : "border-suma-navy/10 text-suma-navy/80")}>
         <p>{explanation.what}</p>
         <p><strong>Ejemplo:</strong> {explanation.example}</p>
-        <p><strong>Va aparte o no incluye:</strong> {explanation.excluded}</p>
+        <p><strong>Importante:</strong> {explanation.excluded}</p>
       </div>
     </details>
   );
