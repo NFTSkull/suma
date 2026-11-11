@@ -71,7 +71,7 @@ export function showroomWhatsAppHref(selection: ShowroomSelection, intent: Showr
     "Equipo: " + q.teamUsers + " personas. Sedes: " + q.locations + ".",
     ...(safe(selection.platform, 65) ? ["Herramientas actuales: " + safe(selection.platform, 65) + "."] : []),
     ...(q.isEmpty ? ["Solicito recomendación de alcance y presupuesto."] : [
-      "Estimación base SUMA" + (q.isStartingPrice ? " desde" : "") + ": " + formatMXN(q.setup) + " implementación + " + formatMXN(q.monthlySuma) + "/mes.",
+      "Estimación desde para una sede: " + formatMXN(q.setup) + " de pago inicial + " + formatMXN(q.monthlySuma) + "/mes. Rango orientativo: " + formatMXN(q.setup) + "–" + formatMXN(q.setupMax) + " inicial y " + formatMXN(q.monthlySuma) + "–" + formatMXN(q.monthlyMax) + "/mes. Precio final según alcance.",
       "Primer desembolso orientativo SUMA: " + formatMXNExact(q.firstPaymentSuma) + ".",
       ...(q.setupPayments > 1
         ? ["Implementación: " + q.setupPayments + " abonos mensuales, primero de " + formatMXNExact(q.setupInstallment) +

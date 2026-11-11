@@ -74,7 +74,7 @@ export function PricingEstimator() {
         <p className="text-eyebrow text-suma-orange">Tu solución, a tu medida</p>
         <h3 className="mt-3 font-display text-3xl font-bold leading-tight md:text-4xl">Elige lo que necesitas. Conoce la inversión.</h3>
         <p className="mt-3 text-sm leading-relaxed text-suma-cream/75">
-          Paquete completo o servicios individuales. El precio se actualiza aquí y llevamos tu selección a WhatsApp para afinar el alcance.
+          Elige lo que necesitas. Mostramos cuánto cuesta empezar y un rango orientativo; antes de cobrarte confirmamos el precio final.
         </p>
 
         <fieldset className="mt-8">
@@ -111,7 +111,7 @@ export function PricingEstimator() {
 
         <fieldset className="mt-7">
           <legend className="mb-1 text-sm font-bold">{mode === "package" ? "3. Complementa tu paquete (opcional)" : "2. Elige uno o varios servicios"}</legend>
-          <p className="mb-4 text-xs text-suma-cream/65">Los módulos incluidos en un paquete no se cobran de nuevo. Los importes «desde» son referencias mínimas.</p>
+          <p className="mb-4 text-xs text-suma-cream/65">No cobramos dos veces lo que ya incluye un plan. Todos los precios son «desde»: dependen de lo que necesites.</p>
           {categories.map((category) => {
             const services = individualServices.filter((s) => s.category === category && !included.includes(s.id));
             if (!services.length) return null;
@@ -126,7 +126,7 @@ export function PricingEstimator() {
                       <span className="text-sm">
                         <strong className="block leading-snug">{s.name}</strong>
                         <span className="mt-1 block text-xs text-suma-cream/70">
-                          {s.from ? "Desde " : ""}{formatMXN(s.setup || s.monthly)}{s.setup === 0 ? "/mes" : s.monthly ? " inicial + " + formatMXN(s.monthly) + "/mes" : " · pago único"}
+                          Desde {formatMXN(s.setup || s.monthly)}{s.setup === 0 ? "/mes" : s.monthly ? " inicial + desde " + formatMXN(s.monthly) + "/mes" : " · pago único"}
                         </span>
                       </span>
                     </label>
@@ -139,7 +139,7 @@ export function PricingEstimator() {
 
         {quote.setup > 0 && (
           <fieldset className="mt-7 rounded-2xl border border-white/20 bg-white/5 p-4">
-            <legend className="px-2 text-sm font-bold">Paga la implementación a tu ritmo</legend>
+            <legend className="px-2 text-sm font-bold">¿Quieres dividir el pago inicial?</legend>
             <div role="group" aria-label="Pago de implementación" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {paymentOptions.map((count) => (
                 <button key={count} type="button" aria-pressed={quote.setupPayments === count}
@@ -153,8 +153,8 @@ export function PricingEstimator() {
             </div>
             <p className="mt-3 text-xs leading-relaxed text-suma-cream/70">
               {quote.setupPayments === 1
-                ? "Una sola implementación, pagada al iniciar."
-                : "Primer abono de implementación " + formatMXNExact(quote.setupInstallment) + ". Último abono " + formatMXNExact(quote.setupFinalInstallment) + ". No cambia el precio total de implementación."}
+                ? "Todo el pago inicial al comenzar, sujeto a la propuesta."
+                : "Primer pago mínimo orientativo " + formatMXNExact(quote.setupInstallment) + ". Último abono " + formatMXNExact(quote.setupFinalInstallment) + ". Dividir el pago no cambia el costo mínimo."}
               {" "}Las parcialidades están sujetas a un acuerdo comercial por escrito; no son una financiación aprobada ni cobros automáticos.
             </p>
           </fieldset>
@@ -162,13 +162,13 @@ export function PricingEstimator() {
 
         <div className="mt-7 grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="pricing-months" className="text-sm font-bold">Periodo de referencia</label>
+            <label htmlFor="pricing-months" className="text-sm font-bold">¿Cuántos meses quieres comparar?</label>
             <select id="pricing-months" className={selectStyle} value={months} onChange={(e) => setMonths(Number(e.target.value))}>
               {periods.map((n) => <option key={n} value={n}>{n} {n === 1 ? "mes" : "meses"}</option>)}
             </select>
           </div>
           <div>
-            <label htmlFor="pricing-users" className="text-sm font-bold">Personas de tu equipo</label>
+            <label htmlFor="pricing-users" className="text-sm font-bold">¿Cuántas personas trabajan contigo?</label>
             <select id="pricing-users" className={selectStyle} value={teamUsers} onChange={(e) => setTeamUsers(Number(e.target.value))}>
               {[1, 5, 10, 25, 50, 100, 500].map((n) => <option key={n} value={n}>{n === 500 ? "500 o más" : n}</option>)}
             </select>
@@ -194,7 +194,7 @@ export function PricingEstimator() {
             </select>
           </div>
           <div>
-            <label htmlFor="pricing-platform" className="text-sm font-bold">Canal o reservador actual</label>
+            <label htmlFor="pricing-platform" className="text-sm font-bold">¿Dónde recibes consultas o reservas?</label>
             <select id="pricing-platform" className={selectStyle} value={platform} onChange={(e) => setPlatform(e.target.value)}>
               {["WhatsApp", "Wellhub / TotalPass / Fitpass", "Fitco / Fitune", "Reservador propio", "Instagram / Facebook", "Sin plataforma todavía", "Otro"].map((n) => <option key={n}>{n}</option>)}
             </select>
@@ -203,11 +203,11 @@ export function PricingEstimator() {
 
         {quote.hasAds && (
           <div className="mt-6">
-            <label htmlFor="pricing-ads" className="text-sm font-bold">Pauta mensual estimada (se paga a la plataforma)</label>
+            <label htmlFor="pricing-ads" className="text-sm font-bold">¿Cuánto te gustaría gastar en anuncios cada mes? (aparte)</label>
             <select id="pricing-ads" className={selectStyle} value={adBudget} onChange={(e) => setAdBudget(Number(e.target.value))}>
               {pricingSettings.adBudgets.map((n) => <option key={n} value={n}>{formatMXN(n)} al mes</option>)}
             </select>
-            <p className="mt-1 text-xs text-suma-cream/60">Presupuesto hipotético, no cobro de SUMA ni promesa de resultados.</p>
+            <p className="mt-1 text-xs text-suma-cream/60">Este dinero lo pagas a Meta o Google, no a SUMA. No garantiza ventas.</p>
           </div>
         )}
 
@@ -230,34 +230,40 @@ export function PricingEstimator() {
               <p className="mt-7 rounded-xl bg-suma-navy/10 p-4 text-sm">Selecciona al menos un servicio para ver la inversión.</p>
             ) : (
               <>
-                <p className="mt-6 text-sm font-semibold text-suma-navy/65">{quote.isStartingPrice ? "Primer desembolso estimado desde" : "Primer desembolso estimado a SUMA"}</p>
+                <p className="mt-6 text-sm font-semibold text-suma-navy/65">{quote.isStartingPrice ? "Para empezar, desde" : "Para empezar, desde"}</p>
                 <p className="mt-2 font-display text-[clamp(2.2rem,4vw,3.4rem)] font-extrabold leading-none tracking-tight tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
                 <p className="mt-2 text-xs text-suma-navy/60">
                   {quote.setupPayments === 1 ? "Implementación completa" : "Primera parcialidad de implementación"} + primer mes de servicio, antes de IVA.
                 </p>
                 <p className="mt-2 text-sm font-semibold text-suma-navy/80">
-                  Primer desembolso con IVA general del 16%, si aplica: {formatMXNExact(quote.firstPaymentSuma * 1.16)}
+                  Ejemplo con IVA del 16%, si aplica: {formatMXNExact(quote.firstPaymentSuma * 1.16)}
                 </p>
                 <dl className="mt-7 divide-y divide-suma-navy/15 border-y border-suma-navy/15">
                   <div className="flex items-center justify-between gap-3 py-3 text-sm">
-                    <dt>Implementación única</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd>
+                    <dt>Pago inicial · desde</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd>
                   </div>
                   {quote.setupPayments > 1 && <div className="flex items-center justify-between gap-3 py-3 text-sm">
                     <dt>Implementación: {quote.setupPayments} abonos (primero)</dt><dd className="font-bold tabular-nums">{formatMXNExact(quote.setupInstallment)}</dd>
                   </div>}
                   <div className="flex items-center justify-between gap-3 py-3 text-sm">
-                    <dt>Mensualidad SUMA</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd>
+                    <dt>Servicio mensual · desde</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd>
                   </div>
                   {quote.hasAds && <div className="flex items-center justify-between gap-3 py-3 text-sm">
                     <dt>Pauta mensual externa</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd>
                   </div>}
                 </dl>
-                <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-navy/60">Costo total SUMA: implementación íntegra + {quote.months} {quote.months === 1 ? "mes de servicio" : "meses de servicio"}</p>
-                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatMXN(quote.totalSuma)}</p>
-                <p className="mt-2 text-xs text-suma-navy/70">Total de servicios SUMA incluyendo IVA general del 16%, si aplica: {formatMXNExact(quote.totalSuma * 1.16)}.</p>
+                <div className="mt-6 rounded-xl bg-suma-navy/7 p-4">
+                  <p className="text-xs font-bold uppercase tracking-widest text-suma-navy/60">Rango orientativo · una sede, sin IVA</p>
+                  <p className="mt-2 text-sm">Pago inicial: <strong>{formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}</strong></p>
+                  {quote.monthlyMax > 0 && <p className="mt-1 text-sm">Cada mes: <strong>{formatMXN(quote.monthlySuma)}–{formatMXN(quote.monthlyMax)}</strong></p>}
+                  <p className="mt-2 text-xs text-suma-navy/65">Para servicios sencillos a medianos. Si necesitas más funciones o sedes, el precio puede ser mayor.</p>
+                </div>
+                <p className="mt-5 text-xs font-bold uppercase tracking-widest text-suma-navy/60">Ejemplo de {quote.months} {quote.months === 1 ? "mes" : "meses"}: pago inicial completo + servicio mensual</p>
+                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">Desde {formatMXN(quote.totalSuma)}</p>
+                <p className="mt-1 text-sm text-suma-navy/65">Rango orientativo para una sede: {formatMXN(quote.totalSuma)}–{formatMXN(quote.totalSumaMax)}. No es cotización.</p>
                 {quote.hasAds && <p className="mt-1 text-xs text-suma-navy/65">+ {formatMXN(quote.totalExternalAds)} de pauta externa estimada en ese periodo.</p>}
                 {quote.setupPayments > 1 && <p className="mt-2 text-xs leading-relaxed text-suma-navy/65">
-                  El costo total incluye todas las parcialidades de implementación, aunque alguna venza después de los {quote.months} {quote.months === 1 ? "mes" : "meses"} elegidos.
+                  Este ejemplo incluye todo el pago inicial, aunque alguna parcialidad venza después de los {quote.months} {quote.months === 1 ? "mes" : "meses"} elegidos.
                 </p>}
                 {quote.services.length > 0 && <div className="mt-6 border-t border-suma-navy/15 pt-4">
                   <p className="text-xs font-bold uppercase tracking-widest text-suma-navy/60">Servicios elegidos</p>
@@ -277,7 +283,7 @@ export function PricingEstimator() {
             </a>
           )}
           <p className="mt-4 text-xs leading-relaxed text-suma-navy/65">
-            Los importes con IVA son orientativos y no constituyen cálculo fiscal personalizado. Modalidad en abonos sujeta a acuerdo escrito; no se financia ni cobra automáticamente. Referencia no vinculante, antes de IVA. No incluye licencias, pautas, costos WhatsApp API ni consumos de IA. En CRM de terceros puede haber licencias por usuario; SUMA no agrega tarifas por asiento. Multi-sede e integraciones personalizadas se cotizan tras diagnóstico.
+            Precios de referencia para una sede, antes de IVA. El precio final depende de lo que necesites; lo confirmamos antes de empezar. Anuncios, licencias, dominio, mensajes y uso de IA van aparte. Si eliges varias sedes, preparamos un presupuesto especial. Las parcialidades requieren acuerdo por escrito.
           </p>
         </div>
       </div>

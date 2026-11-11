@@ -22,23 +22,25 @@ describe("Showroom SUMA", () => {
   });
   it("el precio para CRM aprovecha el catálogo de la web", () => {
     const quote = showroomEstimate(initial);
-    expect(quote.setup).toBe(5900);
-    expect(quote.monthlySuma).toBe(2900);
-    expect(quote.firstPaymentSuma).toBe(8800);
-    expect(quote.isStartingPrice).toBe(false);
+    expect(quote.setup).toBe(2490);
+    expect(quote.monthlySuma).toBe(1490);
+    expect(quote.firstPaymentSuma).toBe(3980);
+    expect(quote.isStartingPrice).toBe(true);
+    expect(quote.setupMax).toBe(7900);
+    expect(quote.monthlyMax).toBe(3900);
   });
   it("puede combinar chatbot sin un descuento ficticio", () => {
     const quote = showroomEstimate({ ...initial, experience: "chatbot", serviceIds: ["crm-gestionado", "chatbot-ia"] });
-    expect(quote.setup).toBe(20800);
-    expect(quote.monthlySuma).toBe(6800);
-    expect(quote.firstPaymentSuma).toBe(27600);
+    expect(quote.setup).toBe(9390);
+    expect(quote.monthlySuma).toBe(3480);
+    expect(quote.firstPaymentSuma).toBe(12870);
     expect(quote.isStartingPrice).toBe(true);
   });
   it("mantiene notas y parcialidades en WhatsApp sin cambiar setup real", () => {
     const planned = { ...initial, setupPayments: 3 as const, notes:"No quiero cambiar mi agenda" };
     const quote = showroomEstimate(planned);
-    expect(quote.setup).toBe(5900);
-    expect(quote.firstPaymentSuma).toBe(4866.67);
+    expect(quote.setup).toBe(2490);
+    expect(quote.firstPaymentSuma).toBe(2320);
     const msg = decodeURIComponent(showroomWhatsAppHref(planned, "quote").split("?text=")[1]);
     expect(msg).toContain("3 abonos mensuales");
     expect(msg).toContain("No quiero cambiar mi agenda");
@@ -46,7 +48,7 @@ describe("Showroom SUMA", () => {
   it("no factura dos veces el módulo CRM dentro de Flow", () => {
     const quote = showroomEstimate({ ...initial, mode: "package", planId: "flow", serviceIds: ["crm-gestionado", "chatbot-ia"] });
     expect(quote.services.map(s => s.id)).toEqual(["chatbot-ia"]);
-    expect(quote.setup).toBe(20800);
+    expect(quote.setup).toBe(9390);
   });
   it("sin tarifa SUMA por asiento; múltiples sedes requieren ajuste", () => {
     const a = showroomEstimate({ ...initial, teamUsers: 1 });

@@ -21,14 +21,14 @@ describe("ShowroomImpacto · interacción", () => {
     render(<ShowroomImpacto selection={selection} quote={showroomEstimate(selection)} />);
     expect(screen.getByText(/Partimos de un estudio de ejemplo/)).toBeInTheDocument();
     expect(screen.getAllByText("Ejemplo").length).toBeGreaterThanOrEqual(4);
-    // 180 consultas × 30% = 54 sin respuesta × 40% × 25% = 5.4 clientes × $1,800 = $9,720; 60% = $5,832; − $2,900 = +$2,932.
+    // 180 consultas × 30% = 54 sin respuesta × 40% × 25% = 5.4 clientes × $1,800 = $9,720; 60% = $5,832; − $1,490 = +$4,342.
     expect(screen.getByText(/54 sin respuesta × 40% recuperadas × 25% compran/)).toBeInTheDocument();
     expect(screen.getByText(formatMXN(9720))).toBeInTheDocument();
     expect(screen.getByText(formatMXN(5832))).toBeInTheDocument();
-    expect(screen.getByText("−" + formatMXN(2900))).toBeInTheDocument();
-    expect(screen.getByText("+" + formatMXN(2932))).toBeInTheDocument();
+    expect(screen.getByText("−" + formatMXN(1490))).toBeInTheDocument();
+    expect(screen.getByText("+" + formatMXN(4342))).toBeInTheDocument();
     expect(screen.getByText(/Si estos supuestos se cumplen, el margen estimado cubriría la mensualidad/)).toBeInTheDocument();
-    expect(screen.getByText(/harían falta 3 clientes nuevos al mes/)).toBeInTheDocument();
+    expect(screen.getByText(/harían falta 2 clientes nuevos al mes/)).toBeInTheDocument();
     expect(screen.getByText(/podrían liberarse/)).toBeInTheDocument();
     expect(screen.getAllByText(/No garantizado/i).length).toBeGreaterThan(0);
   });
@@ -64,14 +64,14 @@ describe("ShowroomImpacto · interacción", () => {
   it("el periodo se comparte con la propuesta y el balance resta la implementación", () => {
     const onMonthsChange = vi.fn();
     const { rerender } = render(<ShowroomImpacto selection={selection} quote={showroomEstimate(selection)} onMonthsChange={onMonthsChange} />);
-    expect(screen.getByText("-" + formatMXN(2968).replace("$", "$"))).toBeInTheDocument();
+    expect(screen.getByText("+" + formatMXN(1852))).toBeInTheDocument();
     fireEvent.click(within(screen.getByRole("group", { name: "Periodo a evaluar" })).getByRole("button", { name: "12 m" }));
     expect(onMonthsChange).toHaveBeenCalledWith(12);
     const year = { ...selection, months: 12 };
     rerender(<ShowroomImpacto selection={year} quote={showroomEstimate(year)} onMonthsChange={onMonthsChange} />);
-    // 12 × $2,932 − $5,900 = $29,284
-    expect(screen.getByText("+" + formatMXN(29284))).toBeInTheDocument();
-    expect(screen.getByText(/se recuperaría en ~3 meses/)).toBeInTheDocument();
+    // 12 × $4,342 − $2,490 = $49,614
+    expect(screen.getByText("+" + formatMXN(49614))).toBeInTheDocument();
+    expect(screen.getByText(/se recuperaría en ~1 mes/)).toBeInTheDocument();
   });
 
   it("sin módulos de seguimiento no atribuye clientes, diferencia ni horas a lo elegido", () => {
@@ -121,8 +121,8 @@ describe("ShowroomImpacto · interacción", () => {
     expect(text).toContain("Quiero agregar o revisar: Tengo dos sedes en San Pedro.");
     expect(text).toContain("Escenario base (supuestos por validar)");
     expect(text).toContain(formatMXN(9720));
-    expect(text).toContain("diferencia de +" + formatMXN(2932) + "/mes");
-    expect(text).toContain("Mensualidad SUMA " + formatMXN(2900));
+    expect(text).toContain("diferencia de +" + formatMXN(4342) + "/mes");
+    expect(text).toContain("Mensualidad SUMA " + formatMXN(1490));
     expect(text).not.toContain("..");
   });
 });

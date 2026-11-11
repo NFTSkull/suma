@@ -5,21 +5,24 @@ import { availableSetupPayments, estimatePricing, formatMXN, pricingWhatsAppHref
 describe("precios configurables SUMA", () => {
   it("ofrece planes de mercado con setup, mensualidad y alcance claros", () => {
     expect(pricingPlans.map((plan) => plan.id)).toEqual(["ads", "flow", "growth"]);
-    expect(pricingPlans.map((plan) => plan.setup)).toEqual([2900, 5900, 12900]);
-    expect(pricingPlans.map((plan) => plan.monthly)).toEqual([3900, 2900, 6900]);
+    expect(pricingPlans.map((plan) => plan.setup)).toEqual([990, 2490, 4990]);
+    expect(pricingPlans.map((plan) => plan.monthly)).toEqual([1990, 1490, 3990]);
+    expect(pricingPlans.map((plan) => plan.setupMax)).toEqual([3900, 7900, 14900]);
+    expect(pricingPlans.map((plan) => plan.monthlyMax)).toEqual([4900, 3900, 9900]);
+    expect(individualServices.every((s) => s.from && s.setupMax >= s.setup && s.monthlyMax >= s.monthly)).toBe(true);
     expect(new Set(individualServices.map((s) => s.id)).size).toBe(individualServices.length);
   });
 
   it("distingue instalación, mensualidad, pauta y primer pago", () => {
-    expect(estimatePricing({ planId: "ads", months: 1 }).firstPaymentSuma).toBe(6800);
-    expect(estimatePricing({ planId: "flow", months: 1 }).firstPaymentSuma).toBe(8800);
-    expect(estimatePricing({ planId: "growth", months: 1 }).firstPaymentSuma).toBe(19800);
+    expect(estimatePricing({ planId: "ads", months: 1 }).firstPaymentSuma).toBe(2980);
+    expect(estimatePricing({ planId: "flow", months: 1 }).firstPaymentSuma).toBe(3980);
+    expect(estimatePricing({ planId: "growth", months: 1 }).firstPaymentSuma).toBe(8980);
     const ads = estimatePricing({ planId: "ads", months: 3, adBudget: 6000 });
-    expect(ads.totalSuma).toBe(14600);
+    expect(ads.totalSuma).toBe(6960);
     expect(ads.totalExternalAds).toBe(18000);
-    expect(ads.totalWithAds).toBe(32600);
+    expect(ads.totalWithAds).toBe(24960);
     const growth = estimatePricing({ planId: "growth", months: 3, adBudget: 9000 });
-    expect(growth.totalSuma).toBe(33600);
+    expect(growth.totalSuma).toBe(16960);
     expect(growth.totalExternalAds).toBe(27000);
   });
 
@@ -28,9 +31,9 @@ describe("precios configurables SUMA", () => {
       mode: "services", planId: "flow", months: 3,
       serviceIds: ["reservas", "seo-local"],
     });
-    expect(estimate.setup).toBe(5800);
-    expect(estimate.monthlySuma).toBe(1990);
-    expect(estimate.totalSuma).toBe(11770);
+    expect(estimate.setup).toBe(1980);
+    expect(estimate.monthlySuma).toBe(990);
+    expect(estimate.totalSuma).toBe(4950);
     expect(estimate.isStartingPrice).toBe(true);
     expect(estimate.hasAds).toBe(false);
     expect(estimatePricing({ mode: "services", planId: "ads", months: 1 }).isEmpty).toBe(true);
@@ -42,39 +45,43 @@ describe("precios configurables SUMA", () => {
       serviceIds: ["meta-ads", "crm-gestionado", "chatbot-ia"],
     });
     expect(quote.services.map(s => s.id)).toEqual(["chatbot-ia"]);
-    expect(quote.setup).toBe(27800);
-    expect(quote.monthlySuma).toBe(10800);
+    expect(quote.setup).toBe(11890);
+    expect(quote.monthlySuma).toBe(5980);
     expect(quote.isStartingPrice).toBe(true);
   });
 
   it("ofrece 3 pagos en proyectos pequeños y hasta 6 en implementaciones mayores", () => {
-    expect(availableSetupPayments(2900)).toEqual([1, 3]);
-    expect(availableSetupPayments(12900)).toEqual([1, 3, 6]);
+    expect(availableSetupPayments(990)).toEqual([1, 3]);
+    expect(availableSetupPayments(11890)).toEqual([1, 3, 6]);
     expect(availableSetupPayments(0)).toEqual([1]);
-    expect(setupPaymentSchedule(5900, 3).schedule).toEqual([1966.67, 1966.67, 1966.66]);
-    expect(setupPaymentSchedule(5900, 3).schedule.reduce((a, b) => a + b, 0)).toBeCloseTo(5900, 2);
+    expect(setupPaymentSchedule(2490, 3).schedule).toEqual([830, 830, 830]);
+    expect(setupPaymentSchedule(2490, 3).schedule.reduce((a, b) => a + b, 0)).toBeCloseTo(2490, 2);
   });
 
   it("una parcialidad cambia el desembolso, nunca el costo del contrato", () => {
     const full = estimatePricing({planId:"flow",months:3,setupPayments:1});
     const flexible = estimatePricing({planId:"flow",months:3,setupPayments:3});
-    expect(full.firstPaymentSuma).toBe(8800);
-    expect(flexible.firstPaymentSuma).toBe(4866.67);
-    expect(flexible.setupInstallment).toBe(1966.67);
-    expect(flexible.setupFinalInstallment).toBe(1966.66);
+    expect(full.firstPaymentSuma).toBe(3980);
+    expect(flexible.firstPaymentSuma).toBe(2320);
+    expect(flexible.setupInstallment).toBe(830);
+    expect(flexible.setupFinalInstallment).toBe(830);
     expect(flexible.totalSuma).toBe(full.totalSuma);
-    expect(flexible.setup).toBe(5900);
+    expect(flexible.setupMax).toBe(7900);
+    expect(flexible.monthlyMax).toBe(3900);
+    expect(flexible.totalSumaMax).toBe(19600);
+    expect(flexible.isStartingPrice).toBe(true);
+    expect(flexible.setup).toBe(2490);
   });
 
   it("módulos de pago único permiten parcialidades sin inventar membresías", () => {
     const landing = estimatePricing({mode:"services",planId:"flow",months:1,serviceIds:["landing"],setupPayments:3});
     expect(landing.monthlySuma).toBe(0);
-    expect(landing.firstPaymentSuma).toBe(1966.67);
-    expect(landing.totalSuma).toBe(5900);
+    expect(landing.firstPaymentSuma).toBe(996.67);
+    expect(landing.totalSuma).toBe(2990);
   });
 
   it("la propuesta WhatsApp expresa parcialidades y totalidad pendiente", () => {
-    const href = pricingWhatsAppHref({planId:"growth",months:1,setupPayments:6});
+    const href = pricingWhatsAppHref({planId:"growth",months:1,serviceIds:["chatbot-ia"],setupPayments:6});
     const msg = decodeURIComponent(href.split("?text=")[1]);
     expect(msg).toContain("6 pagos mensuales");
     expect(msg).toContain("Total de implementación sin descontar");
@@ -100,11 +107,12 @@ describe("precios configurables SUMA", () => {
     expect(href).toMatch(/^https:\/\/wa\.me\/528114688882\?text=/);
     const message = decodeURIComponent(href.split("?text=")[1]);
     expect(message).toContain("servicios individuales");
-    expect(message).toContain("Asistente de WhatsApp con IA");
+    expect(message).toContain("Asistente con IA para WhatsApp");
     expect(message).toContain("25 integrantes");
     expect(message).toContain("2.");
-    expect(message).toContain(formatMXN(14900));
-    expect(message).toContain("sin IVA, licencias de terceros");
+    expect(message).toContain(formatMXN(6900));
+    expect(message).toContain("Rangos orientativos");
+    expect(message).toContain("IVA, licencias, publicidad");
     expect(message).not.toMatch(/RFC|NSS/i);
   });
 });

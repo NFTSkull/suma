@@ -208,7 +208,7 @@ export function ShowroomBuilder() {
         <div className="mb-7">
           <p className="text-eyebrow text-suma-orange-ink">04 · Tu propuesta</p>
           <h2 id="showroom-price-title" className="mt-3 font-display text-3xl font-extrabold text-suma-navy">Elige qué contratar y ve cuánto pagarías.</h2>
-          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">Precios del catálogo público de SUMA, antes de IVA y sin descuentos ocultos. Lo que eliges aquí también actualiza el cálculo del paso 3.</p>
+          <p className="mt-3 max-w-3xl text-sm text-suma-navy/70">Precios desde y rangos orientativos, antes de IVA. El total depende de las funciones que necesites; el paso 3 se actualiza con tu selección.</p>
         </div>
         <div className="grid gap-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="space-y-7">
@@ -352,7 +352,7 @@ export function ShowroomBuilder() {
                     {quote.mode === "package" && (
                       <li className="flex justify-between gap-3">
                         <span className="font-bold">{quote.plan.name} <span className="font-normal text-suma-cream/60">· {quote.plan.label}</span></span>
-                        <span className="shrink-0 tabular-nums text-suma-cream/80">{formatMXN(quote.plan.setup)} + {formatMXN(quote.plan.monthly)}/mes</span>
+                        <span className="shrink-0 tabular-nums text-suma-cream/80">Desde {formatMXN(quote.plan.setup)} + desde {formatMXN(quote.plan.monthly)}/mes</span>
                       </li>
                     )}
                     {quote.services.map((service) => (
@@ -372,16 +372,16 @@ export function ShowroomBuilder() {
                     </details>
                   )}
 
-                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Primer desembolso {quote.isStartingPrice ? "desde" : ""}</p>
+                  <p className="mt-6 text-xs font-bold uppercase tracking-widest text-suma-cream/60">Primer pago mínimo orientativo</p>
                   <p className="mt-2 font-display text-[clamp(2.4rem,5vw,3.5rem)] font-extrabold leading-none tabular-nums">{formatMXNExact(quote.firstPaymentSuma)}</p>
                   <p className="mt-2 text-xs text-suma-cream/60">{quote.setupPayments === 1 ? "Implementación íntegra" : "Primer abono de implementación"} + primera mensualidad, antes de IVA.</p>
                   <dl className="mt-5 divide-y divide-white/15 border-y border-white/15 text-sm">
-                    <div className="flex justify-between gap-4 py-3"><dt>Implementación (una vez)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd></div>
+                    <div className="flex justify-between gap-4 py-3"><dt>Pago inicial · desde</dt><dd className="font-bold tabular-nums">{formatMXN(quote.setup)}</dd></div>
                     {quote.setupPayments > 1 && <div className="flex justify-between gap-4 py-3">
                       <dt>Implementación: abono 1 de {quote.setupPayments}</dt>
                       <dd className="font-bold tabular-nums">{formatMXNExact(quote.setupInstallment)}</dd>
                     </div>}
-                    <div className="flex justify-between gap-4 py-3"><dt>Mensualidad SUMA</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd></div>
+                    <div className="flex justify-between gap-4 py-3"><dt>Servicio mensual · desde</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlySuma)}</dd></div>
                     {quote.hasAds && <div className="flex justify-between gap-4 py-3"><dt>Pauta mensual (aparte, a Meta/Google)</dt><dd className="font-bold tabular-nums">{formatMXN(quote.monthlyAds)}</dd></div>}
                     <div className="flex justify-between gap-4 py-3">
                       <dt>
@@ -390,8 +390,13 @@ export function ShowroomBuilder() {
                       </dt>
                       <dd className="font-bold tabular-nums">{formatMXNExact(quote.firstPaymentSuma * (1 + IVA_RATE))}</dd>
                     </div>
-                    <div className="flex justify-between gap-4 py-3"><dt>SUMA: implementación íntegra + {quote.months} {quote.months === 1 ? "mes de servicio" : "meses de servicio"}</dt><dd className="font-bold tabular-nums">{formatMXN(quote.totalSuma)}</dd></div>
+                    <div className="flex justify-between gap-4 py-3"><dt>Desde: pago inicial íntegro + {quote.months} {quote.months === 1 ? "mes de servicio" : "meses de servicio"}</dt><dd className="font-bold tabular-nums">{formatMXN(quote.totalSuma)}</dd></div>
                   </dl>
+                  <p className="mt-4 rounded-xl bg-white/10 p-3 text-xs leading-relaxed text-suma-cream/85">
+                    <strong>Rango de referencia para una sede:</strong> pago inicial {formatMXN(quote.setup)}–{formatMXN(quote.setupMax)}
+                    {quote.monthlyMax > 0 ? " y servicio mensual " + formatMXN(quote.monthlySuma) + "–" + formatMXN(quote.monthlyMax) : ""}.
+                    Un proyecto más grande puede superar ese rango. Confirmamos el costo final antes de contratar.
+                  </p>
                   {quote.hasAds && <p className="mt-2 text-xs text-suma-cream/70">+ {formatMXN(quote.totalExternalAds)} de pauta en {quote.months} {quote.months === 1 ? "mes" : "meses"}, pagada directo a la plataforma.</p>}
                   {quote.setupPayments > 1 && <p className="mt-3 text-xs leading-relaxed text-suma-cream/70">
                     El costo total incluye el 100% de la implementación, aunque algunos abonos venzan después del periodo elegido. El calendario exacto se confirma antes de contratar.
@@ -432,7 +437,7 @@ export function ShowroomBuilder() {
                   Solicitar sesión de diagnóstico →
                 </a>
               </details>
-              <p className="mt-4 text-xs text-suma-cream/55">Estimación orientativa, no cotización definitiva. Alcance e integraciones se confirman antes de contratar.</p>
+              <p className="mt-4 text-xs text-suma-cream/55">Precios desde y rangos orientativos; no son una cotización definitiva. Confirmamos el alcance y los gastos externos antes de contratar.</p>
             </div>
           </div>
         </div>

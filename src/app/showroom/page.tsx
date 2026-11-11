@@ -34,7 +34,7 @@ export default function ShowroomPage() {
         dark
         crumbs={crumbs}
         title={<>Tu idea, <span className="text-suma-orange">a la vista.</span></>}
-        lead="En cuatro pasos ves cómo funcionaría SUMA en tu negocio, estimas qué tendría que pasar para que la inversión te convenga y armas tu propuesta con precios reales. Sin registro ni compromiso."
+        lead="En cuatro pasos ves cómo funcionaría SUMA en tu negocio, estimas qué tendría que pasar para que la inversión te convenga y armas tu propuesta con precios «desde» y rangos orientativos. Sin registro ni compromiso."
       >
         <ol aria-label="Cómo funciona" className="grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-4">
           {steps.map((step) => (
