@@ -8,13 +8,13 @@ import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { individualServiceDeliveryTimes, individualServices, pricingFaqs, pricingPlans } from "@/content/pricing";
-import { estimatePricing, formatMXN, formatMXNExact, pricingWhatsAppHref } from "@/lib/pricing";
+import { formatMXN, pricingWhatsAppHref } from "@/lib/pricing";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
   title: "Precios CRM sin cobro por usuario, automatización y publicidad",
   description:
-    "Configura SUMA Ads, Flow o Growth con cuotas más accesibles y parcialidades de implementación. Cotiza CRM, publicidad, automatizaciones y web en MXN antes de IVA.",
+    "Servicios SUMA desde precios accesibles: anuncios, seguimiento de clientes, chatbots y páginas web. Rangos orientativos, pagos claros y propuestas personalizadas.",
   path: "/precios",
   keywords: [
     "precios CRM para estudios de pilates",
@@ -54,13 +54,13 @@ export default function PreciosPage() {
             id="planes-title"
             eyebrow="Tres planes de servicio · Para una sede"
             title={<>Precios claros. <span className="text-suma-purple">Sin servicios innecesarios.</span></>}
-            lead="Un pago inicial para ponerlo en marcha y una mensualidad para operarlo. Mira exactamente qué incluye cada uno, cuánto tardamos y qué se paga aparte."
+            lead="Empieza con algo sencillo. Todos los precios dicen «desde» porque el costo cambia según lo que necesites. Consulta el rango y qué recibes."
           />
           <div className="mt-9 grid gap-3 md:grid-cols-3">
             {[
-              { title: "1. Implementación · una sola vez", text: "Pagas por configurar y dejar listo lo contratado. No equivale a meses de servicio." },
-              { title: "2. Servicio · cada mes", text: "Pagas por gestión, seguimiento y los entregables mensuales detallados en tu plan." },
-              { title: "3. Gastos externos · aparte", text: "Anuncios, licencias, hosting y mensajería se pagan directamente o según cotización." },
+              { title: "1. Pago inicial · solo una vez", text: "Es lo que cuesta preparar la solución. No incluye meses gratis." },
+              { title: "2. Mensualidad · mientras lo uses", text: "Pagas por nuestra revisión y trabajo cada mes, solo en los servicios que llevan mensualidad." },
+              { title: "3. Gastos externos · aparte", text: "El dinero de anuncios, programas, dominio o mensajes no está incluido." },
             ].map((item) => (
               <div key={item.title} className="rounded-2xl border border-suma-line bg-suma-cream-soft p-5">
                 <h3 className="text-sm font-bold text-suma-navy">{item.title}</h3>
@@ -71,8 +71,6 @@ export default function PreciosPage() {
           <div className="mt-8 grid items-stretch gap-5 lg:grid-cols-3">
             {pricingPlans.map((plan) => {
               const dark = plan.featured;
-              const fullQuote = estimatePricing({ planId: plan.id, months: 1, setupPayments: 1 });
-              const flexibleQuote = estimatePricing({ planId: plan.id, months: 1, setupPayments: 3 });
               return (
                 <article
                   key={plan.id}
@@ -90,21 +88,22 @@ export default function PreciosPage() {
                   <p className={`mt-3 min-h-18 text-sm leading-relaxed ${dark ? "text-suma-cream/70" : "text-suma-navy/65"}`}>{plan.audience}</p>
 
                   <div className={`mt-6 border-t pt-6 ${dark ? "border-suma-cream/20" : "border-suma-navy/15"}`}>
-                    <p className={`text-xs font-bold uppercase tracking-widest ${dark ? "text-suma-cream/70" : "text-suma-navy/60"}`}>Implementación única</p>
+                    <p className={`text-xs font-bold uppercase tracking-widest ${dark ? "text-suma-cream/70" : "text-suma-navy/60"}`}>Pago inicial · desde</p>
                     <p className="mt-2 font-display text-[clamp(2rem,3.1vw,3rem)] font-extrabold leading-none tracking-tight tabular-nums">{formatMXN(plan.setup)}</p>
                     <p className={`mt-4 text-sm ${dark ? "text-suma-cream/75" : "text-suma-navy/70"}`}>
                       {plan.monthly > 0
-                        ? <>+ <strong className={dark ? "text-suma-cream" : "text-suma-navy"}>{formatMXN(plan.monthly)}/mes</strong> de servicio</>
+                        ? <>+ <strong className={dark ? "text-suma-cream" : "text-suma-navy"}>desde {formatMXN(plan.monthly)}/mes</strong> de servicio</>
                         : <>Sin mensualidad obligatoria</>}
                     </p>
-                    <p className={`mt-4 rounded-xl px-3 py-3 text-sm font-bold ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
-                      Primer pago (1/3 de implementación + 1 mes): {formatMXNExact(flexibleQuote.firstPaymentSuma)}
-                      <span className="mt-1 block text-xs font-normal opacity-80">O {formatMXN(fullQuote.firstPaymentSuma)} si liquidas la implementación y el primer mes.</span>
+                    <p className={`mt-4 rounded-xl px-3 py-3 text-xs leading-relaxed ${dark ? "bg-suma-cream/10" : "bg-suma-navy/6"}`}>
+                      <strong>Rango orientativo:</strong> pago inicial {formatMXN(plan.setup)}–{formatMXN(plan.setupMax)}.
+                      <span className="mt-1 block">Servicio mensual {formatMXN(plan.monthly)}–{formatMXN(plan.monthlyMax)}.</span>
+                      <span className="mt-1 block opacity-80">Versión sencilla al precio desde. Si tu negocio necesita más, cotizamos antes de empezar.</span>
                     </p>
                   </div>
 
                   <div className="mt-7 flex-1">
-                    <h3 className="font-display text-lg font-bold">¿Qué te entregamos al inicio?</h3>
+                    <h3 className="font-display text-lg font-bold">¿Qué incluye el pago inicial desde este precio?</h3>
                     <ul className={`mt-3 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
                       {plan.setupIncludes.map((feature) => (
                         <li key={feature} className="flex items-start gap-2">
@@ -113,7 +112,7 @@ export default function PreciosPage() {
                         </li>
                       ))}
                     </ul>
-                    <h3 className="mt-6 font-display text-lg font-bold">¿Qué hacemos cada mes?</h3>
+                    <h3 className="mt-6 font-display text-lg font-bold">¿Qué incluye la mensualidad desde este precio?</h3>
                     <ul className={`mt-3 space-y-2 text-sm leading-relaxed ${dark ? "text-suma-cream/85" : "text-suma-navy/80"}`}>
                       {plan.monthlyIncludes.map((feature) => (
                         <li key={feature} className="flex items-start gap-2">
@@ -148,7 +147,7 @@ export default function PreciosPage() {
             })}
           </div>
           <p className="mt-7 max-w-5xl text-sm leading-relaxed text-suma-navy/70">
-            Precios base en MXN, antes de IVA, para una sede. Cada mensualidad cubre un mes de servicio; las dos automatizaciones de Flow son parte de la configuración inicial, no dos nuevas por mes. El plazo de arranque es orientativo y se confirma por escrito. Puedes solicitar parcialidades de implementación sujetas a aprobación comercial: no son meses de servicio incluidos ni crédito automático. Pauta, licencias, hosting y consumos externos se pagan aparte. Integraciones según permisos y viabilidad.
+            Precios desde para una sede y tareas sencillas, antes de IVA. El rango es una guía, no un tope garantizado. La propuesta final depende de funciones y volumen. Flow incluye una regla automática inicial en el precio de entrada, no una nueva cada mes. La mensualidad cubre un mes de trabajo. Puedes consultar pagos divididos de la implementación; anuncios, licencias y otros proveedores se pagan aparte.
           </p>
         </div>
       </section>
@@ -171,8 +170,8 @@ export default function PreciosPage() {
             <div className="rounded-[1.5rem] bg-suma-navy p-7 text-suma-cream">
               <p className="text-eyebrow text-suma-orange">CRM propio a medida</p>
               <p className="mt-4 text-sm text-suma-cream/80">Desarrollo desde</p>
-              <p className="mt-1 font-display text-4xl font-extrabold">$49,900</p>
-              <p className="mt-2 text-sm text-suma-cream/80">Implementación personalizable; solicita 6 parcialidades o pagos por entregable. Soporte opcional desde $2,990/mes.</p>
+              <p className="mt-1 font-display text-4xl font-extrabold">Desde $29,900</p>
+              <p className="mt-2 text-sm text-suma-cream/80">Para una función sencilla. Rango orientativo: $29,900–$129,000 para proyectos acotados; proyectos mayores a cotizar. Soporte opcional desde $1,490/mes. Pide un alcance por escrito.</p>
               <ul className="mt-5 space-y-2 text-sm text-suma-cream/85">
                 <li>✓ Módulos según tu operación real</li>
                 <li>✓ Sin cobro de SUMA por usuario interno</li>
@@ -193,7 +192,7 @@ export default function PreciosPage() {
               id="simulador-title"
               eyebrow="Personaliza y cotiza"
               title="Un paquete o solo lo que te hace falta."
-              lead="Elige módulos y modalidad de pago. Verás el primer desembolso, el costo total de implementación, la cuota mensual y los terceros por separado."
+              lead="Elige lo que necesitas y conoce un presupuesto mínimo y un rango orientativo. El precio final lo acordamos contigo antes de empezar."
             />
           </div>
           <PricingEstimator />
@@ -206,7 +205,7 @@ export default function PreciosPage() {
             id="independientes-title"
             eyebrow="Elige solo lo que necesitas"
             title="Cada servicio tiene un precio de referencia."
-            lead="Campañas, chatbot guiado o con IA, CRM, automatizaciones, SEO, web y desarrollo. Combínalos en el cotizador; las tarifas «desde» requieren alcance acordado."
+            lead="Elige anuncios, atención, reservas o una web. Te decimos qué incluye la versión sencilla y cuánto suele variar el precio."
           />
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {individualServices.map((service) => (
@@ -214,12 +213,16 @@ export default function PreciosPage() {
                 <h3 className="font-display text-xl font-bold">{service.name}</h3>
                 <div className="mt-6">
                   <p className="font-display text-xl font-extrabold text-suma-purple">
-                    {service.from ? "Desde " : ""}{formatMXN(service.setup || service.monthly)}
+                    Desde {formatMXN(service.setup || service.monthly)}
                   </p>
                   <p className="mt-1 text-sm font-semibold text-suma-navy">
-                    {service.setup === 0 ? "/mes · sin implementación base" : service.monthly ? "+ " + formatMXN(service.monthly) + "/mes" : "Pago único"}
+                    {service.setup === 0 ? "/mes · servicio mensual" : service.monthly ? "+ desde " + formatMXN(service.monthly) + "/mes" : "Pago único · sin mensualidad de SUMA"}
                   </p>
                   <p className="mt-3 text-xs leading-relaxed text-suma-navy/65">{service.detail}</p>
+                  <p className="mt-2 text-xs font-medium text-suma-navy/80">
+                    Rango orientativo: {service.setup > 0 ? formatMXN(service.setup) + "–" + formatMXN(service.setupMax) + " inicial" : formatMXN(service.monthly) + "–" + formatMXN(service.monthlyMax) + "/mes"}
+                    {service.setup > 0 && service.monthly > 0 ? " y " + formatMXN(service.monthly) + "–" + formatMXN(service.monthlyMax) + "/mes" : ""}.
+                  </p>
                   <p className="mt-2 text-xs font-semibold text-suma-navy/80">Plazo orientativo: {individualServiceDeliveryTimes[service.id]}.</p>
                   <a href={"/precios?servicio=" + service.id + "#simulador"} className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-suma-purple underline decoration-2 underline-offset-4">
                     Incluir en mi propuesta →
@@ -229,7 +232,7 @@ export default function PreciosPage() {
             ))}
           </div>
           <p className="mt-7 max-w-4xl text-sm text-suma-navy/65">
-            Pago único significa entrega del alcance acordado, no mantenimiento de por vida. Los plazos empiezan tras recibir contenido, accesos y aprobaciones; revisiones, corrección de fallas, licencias y soporte posterior se definen en la propuesta. Puedes solicitar 3 parcialidades de implementación (6 si es de al menos $10,000), sujetas a aprobación. Los importes «desde» dependen del alcance técnico.
+            Pago único significa crear o dejar listo lo acordado; no incluye soporte para siempre. Los rangos son ejemplos para alcances pequeños o medianos, no precios máximos. IVA, dominio, hosting, pauta y licencias aparte. Los plazos empiezan al recibir materiales y accesos. Puedes solicitar parcialidades, sujetas a aprobación por escrito.
           </p>
           <Link href="/servicios" className="mt-7 inline-flex min-h-11 items-center font-bold text-suma-purple underline decoration-2 underline-offset-[5px] hover:text-suma-navy">
             Explorar todos los servicios →
