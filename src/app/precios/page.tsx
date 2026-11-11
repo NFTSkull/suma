@@ -12,9 +12,9 @@ import { formatMXN, pricingWhatsAppHref } from "@/lib/pricing";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
-  title: "Precios CRM sin cobro por usuario, automatización y publicidad",
+  title: "Precios de CRM, automatización y anuncios",
   description:
-    "Servicios SUMA desde precios accesibles: anuncios, seguimiento de clientes, chatbots y páginas web. Rangos orientativos, pagos claros y propuestas personalizadas.",
+    "Precios de CRM, publicidad y automatización para negocios wellness. Compara paquetes, pagos iniciales y mensualidades con ejemplos claros.",
   path: "/precios",
   keywords: [
     "precios CRM para estudios de pilates",
