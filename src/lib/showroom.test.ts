@@ -22,22 +22,31 @@ describe("Showroom SUMA", () => {
   });
   it("el precio para CRM aprovecha el catálogo de la web", () => {
     const quote = showroomEstimate(initial);
-    expect(quote.setup).toBe(9900);
-    expect(quote.monthlySuma).toBe(3900);
-    expect(quote.firstPaymentSuma).toBe(13800);
+    expect(quote.setup).toBe(5900);
+    expect(quote.monthlySuma).toBe(2900);
+    expect(quote.firstPaymentSuma).toBe(8800);
     expect(quote.isStartingPrice).toBe(false);
   });
   it("puede combinar chatbot sin un descuento ficticio", () => {
     const quote = showroomEstimate({ ...initial, experience: "chatbot", serviceIds: ["crm-gestionado", "chatbot-ia"] });
-    expect(quote.setup).toBe(29800);
-    expect(quote.monthlySuma).toBe(8800);
-    expect(quote.firstPaymentSuma).toBe(38600);
+    expect(quote.setup).toBe(20800);
+    expect(quote.monthlySuma).toBe(6800);
+    expect(quote.firstPaymentSuma).toBe(27600);
     expect(quote.isStartingPrice).toBe(true);
+  });
+  it("mantiene notas y parcialidades en WhatsApp sin cambiar setup real", () => {
+    const planned = { ...initial, setupPayments: 3 as const, notes:"No quiero cambiar mi agenda" };
+    const quote = showroomEstimate(planned);
+    expect(quote.setup).toBe(5900);
+    expect(quote.firstPaymentSuma).toBe(4866.67);
+    const msg = decodeURIComponent(showroomWhatsAppHref(planned, "quote").split("?text=")[1]);
+    expect(msg).toContain("3 abonos mensuales");
+    expect(msg).toContain("No quiero cambiar mi agenda");
   });
   it("no factura dos veces el módulo CRM dentro de Flow", () => {
     const quote = showroomEstimate({ ...initial, mode: "package", planId: "flow", serviceIds: ["crm-gestionado", "chatbot-ia"] });
     expect(quote.services.map(s => s.id)).toEqual(["chatbot-ia"]);
-    expect(quote.setup).toBe(29800);
+    expect(quote.setup).toBe(20800);
   });
   it("sin tarifa SUMA por asiento; múltiples sedes requieren ajuste", () => {
     const a = showroomEstimate({ ...initial, teamUsers: 1 });
