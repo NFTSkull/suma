@@ -109,23 +109,30 @@ export function Footer() {
           SUMA
         </p>
 
-        <div className="mt-6 flex flex-col gap-4 border-t border-suma-cream/15 pt-6 text-sm text-suma-cream/60 md:flex-row md:items-center md:justify-between">
-          <p>
-            © <CurrentYear /> {site.name} · {site.institutionalDescriptor}
-          </p>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {legalLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="inline-flex min-h-10 items-center hover:text-suma-cream">
-                  {link.label}
-                </Link>
+        <div className="mt-6 border-t border-suma-cream/15 pt-6 text-sm text-suma-cream/60">
+          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between md:gap-10">
+            <div className="flex-1 space-y-2">
+              <p className="text-suma-cream/80">
+                © <CurrentYear /> {site.name}
+              </p>
+              <p className="text-xs leading-relaxed">
+                VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V. es la persona moral responsable de la marca SUMA STUDIO
+              </p>
+            </div>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="inline-flex min-h-10 items-center hover:text-suma-cream">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <PrivacyPreferences />
               </li>
-            ))}
-            <li>
-              <PrivacyPreferences />
-            </li>
-            <li className="inline-flex min-h-10 items-center">Fotografía: Unsplash</li>
-          </ul>
+            </ul>
+          </div>
+          <p className="mt-4 text-xs">Fotografía: Unsplash</p>
         </div>
       </div>
     </footer>

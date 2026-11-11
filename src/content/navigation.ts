@@ -63,7 +63,11 @@ export const footerNav: { title: string; links: NavLink[] }[] = [
   { title: "Industrias", links: industryLinks.map(({ label, href }) => ({ label, href })) },
 ];
 
-export const legalLinks: NavLink[] = [{ label: "Aviso de privacidad", href: "/aviso-de-privacidad" }];
+export const legalLinks: NavLink[] = [
+  { label: "Aviso de privacidad", href: "/aviso-de-privacidad" },
+  { label: "Términos y condiciones", href: "/terminos-y-condiciones" },
+  { label: "Eliminación de datos", href: "/eliminacion-de-datos" },
+];
 
 /** Todas las rutas públicas del sitio (fuente para sitemap y pruebas de enlaces). */
 export const allRoutes: string[] = [
@@ -83,10 +87,16 @@ export const allRoutes: string[] = [
   "/guias/automatizar-reservas-spa",
   "/guias/chatbot-whatsapp-pilates",
   "/aviso-de-privacidad",
+  "/terminos-y-condiciones",
+  "/eliminacion-de-datos",
 ];
 
 /** Rutas públicas que todavía no deben indexarse (borradores con datos pendientes). */
-export const noindexRoutes: string[] = ["/aviso-de-privacidad"];
+export const noindexRoutes: string[] = [
+  "/aviso-de-privacidad",
+  "/terminos-y-condiciones",
+  "/eliminacion-de-datos",
+];
 
 /** Rutas que van al sitemap. */
 export const indexableRoutes: string[] = allRoutes.filter((r) => !noindexRoutes.includes(r));

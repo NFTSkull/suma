@@ -19,7 +19,7 @@ export const site = {
   },
   /** Único teléfono de contacto aprobado para SUMA STUDIO (México, +52). */
   contact: {
-    email: null as string | null,
+    email: "ventas@sumastudio.mx",
     phone: "8114688882",
     phoneDisplay: "81 1468 8882",
     phoneE164: "+528114688882",

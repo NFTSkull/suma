@@ -45,7 +45,7 @@ describe("JSON-LD", () => {
     const sales = org.contactPoint as Node;
     expect(sales["@type"]).toBe("ContactPoint");
     expect(sales.telephone).toBe("+528114688882");
-    expect(sales.email).toBeUndefined();
+    expect(sales.email).toBe("ventas@sumastudio.mx");
     expect((org.logo as Node).url).toBe(absoluteUrl("/brand/isotipo-512.png"));
     expect(org.sameAs).toEqual(["https://www.linkedin.com/company/sumastudio-tecnologia/"]);
   });
