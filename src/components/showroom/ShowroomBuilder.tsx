@@ -25,6 +25,13 @@ const guidedGoals = [
   { id: "operar", name: "Ordenar mi operación", experience: "reservas", recommendations: ["reservas", "app", "crm-medida"] },
 ] as const;
 type GuidedGoalId = (typeof guidedGoals)[number]["id"];
+type WizardStage = "welcome" | "personalize" | "explore" | "impact" | "quote";
+const wizardLabels = [
+  { stage: "personalize", title: "Tu negocio", detail: "Personaliza el ejemplo" },
+  { stage: "explore", title: "Prueba", detail: "Elige y usa una demo" },
+  { stage: "impact", title: "Calcula", detail: "Opcional, con tus datos" },
+  { stage: "quote", title: "Tu propuesta", detail: "Precio y contacto" },
+] as const;
 
 const priceLine = (service: (typeof individualServices)[number]) =>
   (service.from ? "Desde " : "") + (service.setup
@@ -32,6 +39,18 @@ const priceLine = (service: (typeof individualServices)[number]) =>
     : formatMXN(service.monthly) + "/mes");
 
 export function ShowroomBuilder() {
+  const [stage, setStage] = useState<WizardStage>("welcome");
+  const [personalizeField, setPersonalizeField] = useState(0);
+  const activeWizardIndex = wizardLabels.findIndex((item) => item.stage === stage);
+  const goTo = (next: WizardStage) => setStage(next);
+  // Cada etapa mantiene los datos de la anterior. Sin almacenamiento ni envío silencioso.
+  useEffect(() => {
+    if (stage === "welcome") return;
+    const el = document.getElementById("showroom-wizard");
+    if (el && typeof el.scrollIntoView === "function") {
+      el.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  }, [stage, personalizeField]);
   const [industry, setIndustry] = useState<ShowroomIndustryId>("pilates");
   const [businessName, setBusinessName] = useState("");
   const [paletteId, setPaletteId] = useState<ShowroomPaletteId>("suma");
@@ -111,30 +130,110 @@ export function ShowroomBuilder() {
 
   return (
     <div className="space-y-10">
-      <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
-        <p className="text-eyebrow text-suma-orange-ink">01 · Personaliza</p>
-        <h2 id="showroom-custom-title" className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">Pon tu marca en la demo.</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div>
-            <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio</label>
-            <input id="showroom-name" maxLength={45} value={businessName} onChange={(e) => { personalized({}); setBusinessName(e.target.value); }}
-              className={field} placeholder="Ej. Estudio Aurora" autoComplete="organization" />
+      <div id="showroom-wizard" className="scroll-mt-28">
+        {stage === "welcome" ? (
+          <section aria-labelledby="showroom-welcome-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-6 shadow-soft md:p-10">
+            <p className="text-eyebrow text-suma-orange-ink">SUMA VISION STUDIO · UNA EXPERIENCIA A TU RITMO</p>
+            <h2 id="showroom-welcome-title" className="mt-3 max-w-3xl font-display text-3xl font-extrabold text-suma-navy md:text-4xl">
+              Descubre cómo podría funcionar SUMA en tu negocio.
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-suma-navy/75">
+              Responde tres preguntas sencillas, prueba una herramienta de ejemplo y conoce el precio de lo que elijas. Sin saber de sistemas ni registrarte.
+            </p>
+            <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {wizardLabels.map((item, index) => (
+                <li key={item.stage} className="rounded-2xl border border-suma-line bg-white p-4">
+                  <span className="text-xs font-extrabold text-suma-orange-ink">PASO {index + 1}</span>
+                  <p className="mt-1 font-bold text-suma-navy">{item.title}</p>
+                  <p className="mt-1 text-xs text-suma-navy/65">{item.detail}</p>
+                </li>
+              ))}
+            </ol>
+            <button type="button" onClick={() => goTo("personalize")}
+              className="mt-8 inline-flex min-h-14 items-center justify-center rounded-full bg-suma-orange px-8 text-base font-extrabold text-suma-navy transition-colors hover:bg-suma-navy hover:text-white focus-visible:outline-2 focus-visible:outline-suma-purple">
+              Iniciar experiencia →
+            </button>
+            <p className="mt-3 text-xs text-suma-navy/60">Tú decides qué probar. Nada se contrata ni se envía automáticamente.</p>
+          </section>
+        ) : (
+          <nav aria-label="Avance de la experiencia" className="mb-7 rounded-2xl border border-suma-line bg-white px-4 py-4 md:px-6">
+            <p aria-live="polite" className="text-xs font-bold text-suma-purple">Paso {activeWizardIndex + 1} de 4 · {wizardLabels[activeWizardIndex]?.title}</p>
+            <ol className="mt-3 grid grid-cols-4 gap-2">
+              {wizardLabels.map((item, index) => (
+                <li key={item.stage} className="min-w-0">
+                  <div aria-current={stage === item.stage ? "step" : undefined}
+                    className={"h-2 rounded-full " + (index <= activeWizardIndex ? "bg-suma-orange" : "bg-suma-navy/10")} />
+                  <span className={"mt-1.5 block truncate text-[0.65rem] font-bold sm:text-xs " + (stage === item.stage ? "text-suma-navy" : "text-suma-navy/50")}>{item.title}</span>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+      {stage === "personalize" && (
+        <section id="showroom-construir" aria-labelledby="showroom-custom-title" className="rounded-[2rem] border border-suma-line bg-suma-cream-soft p-5 shadow-soft md:p-8">
+          <p className="text-eyebrow text-suma-orange-ink">01 · PERSONALIZA</p>
+          <h2 id="showroom-custom-title" className="mt-2 font-display text-2xl font-extrabold text-suma-navy md:text-3xl">
+            {personalizeField === 0 ? "¿Cómo se llama tu negocio?" :
+              personalizeField === 1 ? "¿A qué se dedica tu negocio?" : "¿Qué estilo te gusta más?"}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-suma-navy/70">
+            {personalizeField === 0 ? "Es opcional. Si lo escribes, aparecerá en tu demostración." :
+              personalizeField === 1 ? "Así adaptamos los ejemplos a lo que haces." : "Solo cambia los colores del ejemplo. Podrás modificarlos después."}
+          </p>
+          <p className="mt-5 text-xs font-bold text-suma-purple">Pregunta {personalizeField + 1} de 3</p>
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-suma-navy/10">
+            <div className="h-full rounded-full bg-suma-orange transition-all" style={{ width: ((personalizeField + 1) / 3 * 100) + "%" }} />
           </div>
-          <div>
-            <label htmlFor="showroom-industry" className="text-sm font-bold text-suma-navy">Giro</label>
-            <select id="showroom-industry" value={industry} onChange={(e) => { personalized({ industry: e.target.value as ShowroomIndustryId }); setIndustry(e.target.value as ShowroomIndustryId); }} className={field}>
-              {showroomIndustries.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-            </select>
+          <div className="mt-6 max-w-xl">
+            {personalizeField === 0 && (
+              <div>
+                <label htmlFor="showroom-name" className="text-sm font-bold text-suma-navy">Nombre de tu negocio (opcional)</label>
+                <input id="showroom-name" maxLength={45} value={businessName}
+                  onChange={(e) => { personalized({}); setBusinessName(e.target.value); }}
+                  className={field} placeholder="Ej. Mi estudio de Pilates" autoComplete="organization" />
+              </div>
+            )}
+            {personalizeField === 1 && (
+              <div>
+                <label htmlFor="showroom-industry" className="text-sm font-bold text-suma-navy">Tipo de negocio</label>
+                <select id="showroom-industry" value={industry}
+                  onChange={(e) => { personalized({ industry: e.target.value as ShowroomIndustryId }); setIndustry(e.target.value as ShowroomIndustryId); }}
+                  className={field}>
+                  {showroomIndustries.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                </select>
+              </div>
+            )}
+            {personalizeField === 2 && (
+              <div>
+                <label htmlFor="showroom-palette" className="text-sm font-bold text-suma-navy">Estilo de colores</label>
+                <select id="showroom-palette" value={paletteId}
+                  onChange={(e) => { personalized({ style: e.target.value as ShowroomPaletteId }); setPaletteId(e.target.value as ShowroomPaletteId); }}
+                  className={field}>
+                  {showroomPalettes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                </select>
+                <p className="mt-2 text-xs text-suma-navy/60">Tu elección se reflejará en la pantalla del siguiente paso.</p>
+              </div>
+            )}
           </div>
-          <div>
-            <label htmlFor="showroom-palette" className="text-sm font-bold text-suma-navy">Estilo de la demo</label>
-            <select id="showroom-palette" value={paletteId} onChange={(e) => { personalized({ style: e.target.value as ShowroomPaletteId }); setPaletteId(e.target.value as ShowroomPaletteId); }} className={field}>
-              {showroomPalettes.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-            </select>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+            <button type="button"
+              onClick={() => personalizeField === 0 ? goTo("welcome") : setPersonalizeField((value) => value - 1)}
+              className="min-h-12 rounded-full border border-suma-line bg-white px-6 text-sm font-bold text-suma-navy hover:border-suma-purple">
+              ← Atrás
+            </button>
+            <button type="button"
+              onClick={() => {
+                if (personalizeField < 2) setPersonalizeField((value) => value + 1);
+                else { personalized({}); goTo("explore"); }
+              }}
+              className="min-h-12 rounded-full bg-suma-navy px-7 text-sm font-bold text-white hover:bg-suma-purple">
+              {personalizeField < 2 ? personalizeField === 0 && !businessName.trim() ? "Omitir nombre y seguir →" : "Siguiente →" : "Probar mi demo →"}
+            </button>
           </div>
-        </div>
-        <p className="mt-4 text-xs text-suma-navy/60">Solo cambia la demo en tu navegador. No se guarda ni se envía.</p>
-      </section>
+          <p className="mt-5 text-xs text-suma-navy/60">Los datos de esta prueba solo se usan en tu navegador. No enviamos nada.</p>
+        </section>
+      )}
 
       <section id="showroom-explorar" aria-labelledby="showroom-preview-title"
         className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-7">
