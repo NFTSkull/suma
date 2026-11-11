@@ -38,7 +38,7 @@ describe("ShowroomBuilder", () => {
     render(<ShowroomBuilder />);
     fireEvent.click(screen.getByRole("checkbox", { name: "Organizar clientes (CRM)" }));
     expect(within(summary()).getByText("Organizar clientes (CRM)")).toBeInTheDocument();
-    expect(screen.getByText(/Ordenamos consultas, seguimiento/)).toBeInTheDocument();
+    expect(screen.getByText(/Organizamos las consultas/)).toBeInTheDocument();
     // ($2,490 / 3 + $1,490) × 1.16
     expect(screen.getByText(formatMXNExact(2691.20))).toBeInTheDocument();
     for (const step of ["Descubrimos", "Diseñamos", "Construimos", "Evolucionamos"]) {
@@ -74,7 +74,7 @@ describe("ShowroomBuilder", () => {
     expect(screen.getAllByText(formatMXNExact(3980)).length).toBeGreaterThan(0);
     fireEvent.click(within(screen.getByRole("group", { name: "Pagar implementación" })).getByRole("button", { name: "3 mensualidades" }));
     const href = screen.getByRole("link", { name: /Enviar mi propuesta por WhatsApp/i }).getAttribute("href");
-    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("Referencia desde");
+    expect(decodeURIComponent(href!.split("?text=")[1])).toContain("referencia desde");
   });
 
   it("genera un enlace WhatsApp con los detalles, pero no envía ni agenda una cita", () => {
