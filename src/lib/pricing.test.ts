@@ -100,7 +100,7 @@ describe("precios configurables SUMA", () => {
     expect(growth.setup).toBe(3290);
     expect(growth.monthlySuma).toBe(3290);
     expect(pricingPlans.find((p) => p.id === "flow")?.includes).toContain("Hasta 2 tareas automáticas sencillas al inicio");
-    expect(pricingPlans.find((p) => p.id === "growth")?.setupIncludes.some((s) => s.includes("hasta dos"))).toBe(true);
+    expect(pricingPlans.find((p) => p.id === "growth")?.setupIncludes.some((s) => s.includes("hasta 2"))).toBe(true);
   });
 
   it("usuarios del equipo no elevan el precio de SUMA y sedes extras requieren cotización", () => {
