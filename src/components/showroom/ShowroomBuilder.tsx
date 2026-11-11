@@ -304,7 +304,10 @@ export function ShowroomBuilder() {
                   </div>
                   <div className={selectedPalette.light + " flex items-center justify-between gap-3 p-4"}>
                     <p className={selectedPalette.text + " text-xs font-bold"}>Así se verá tu demostración</p>
-                    <span className={selectedPalette.accent + " rounded-full border border-black/10 px-4 py-2 text-xs font-bold text-suma-navy"}>Ver horarios</span>
+                    <span className={selectedPalette.text + " flex items-center gap-2 text-xs font-bold"}>
+                      <span aria-hidden="true" className={selectedPalette.accent + " size-8 rounded-lg border border-black/10"} />
+                      Color de botones
+                    </span>
                   </div>
                 </div>
                 <p className="mt-2 text-xs text-suma-navy/60">Esto solo cambia el aspecto de la demo; no modifica tu página ni contrata un diseño.</p>
