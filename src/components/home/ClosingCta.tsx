@@ -1,4 +1,5 @@
 import { AnimatedSumaSymbol } from "@/components/brand/AnimatedSumaSymbol";
+import { WhatsAppPrivacyNotice } from "@/components/legal/WhatsAppPrivacyNotice";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { primaryCta } from "@/content/navigation";
@@ -39,15 +40,18 @@ export function ClosingCta({
           <Reveal delay={120}>
             <p className="text-lead mt-8 max-w-2xl text-suma-navy/75">{text}</p>
           </Reveal>
-          <Reveal delay={220} className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
-            <ButtonLink href={primaryHref} size="lg" arrow target="_blank" rel="noopener noreferrer" {...primaryAttrs}>
-              {primaryCta.label}
-            </ButtonLink>
-            {secondary && (
-              <ButtonLink href={secondary.href} variant="link">
-                {secondary.label}
+          <Reveal delay={220} className="mt-10 space-y-3">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+              <ButtonLink href={primaryHref} size="lg" arrow target="_blank" rel="noopener noreferrer" {...primaryAttrs}>
+                {primaryCta.label}
               </ButtonLink>
-            )}
+              {secondary && (
+                <ButtonLink href={secondary.href} variant="link">
+                  {secondary.label}
+                </ButtonLink>
+              )}
+            </div>
+            <WhatsAppPrivacyNotice />
           </Reveal>
         </div>
 
