@@ -69,7 +69,7 @@ export function Configurator({ config, setConfig, step, setStep, logo, setLogo, 
             <div key={step} className="os-fade mt-6">
               {step <= 4 && <StepStudio activeStep={step} config={config} update={update} logo={logo} setLogo={setLogo} onTypeChange={(type) => {
                 setConfig((c) => withTypeSuggestions(c, type));
-                setNote(`Actualizamos las sugerencias del paso 2 para ${studioTypes[type].name}. Puedes cambiarlas.`);
+                setNote(`Preparamos clases y paquetes sugeridos para ${studioTypes[type].name}. Podrás ajustarlos.`);
               }} note={note} />}
               {step >= 5 && step <= 9 && <StepWork activeStep={step} config={config} update={update} />}
               {step === 10 && <StepModules config={config} update={update} />}
@@ -78,15 +78,15 @@ export function Configurator({ config, setConfig, step, setStep, logo, setLogo, 
           <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-b-[1.5rem] border-t border-(--os-line) bg-white/95 px-5 py-3 backdrop-blur sm:px-7">
             {step > 1 ? <Button variant="ghost" icon="chevronLeft" onClick={() => setStep(step - 1)}>Atrás</Button> : <span className="text-[13px] text-(--os-muted)">Todo es editable después.</span>}
             <div className="flex items-center gap-3">
-              {problem && <p role="alert" className="text-[13px] font-medium text-[#962B2B] max-sm:hidden">{problem}</p>}
+              {problem && step !== 1 && <p role="alert" className="text-[13px] font-medium text-[#962B2B] max-sm:hidden">{problem}</p>}
               {step < STEPS.length ? (
-                <Button variant="primary" iconRight="arrowRight" disabled={!!problem} onClick={() => setStep(step + 1)}>{step === 4 ? "Continuar sin logotipo" : "Continuar"}</Button>
+                <Button variant="primary" iconRight="arrowRight" disabled={!!problem} onClick={() => setStep(step + 1)}>{step === 4 && !logo ? "Omitir este paso" : "Continuar"}</Button>
               ) : (
                 <Button variant="primary" size="lg" iconRight="arrowRight" disabled={!!problem} onClick={onEnter}>{hasStudio ? "Volver a mi estudio" : "Entrar a mi estudio"}</Button>
               )}
             </div>
           </div>
-          {problem && <p role="alert" className="px-5 pb-3 text-[13px] font-medium text-[#962B2B] sm:hidden">{problem}</p>}
+          {problem && step !== 1 && <p role="alert" className="px-5 pb-3 text-[13px] font-medium text-[#962B2B] sm:hidden">{problem}</p>}
         </div>
         <aside aria-label="Vista previa" className="sticky top-24 max-lg:hidden">
           <MiniPreview config={config} logo={logo} />
