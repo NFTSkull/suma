@@ -1,0 +1,35 @@
+/* SUMA Studio OS — estilos propios de la demo (no afectan al resto del sitio). */
+.os-root {
+  font-family: var(--font-os-sans), ui-sans-serif, system-ui, sans-serif;
+  color: var(--os-ink);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+.os-display {
+  font-family: var(--font-os-display), ui-serif, Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.os-fade {
+  animation: os-fade 200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.os-slide {
+  animation: os-slide 220ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes os-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes os-slide {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.os-scroll-x {
+  scrollbar-width: none;
+}
+.os-scroll-x::-webkit-scrollbar {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .os-fade, .os-slide { animation: none; }
+}

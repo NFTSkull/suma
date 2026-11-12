@@ -97,3 +97,15 @@
 **`pricing_cta_click` y el plan Ads.** La lista de planes estaba escrita a mano con un `start` que ya no existe; ahora se valida contra `pricingPlans`.
 
 **Anclas.** `globals.css` ya reserva el header con `scroll-padding-top`; el `scroll-mt-24` de las secciones lo duplicaba.
+
+## 2026-11-11 — SUMA Studio OS (demo privada)
+
+**Un solo estado y funciones puras.** Cada acción (`engine.ts`) clona el estado, aplica reglas y devuelve `{ estado, ok, mensaje }`; si una regla lo impide, el estado no cambia y el mensaje explica por qué. Los indicadores se derivan siempre del estado (`selectors.ts`), así que reservar, cancelar, vender o mover un interesado actualiza panel, fichas y reportes sin sincronización manual. `creditCharged` en cada reserva garantiza que un crédito se descuenta y se devuelve una sola vez.
+
+**Datos ficticios con el propio motor.** `seed.ts` genera alumnas, membresías y la semana actual con una semilla fija, y crea las reservas llamando al mismo `applyBook`: los datos iniciales cumplen las mismas reglas que las acciones del usuario. La última clase del día queda sin pasar lista y dos clases futuras llenas con lista de espera, para que haya algo que hacer al entrar. Volumen de alumnas proporcional al cupo semanal (24–80) para que la ocupación sea creíble.
+
+**Pantalla completa sin tocar el layout.** El layout raíz incluye header, footer y splash del sitio; en vez de reestructurar rutas, el CRM se abre en un portal a `document.body` y marca header, contenido y footer como `inert` mientras está abierto (sin eso, el configurador seguía recibiendo foco y clics detrás).
+
+**Producción.** `notFound()` en la página hacía que el build de producción prerenderizara un 404 sin canonical y `seo-check` fallaba (rompería un despliegue si se fusionara). Con `src/proxy.ts` limitado a `/demo/:path*` la página se prerenderiza completa y la respuesta en producción es 404; verificado con `VERCEL_ENV=production`. En previews el acceso lo protege Vercel; `noindex` no sustituye esa protección.
+
+**Fuentes de Google intermitentes.** El fallo local "next/font/google queries have exactly one entry" se debe a que Google Fonts a veces responde con URLs `fonts.gstatic.com/l/font?kit=…&skey=…`, y Turbopack 16.4.2 no admite el `&` en ese parámetro. Depende de la respuesta de Google en cada descarga; con una respuesta normal en la caché de `.next` compila. No borrar `.next` al validar localmente.

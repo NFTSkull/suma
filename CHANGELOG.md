@@ -2,6 +2,13 @@
 
 ## [Sin publicar]
 
+### SUMA Studio OS: demo interactiva de CRM para estudios (rama `feat/studio-os-demo-20261111`, sin publicar)
+- Ruta privada `/demo/studio-os`: hero, configurador de tres pasos (tu estudio, cómo trabajas, qué necesitas controlar) con vista previa en vivo y CRM a pantalla completa con el nombre, colores, logotipo y módulos elegidos.
+- Secciones: Inicio, Agenda (día/semana, crear clase, cupos, inscribir, cancelar, asistencia, lista de espera, sustituciones), Alumnas (fichas editables), Membresías (vender, renovar, pausar), Ventas (tablero por etapas con historial y tareas), Pagos (ficticios), Profesores, Reportes, Automatizaciones simuladas, Portal de alumnas, Personalizar y "Así quedaría" (resumen sin precios y WhatsApp solo al pulsar).
+- Motor de simulación con funciones puras y un solo estado: sin sobrecupo, sin reservas duplicadas, créditos que se descuentan y devuelven una sola vez, cancelación tardía según regla, membresías pausadas o vencidas que no reservan. Roles Dueña, Recepción e Instructor. "Restaurar demostración" deja todo como al entrar.
+- Sin red, base de datos, cobros ni mensajes; datos ficticios deterministas; `sessionStorage` sin logotipo. Fuera del menú y del sitemap, `noindex, nofollow`, y 404 en producción mediante `src/proxy.ts`.
+- Pruebas: 260 (29 nuevas de Studio OS, 3 del proxy).
+
 ### SUMA Vision Studio (`/showroom`): pulido de experiencia (PR #21)
 - **Hero**: explica en una frase qué se obtiene y muestra los cuatro pasos con el mismo nombre que usan después las secciones (Personaliza, Pruébalo, Calcula, Tu propuesta). Se quitaron la barra de chips, el texto intermedio y la sección de límites que repetían lo mismo. Acento morado para que "a la vista" no quede naranja sobre naranja en móvil. Title SEO sin la marca duplicada.
 - **Personaliza**: solo nombre, giro y estilo; la herramienta actual pasó a la propuesta.

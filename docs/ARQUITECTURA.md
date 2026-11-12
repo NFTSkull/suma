@@ -33,6 +33,12 @@ src/
   lib/                      contact-schema, recommend, seo, rate-limit, action-log, contact-delivery, cn
 ```
 
+## SUMA Studio OS (`/demo/studio-os`, demo privada)
+Demostración de un CRM para estudios con datos ficticios. Sin red, sin base de datos ni servicios externos; el estado vive en React y en `sessionStorage` (el logotipo nunca se guarda).
+- `src/lib/studio-os/`: `types` (modelo), `catalog` (sugerencias por tipo de estudio, temas, módulos, roles), `seed` (datos ficticios deterministas creados con el propio motor), `rules` y `engine` (acciones puras `estado → { estado, ok, mensaje }`: reservas, cancelaciones, lista de espera, membresías, pagos, ventas, automatizaciones simuladas, configuración), `selectors` (todos los indicadores se derivan del estado), `summary` y `storage`.
+- `src/components/studio-os/`: configurador de tres pasos, `AppShell` (portal a pantalla completa; el sitio de fondo queda `inert`) y una vista por sección en `views/`.
+- Fuera del menú y del sitemap, `noindex, nofollow`. `src/proxy.ts` responde 404 en `/demo/*` cuando `VERCEL_ENV=production`; en previews el acceso lo protege Vercel.
+
 ## Formulario de contacto
 `ContactForm` (cliente) → `POST /api/contacto` → validación Zod → anti-spam (honeypot + tiempo mínimo + rate limit en memoria) → entrega por `CONTACT_WEBHOOK_URL` o Resend (`RESEND_API_KEY` + `CONTACT_TO_EMAIL`). Si no hay proveedor configurado responde `503 not_configured` y la UI lo comunica sin simular éxito.
 
