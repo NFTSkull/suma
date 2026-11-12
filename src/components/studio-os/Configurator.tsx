@@ -18,7 +18,18 @@ type Props = {
   hasStudio: boolean;
 };
 
-const STEPS = ["Tu estudio", "Cómo trabajas", "Qué necesitas controlar"];
+const STEPS = [
+  "¿Cómo se llama tu estudio?",
+  "¿Qué tipo de estudio tienes?",
+  "¿Qué estilo te representa?",
+  "¿Quieres agregar tu logotipo?",
+  "¿Qué clases impartes?",
+  "¿Cuántos instructores trabajan contigo?",
+  "¿Cuántas salas tiene tu estudio?",
+  "¿Cuántas personas caben por clase?",
+  "¿Qué paquetes o membresías ofreces?",
+  "¿Qué quieres administrar?",
+];
 const allClasses = Object.values(studioTypes).flatMap((t) => t.classes).filter((c, i, list) => list.findIndex((x) => x.name === c.name) === i);
 const typeHints: Record<StudioType, string> = {
   yoga: "Clases grupales en mat, cupos amplios.",
@@ -31,51 +42,45 @@ export function Configurator({ config, setConfig, step, setStep, logo, setLogo, 
   const [note, setNote] = useState<string | null>(null);
   const update = (patch: Partial<StudioConfig>) => setConfig((c) => ({ ...c, ...patch }));
   const problem =
-    step === 2 && !config.classes.length ? "Elige al menos una clase." :
-    step === 2 && !config.plans.length ? "Elige al menos un paquete o membresía." :
-    step === 3 && !config.modules.length ? "Activa al menos un módulo." : null;
+    step === 1 && !config.name.trim() ? "Escribe un nombre para tu estudio. Puede ser ficticio." :
+    step === 5 && !config.classes.length ? "Elige al menos una clase." :
+    step === 9 && !config.plans.length ? "Elige al menos un paquete o membresía." :
+    step === 10 && !config.modules.length ? "Activa al menos un módulo." : null;
 
   return (
     <div className="os-root" style={themeStyle(config.theme)}>
-      <ol aria-label="Pasos de configuración" className="mb-6 grid grid-cols-3 gap-2">
-        {STEPS.map((label, i) => {
-          const n = i + 1;
-          const state = n === step ? "current" : n < step ? "done" : "todo";
-          return (
-            <li key={label}>
-              <button type="button" disabled={n > step} onClick={() => setStep(n)} aria-current={state === "current" ? "step" : undefined}
-                className={cx("w-full rounded-xl text-left disabled:cursor-default", focusRing)}>
-                <span className={cx("block h-1.5 rounded-full transition-colors duration-200", state === "todo" ? "bg-[#E6E0D9]" : "bg-(--os-accent)")} />
-                <span className={cx("mt-2 block text-[12px] font-semibold sm:text-[13px]", state === "current" ? "text-(--os-ink)" : "text-(--os-muted)")}>
-                  <span className="tabular-nums">Paso {n}</span><span className="max-sm:hidden"> · {label}</span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      <div className="mb-7" aria-label="Progreso de configuración">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <p className="text-[13px] font-semibold text-(--os-ink)">Tu estudio, a tu manera</p>
+          <span className="text-[12px] tabular-nums text-(--os-muted)">Pregunta {step} de {STEPS.length}</span>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-[#E6E0D9]" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={STEPS.length} aria-label="Progreso">
+          <div className="h-full rounded-full bg-(--os-accent) transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${(step / STEPS.length) * 100}%` }} />
+        </div>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
         <div className="min-w-0 rounded-[1.5rem] border border-(--os-line) bg-white shadow-[0_1px_2px_rgba(31,28,26,0.04)]">
           <div className="p-5 sm:p-7">
-            <p className="text-[13px] font-semibold text-(--os-accent-ink)">Paso {step} de 3</p>
-            <h2 className="os-display mt-1 text-[1.7rem] leading-tight sm:text-[2rem]">{STEPS[step - 1]}</h2>
-            <div className="mt-4 lg:hidden"><MiniPreview config={config} logo={logo} compact /></div>
+            <p className="text-[13px] font-semibold text-(--os-accent-ink)">Paso {step} de {STEPS.length}</p>
+            <h2 className="os-display mt-2 text-[1.85rem] leading-tight sm:text-[2.25rem]">{STEPS[step - 1]}</h2>
+            <p className="mt-2 text-[13px] text-(--os-muted)">Solo una pregunta a la vez. Puedes cambiarlo todo más adelante.</p>
+            {(step === 3 || step === 10) && <div className="mt-4 lg:hidden"><MiniPreview config={config} logo={logo} compact /></div>}
             <div key={step} className="os-fade mt-6">
-              {step === 1 && <StepStudio config={config} update={update} logo={logo} setLogo={setLogo} onTypeChange={(type) => {
+              {step <= 4 && <StepStudio activeStep={step} config={config} update={update} logo={logo} setLogo={setLogo} onTypeChange={(type) => {
                 setConfig((c) => withTypeSuggestions(c, type));
                 setNote(`Actualizamos las sugerencias del paso 2 para ${studioTypes[type].name}. Puedes cambiarlas.`);
               }} note={note} />}
-              {step === 2 && <StepWork config={config} update={update} />}
-              {step === 3 && <StepModules config={config} update={update} />}
+              {step >= 5 && step <= 9 && <StepWork activeStep={step} config={config} update={update} />}
+              {step === 10 && <StepModules config={config} update={update} />}
             </div>
           </div>
           <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-b-[1.5rem] border-t border-(--os-line) bg-white/95 px-5 py-3 backdrop-blur sm:px-7">
             {step > 1 ? <Button variant="ghost" icon="chevronLeft" onClick={() => setStep(step - 1)}>Atrás</Button> : <span className="text-[13px] text-(--os-muted)">Todo es editable después.</span>}
             <div className="flex items-center gap-3">
               {problem && <p role="alert" className="text-[13px] font-medium text-[#962B2B] max-sm:hidden">{problem}</p>}
-              {step < 3 ? (
-                <Button variant="primary" iconRight="arrowRight" disabled={!!problem} onClick={() => setStep(step + 1)}>Siguiente</Button>
+              {step < STEPS.length ? (
+                <Button variant="primary" iconRight="arrowRight" disabled={!!problem} onClick={() => setStep(step + 1)}>{step === 4 ? "Continuar sin logotipo" : "Continuar"}</Button>
               ) : (
                 <Button variant="primary" size="lg" iconRight="arrowRight" disabled={!!problem} onClick={onEnter}>{hasStudio ? "Volver a mi estudio" : "Entrar a mi estudio"}</Button>
               )}
@@ -92,8 +97,8 @@ export function Configurator({ config, setConfig, step, setStep, logo, setLogo, 
   );
 }
 
-function StepStudio({ config, update, logo, setLogo, onTypeChange, note }: {
-  config: StudioConfig; update: (p: Partial<StudioConfig>) => void; logo: string | null; setLogo: (l: string | null) => void;
+function StepStudio({ activeStep, config, update, logo, setLogo, onTypeChange, note }: {
+  activeStep: number; config: StudioConfig; update: (p: Partial<StudioConfig>) => void; logo: string | null; setLogo: (l: string | null) => void;
   onTypeChange: (t: StudioType) => void; note: string | null;
 }) {
   const id = useId();
@@ -111,12 +116,14 @@ function StepStudio({ config, update, logo, setLogo, onTypeChange, note }: {
   };
   return (
     <div className="space-y-7">
-      <Field label="Nombre comercial (opcional)" htmlFor={`${id}-name`} hint="Así aparecerá en tu sistema.">
+      <div hidden={activeStep !== 1}>
+      <Field label="Nombre de tu estudio" htmlFor={`${id}-name`} hint="Puedes usar un nombre ficticio; así aparecerá en tu CRM.">
         <input id={`${id}-name`} className={inputClass} maxLength={40} value={config.name} placeholder="Ej. Casa Aurora" autoComplete="off"
-          onChange={(e) => update({ name: e.target.value })} />
+          autoFocus={activeStep === 1} onChange={(e) => update({ name: e.target.value })} />
       </Field>
+      </div>
 
-      <fieldset>
+      <fieldset hidden={activeStep !== 2}>
         <legend className="mb-2 text-[13px] font-semibold">Tipo de estudio</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {(Object.keys(studioTypes) as StudioType[]).map((t) => (
@@ -131,7 +138,7 @@ function StepStudio({ config, update, logo, setLogo, onTypeChange, note }: {
         {note && <p role="status" className="os-fade mt-2 text-[13px] text-(--os-accent-ink)">{note}</p>}
       </fieldset>
 
-      <fieldset>
+      <fieldset hidden={activeStep !== 3}>
         <legend className="mb-2 text-[13px] font-semibold">Colores de tu sistema</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {themeIds.map((t) => {
@@ -157,7 +164,7 @@ function StepStudio({ config, update, logo, setLogo, onTypeChange, note }: {
         </div>
       </fieldset>
 
-      <div>
+      <div hidden={activeStep !== 4}>
         <p className="mb-2 text-[13px] font-semibold">Logotipo (opcional)</p>
         <div className="flex flex-wrap items-center gap-3">
           {logo ? (
@@ -194,7 +201,7 @@ function Stepper({ label, value, min, max, onChange, hint }: { label: string; va
   );
 }
 
-function StepWork({ config, update }: { config: StudioConfig; update: (p: Partial<StudioConfig>) => void }) {
+function StepWork({ activeStep, config, update }: { activeStep: number; config: StudioConfig; update: (p: Partial<StudioConfig>) => void }) {
   const id = useId();
   const [custom, setCustom] = useState("");
   const [minutes, setMinutes] = useState(50);
@@ -213,11 +220,11 @@ function StepWork({ config, update }: { config: StudioConfig; update: (p: Partia
 
   return (
     <div className="space-y-7">
-      <p className="flex items-start gap-2 rounded-xl bg-(--os-soft) p-3 text-[13px] leading-snug text-(--os-accent-ink)">
+      {activeStep === 5 && <p className="flex items-start gap-2 rounded-xl bg-(--os-soft) p-3 text-[13px] leading-snug text-(--os-accent-ink)">
         <Icon name="sparkle" className="mt-0.5 size-4 shrink-0" />
         Preseleccionamos sugerencias para un estudio de {studioTypes[config.type].name.toLowerCase()}. Son editables; los horarios los ajustas después en la agenda.
-      </p>
-      <fieldset>
+      </p>}
+      <fieldset hidden={activeStep !== 5}>
         <legend className="mb-2 text-[13px] font-semibold">Clases que impartes</legend>
         <div className="flex flex-wrap gap-2">
           {options.map((c) => (
@@ -242,13 +249,13 @@ function StepWork({ config, update }: { config: StudioConfig; update: (p: Partia
         </div>
       </fieldset>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <Stepper label="Instructores" value={config.instructors} min={1} max={8} onChange={(n) => update({ instructors: n })} />
-        <Stepper label="Salas" value={config.rooms} min={1} max={4} onChange={(n) => update({ rooms: n })} />
-        <Stepper label="Cupo por clase" value={config.capacity} min={1} max={40} onChange={(n) => update({ capacity: n })} hint="Promedio; lo ajustas por clase." />
+      <div className="grid grid-cols-1 gap-2">
+        {activeStep === 6 && <Stepper label="Instructores" value={config.instructors} min={1} max={8} onChange={(n) => update({ instructors: n })} />}
+        {activeStep === 7 && <Stepper label="Salas" value={config.rooms} min={1} max={4} onChange={(n) => update({ rooms: n })} />}
+        {activeStep === 8 && <Stepper label="Cupo por clase" value={config.capacity} min={1} max={40} onChange={(n) => update({ capacity: n })} hint="Promedio; lo ajustas por clase." />}
       </div>
 
-      <fieldset>
+      <fieldset hidden={activeStep !== 9}>
         <legend className="mb-2 text-[13px] font-semibold">Paquetes y membresías que vendes</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {planKinds.map((p) => {
