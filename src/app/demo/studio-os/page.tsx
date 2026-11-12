@@ -12,8 +12,8 @@ import { buildMetadata, pageGraph } from "@/lib/seo";
  * La experiencia ocupa toda la pantalla (se monta en el cliente sobre el sitio).
  */
 const seo = {
-  title: "SUMA Studio OS: demo de sistema para estudios",
-  description: "Demostración interactiva con datos ficticios: configura tu estudio de yoga o Pilates y prueba agenda, alumnas, membresías y reportes.",
+  title: "SUMA Studio OS: diseña tu estudio",
+  description: "Demostración privada e interactiva con datos ficticios para estudios de yoga, Pilates y Reformer.",
   path: "/demo/studio-os",
 };
 export const metadata: Metadata = { ...buildMetadata(seo), robots: { index: false, follow: false } };

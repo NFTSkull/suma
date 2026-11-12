@@ -4,7 +4,7 @@ import type { DemoState, StudioConfig } from "./types";
  * Conserva la demo durante la sesión del navegador (sessionStorage).
  * Solo datos ficticios y la configuración; el logotipo nunca se guarda.
  */
-export const STORAGE_KEY = "suma-studio-os:v1";
+export const STORAGE_KEY = "suma-studio-os:v3";
 
 export type SavedSession = {
   phase: "welcome" | "setup" | "app";
