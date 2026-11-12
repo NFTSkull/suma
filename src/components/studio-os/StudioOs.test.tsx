@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defaultConfig, withTypeSuggestions } from "@/lib/studio-os/catalog";
 import { payingMembership, sessionTaken } from "@/lib/studio-os/rules";
@@ -37,49 +37,70 @@ afterEach(() => {
 });
 
 describe("configurador", () => {
-  it("tres pasos que conservan las respuestas al avanzar y retroceder", () => {
+  it("pregunta una cosa por vez y conserva las respuestas hasta abrir el CRM", async () => {
     render(<StudioOs />);
-    expect(screen.getByText("Paso 1 de 3")).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Nombre comercial (opcional)"), { target: { value: "Casa Aurora" } });
+    const advance = () => fireEvent.click(screen.getByRole("button", { name: /Continuar|Omitir/ }));
+    expect(screen.getByText("Paso 1 de 10")).toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: /^Reformer/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Continuar/ })).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Nombre de tu estudio"), { target: { value: "Casa Aurora" } });
+    advance();
+
+    expect(screen.getByText("Paso 2 de 10")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: /^Reformer/ }));
     expect(screen.getByRole("status")).toHaveTextContent("Actualizamos las sugerencias del paso 2 para Reformer");
-    fireEvent.click(screen.getByRole("button", { name: /Siguiente/ }));
+    advance();
+    expect(screen.getByText("Paso 3 de 10")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: /Salvia/ }));
+    advance();
+    expect(screen.getByText("Paso 4 de 10")).toBeInTheDocument();
+    advance();
 
-    expect(screen.getByText("Paso 2 de 3")).toBeInTheDocument();
+    expect(screen.getByText("Paso 5 de 10")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Reformer power/ })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("group", { name: "Salas" })).toHaveTextContent("2");
+    advance();
+    expect(screen.getByRole("group", { name: "Instructores" })).toHaveTextContent("4");
     fireEvent.click(screen.getByRole("button", { name: "Más instructores" }));
-    fireEvent.click(screen.getByRole("button", { name: /Atrás/ }));
-    expect(screen.getByLabelText("Nombre comercial (opcional)")).toHaveValue("Casa Aurora");
-    fireEvent.click(screen.getByRole("button", { name: /Siguiente/ }));
+    advance();
+    expect(screen.getByRole("group", { name: "Salas" })).toHaveTextContent("2");
+    fireEvent.click(screen.getByRole("button", { name: "Atrás" }));
     expect(screen.getByRole("group", { name: "Instructores" })).toHaveTextContent("5");
-    fireEvent.click(screen.getByRole("button", { name: /Siguiente/ }));
-
-    expect(screen.getByText("Paso 3 de 3")).toBeInTheDocument();
+    advance();
+    advance();
+    expect(screen.getByRole("group", { name: "Cupo por clase" })).toBeInTheDocument();
+    advance();
+    expect(screen.getByText("Paso 9 de 10")).toBeInTheDocument();
+    advance();
+    expect(screen.getByText("Paso 10 de 10")).toBeInTheDocument();
     expect(screen.getAllByRole("switch")).toHaveLength(6);
-    for (const s of screen.getAllByRole("switch")) fireEvent.click(s);
+    for (const control of screen.getAllByRole("switch")) fireEvent.click(control);
     expect(screen.getByRole("button", { name: /Entrar a mi estudio/ })).toBeDisabled();
-    expect(screen.getAllByRole("alert")[0]).toHaveTextContent("Activa al menos un módulo");
     fireEvent.click(screen.getAllByRole("switch")[1]);
     fireEvent.click(screen.getByRole("button", { name: /Entrar a mi estudio/ }));
-    // Con solo "Clases y reservas" activo, el menú no muestra Alumnas ni Pagos.
-    expect(screen.getByRole("heading", { level: 2, name: /Casa Aurora/ })).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Preparando tu estudio" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("heading", { level: 2, name: /Casa Aurora/ })).toBeInTheDocument(), { timeout: 3000 });
     expect(screen.queryByRole("button", { name: /^Pagos$/ })).not.toBeInTheDocument();
     expect(nav("Agenda")).toBeInTheDocument();
   });
 
-  it("los colores cambian al instante en la vista previa y en el sistema", () => {
+  it("los colores cambian al instante al elegir una paleta", () => {
     const { container } = render(<StudioOs />);
     const root = container.querySelector<HTMLElement>(".os-root")!;
     expect(root.style.getPropertyValue("--os-accent")).toBe("#A4502F");
+    fireEvent.change(screen.getByLabelText("Nombre de tu estudio"), { target: { value: "Casa Aurora" } });
+    fireEvent.click(screen.getByRole("button", { name: /Continuar/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Continuar/ }));
     fireEvent.click(screen.getByRole("radio", { name: /Salvia/ }));
     expect(root.style.getPropertyValue("--os-accent")).toBe("#4F6E55");
   });
 
   it("no pide datos reales ni guarda el logotipo", async () => {
     render(<StudioOs />);
+    fireEvent.change(screen.getByLabelText("Nombre de tu estudio"), { target: { value: "Casa Aurora" } });
+    fireEvent.click(screen.getByRole("button", { name: /Continuar/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Continuar/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Continuar/ }));
     expect(screen.getByText(/no se sube a ningún servidor/)).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Nombre comercial (opcional)"), { target: { value: "Casa Aurora" } });
     const saved = sessionStorage.getItem(STORAGE_KEY)!;
     expect(saved).toContain("Casa Aurora");
     expect(saved).not.toMatch(/data:image/);
