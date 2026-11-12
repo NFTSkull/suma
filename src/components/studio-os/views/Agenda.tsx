@@ -12,7 +12,7 @@ import { Avatar, Badge, Button, Card, ConfirmButton, cx, DetailPanel, Empty, Fie
 export function Agenda() {
   const { state, target } = useStudio();
   const targetSession = state.sessions.find((s) => s.id === target);
-  const [mode, setMode] = useState<"dia" | "semana">("dia");
+  const [mode, setMode] = useState<"dia" | "semana">(() => (!targetSession && typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches ? "semana" : "dia"));
   const [day, setDay] = useState(() => startOfDay(new Date(targetSession?.start ?? state.now)).toISOString());
   const [selected, setSelected] = useState<string | null>(targetSession?.id ?? null);
   const [creating, setCreating] = useState(false);
@@ -64,7 +64,7 @@ export function Agenda() {
         </div>
       )}
 
-      <div className={cx("grid gap-4", current && "lg:grid-cols-[minmax(0,1fr)_420px]")}>
+      <div className={cx("grid gap-4", current && mode === "dia" && "lg:grid-cols-[minmax(0,1fr)_420px]")}>
         <div className="min-w-0">
           {mode === "dia" ? (
             <>
@@ -76,22 +76,30 @@ export function Agenda() {
               )}
             </>
           ) : (
-            <div className={cx("grid gap-3", !current && "xl:grid-cols-7", current && "xl:grid-cols-2")}>
-              {days.map((d) => (
-                <section key={d.toISOString()} aria-label={fmtLongDay(d)} className="min-w-0">
-                  <h3 className={cx("mb-2 text-[13px] font-semibold ", sameDay(d, state.now) ? "text-(--os-accent-ink)" : "text-(--os-muted)")}>
-                    {sameDay(d, state.now) ? "Hoy · " : ""}{fmtDay(d)}
-                  </h3>
-                  <ul className="space-y-2">
-                    {ofDay(d).map((s) => <li key={s.id}><SessionCard s={s} compact active={selected === s.id} onOpen={() => setSelected(s.id)} /></li>)}
-                    {!ofDay(d).length && <li className="rounded-xl border border-dashed border-(--os-line) px-3 py-4 text-center text-[12.5px] text-(--os-muted)">Sin clases</li>}
-                  </ul>
-                </section>
-              ))}
-            </div>
+            <>
+              <WeekGrid days={days} sessions={sessions} selected={selected} onOpen={setSelected} />
+              <div className={cx("grid gap-3 lg:hidden", current && "xl:grid-cols-2")}>
+                {days.map((d) => (
+                  <section key={d.toISOString()} aria-label={fmtLongDay(d)} className="min-w-0">
+                    <h3 className={cx("mb-2 text-[13px] font-semibold ", sameDay(d, state.now) ? "text-(--os-accent-ink)" : "text-(--os-muted)")}>
+                      {sameDay(d, state.now) ? "Hoy · " : ""}{fmtDay(d)}
+                    </h3>
+                    <ul className="space-y-2">
+                      {ofDay(d).map((s) => <li key={s.id}><SessionCard s={s} compact active={selected === s.id} onOpen={() => setSelected(s.id)} /></li>)}
+                      {!ofDay(d).length && <li className="rounded-xl border border-dashed border-(--os-line) px-3 py-4 text-center text-[12.5px] text-(--os-muted)">Sin clases</li>}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            </>
           )}
         </div>
-        {current && <SessionDetail key={current.id} s={current} onClose={() => setSelected(null)} />}
+        {current && (mode === "dia" ? <SessionDetail key={current.id} s={current} onClose={() => setSelected(null)} /> : (
+          // En semana, el detalle se abre como panel sobre la cuadrícula para no comprimirla.
+          <div className="lg:fixed lg:inset-y-4 lg:right-4 lg:z-[95] lg:w-[440px] lg:[&>section]:max-h-full lg:[&>section]:shadow-[0_30px_80px_-30px_rgba(29,27,25,0.45)]">
+            <SessionDetail key={current.id} s={current} onClose={() => setSelected(null)} />
+          </div>
+        ))}
       </div>
     </>
   );
@@ -329,3 +337,83 @@ function CreateSession({ onDone }: { onDone: (s: Session) => void }) {
   );
 }
 
+
+/** Semana en cuadrícula horaria: cada clase ocupa su hora real y su color refleja la ocupación. */
+function WeekGrid({ days, sessions, selected, onOpen }: { days: Date[]; sessions: Session[]; selected: string | null; onOpen: (id: string) => void }) {
+  const { state } = useStudio();
+  const PX = 76; // px por hora
+  const live = sessions;
+  const startH = Math.max(5, Math.min(7, ...live.map((s) => new Date(s.start).getHours())));
+  const endH = Math.min(23, Math.max(20, ...live.map((s) => Math.ceil((new Date(s.start).getHours() * 60 + new Date(s.start).getMinutes() + s.minutes) / 60))));
+  const hours = Array.from({ length: endH - startH }, (_, i) => startH + i);
+  const now = new Date(state.now);
+  const nowTop = ((now.getHours() - startH) * 60 + now.getMinutes()) * (PX / 60);
+  return (
+    <div className="hidden overflow-hidden rounded-[22px] border border-(--os-line) bg-(--os-paper) lg:block">
+      <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))] border-b border-(--os-line)">
+        <span />
+        {days.map((d) => {
+          const today = sameDay(d, state.now);
+          return (
+            <div key={d.toISOString()} className={cx("border-l border-(--os-line) px-3 py-3", today && "bg-(--os-soft)/50")}>
+              <p className={cx("text-[11.5px] font-semibold uppercase tracking-[0.08em]", today ? "text-(--os-accent-ink)" : "text-(--os-muted)")}>{today ? "Hoy" : fmtDay(d).split(" ")[0]}</p>
+              <p className={cx("os-num mt-0.5 text-[20px] font-medium leading-none", today && "text-(--os-accent-ink)")}>{d.getDate()}</p>
+            </div>
+          );
+        })}
+      </div>
+      <div className="os-scroll-y relative max-h-[calc(100dvh-20rem)] min-h-[420px] overflow-y-auto">
+        <div className="relative grid grid-cols-[56px_repeat(7,minmax(0,1fr))]" style={{ height: hours.length * PX }}>
+          <div className="relative">
+            {hours.map((h, i) => <span key={h} className="os-num absolute right-2 text-[11px] text-(--os-faint)" style={{ top: i * PX + (i ? -7 : 4) }}>{`${String(h).padStart(2, "0")}:00`}</span>)}
+          </div>
+          {days.map((d) => {
+            const list = live.filter((s) => sameDay(s.start, d));
+            // Carriles: clases simultáneas (varias salas) se reparten el ancho.
+            const lanes: Session[][] = [];
+            const laneOf = new Map<string, number>();
+            for (const s of list) {
+              const st = new Date(s.start).getTime();
+              let lane = lanes.findIndex((l) => { const last = l[l.length - 1]; return new Date(last.start).getTime() + last.minutes * 60000 <= st; });
+              if (lane === -1) { lanes.push([]); lane = lanes.length - 1; }
+              lanes[lane].push(s);
+              laneOf.set(s.id, lane);
+            }
+            const today = sameDay(d, state.now);
+            return (
+              <div key={d.toISOString()} className={cx("relative border-l border-(--os-line)", today && "bg-(--os-soft)/25")}>
+                {hours.map((h, i) => <span key={h} aria-hidden="true" className="absolute inset-x-0 border-t border-(--os-line)/70" style={{ top: i * PX }} />)}
+                {list.map((s) => {
+                  const start = new Date(s.start);
+                  const top = ((start.getHours() - startH) * 60 + start.getMinutes()) * (PX / 60);
+                  const taken = sessionTaken(state, s.id);
+                  const pct = Math.min(1, taken / s.capacity);
+                  const cancelled = s.status === "cancelada";
+                  const lane = laneOf.get(s.id) ?? 0;
+                  const n = Math.max(1, lanes.length);
+                  const active = selected === s.id;
+                  return (
+                    <button key={s.id} type="button" onClick={() => onOpen(s.id)} aria-current={active ? "true" : undefined}
+                      aria-label={`${fmtTime(s.start)} ${className(state, s)} con ${instructorName(state, s.instructorId)}, ${taken} de ${s.capacity}`}
+                      className={cx("absolute flex flex-col gap-0.5 overflow-hidden rounded-xl border-l-[3px] px-2 py-1.5 text-left transition-[box-shadow,transform] duration-200 hover:z-10 hover:-translate-y-px hover:shadow-[0_10px_20px_-12px_rgba(29,27,25,0.45)]", focusRing,
+                        cancelled ? "border-(--os-faint) bg-(--os-subtle) opacity-60" : "border-(--os-accent)", active && "z-10 ring-2 ring-(--os-accent)")}
+                      style={{ top: top + 2, height: Math.max(30, s.minutes * (PX / 60) - 4), left: `calc(${(lane / n) * 100}% + 3px)`, width: `calc(${100 / n}% - 6px)`,
+                        background: cancelled ? undefined : `color-mix(in srgb, var(--os-accent) ${10 + Math.round(pct * 22)}%, var(--os-paper))` }}>
+                      <span className="os-num flex justify-between gap-1 text-[10.5px] font-semibold text-(--os-accent-ink)"><span>{fmtTime(s.start)}</span><span className={taken >= s.capacity ? "" : "font-medium text-(--os-muted)"}>{taken}/{s.capacity}</span></span>
+                      <span className={cx("line-clamp-2 block text-[11.5px] font-semibold leading-[1.2]", cancelled && "line-through")}>{className(state, s)}</span>
+                    </button>
+                  );
+                })}
+                {today && nowTop > 0 && nowTop < hours.length * PX && (
+                  <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 z-20 flex items-center" style={{ top: nowTop }}>
+                    <span className="-ml-1 size-2 rounded-full bg-(--os-accent)" /><span className="h-[1.5px] flex-1 bg-(--os-accent)" />
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,7 +1,10 @@
-import { Fraunces, Inter } from "next/font/google";
+import { Fraunces, Geist } from "next/font/google";
 
-/** Tipografías de la demo: Inter para la interfaz y Fraunces para títulos editoriales. */
-const sans = Inter({ subsets: ["latin"], variable: "--font-os-sans", display: "swap" });
-const display = Fraunces({ subsets: ["latin"], variable: "--font-os-display", weight: ["400", "500", "600"], display: "swap" });
+/**
+ * Tipografías de la demo: Geist para la interfaz (precisa, neutra) y Fraunces
+ * variable para la voz editorial (eje SOFT para un trazo cálido, itálica para acentos).
+ */
+const sans = Geist({ subsets: ["latin"], variable: "--font-os-sans", display: "swap" });
+const display = Fraunces({ subsets: ["latin"], variable: "--font-os-display", style: ["normal", "italic"], axes: ["SOFT", "opsz"], display: "swap" });
 
 export const osFontClasses = `${sans.variable} ${display.variable}`;

@@ -33,15 +33,25 @@ export function Membresias() {
       />
       {selling && <div className="mb-5"><SellForm onDone={() => setSelling(false)} /></div>}
 
-      <div className="os-scroll-x -mx-4 mb-6 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
-        {state.plans.filter((p) => p.enabled).map((p) => (
-          <Card key={p.id} className="min-w-[13.5rem] shrink-0 p-4">
-            <p className="text-sm font-semibold">{p.name}</p>
-            <p className="mt-1 text-[1.35rem] font-semibold tabular-nums">{fmtMoney(p.price)}</p>
-            <p className="text-[12.5px] text-(--os-muted)">{p.credits === null ? "Clases ilimitadas" : `${p.credits} clase${p.credits === 1 ? "" : "s"}`} · {p.validityDays} días</p>
-            <p className="mt-2 text-[12.5px]"><span className="font-semibold tabular-nums">{activeCount(p.id)}</span> activas</p>
-          </Card>
-        ))}
+      <div className="os-scroll-x -mx-4 mb-8 flex snap-x gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 xl:grid-cols-[repeat(auto-fit,minmax(12.5rem,1fr))]">
+        {state.plans.filter((p) => p.enabled).map((p, i) => {
+          const active = activeCount(p.id);
+          const total = Math.max(1, rows.filter((r) => r.status === "activa" || r.status === "por_vencer").length);
+          const per = p.credits ? Math.round(p.price / p.credits) : null;
+          const featured = i === 0 ? false : active === Math.max(...state.plans.filter((x) => x.enabled).map((x) => activeCount(x.id)));
+          return (
+            <Card key={p.id} className={cx("relative min-w-[15rem] shrink-0 snap-start overflow-hidden p-5", featured && "border-(--os-accent)/50")}>
+              <p className="flex min-h-6 flex-wrap items-center gap-2 text-[14px] font-semibold">{p.name}{featured && <Badge tone="accent">Más vendido</Badge>}</p>
+              <p className="os-num mt-3 text-[2rem] font-medium leading-none">{fmtMoney(p.price)}</p>
+              <p className="mt-2 text-[12.5px] text-(--os-muted)">{p.credits === null ? "Clases ilimitadas" : `${p.credits} clase${p.credits === 1 ? "" : "s"}`} · vigencia {p.validityDays} días</p>
+              {per && p.credits! > 1 && <p className="mt-0.5 text-[12.5px] text-(--os-accent-ink)">{fmtMoney(per)} por clase</p>}
+              <div className="mt-4 border-t border-(--os-line) pt-3">
+                <p className="flex items-baseline justify-between text-[12.5px]"><span className="text-(--os-muted)">Alumnas con este plan</span><span className="os-num font-semibold">{active}</span></p>
+                <div className="mt-2"><Meter value={active} max={total} label={`Participación de ${p.name}`} /></div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">

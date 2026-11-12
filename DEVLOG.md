@@ -1,5 +1,14 @@
 # DEVLOG — decisiones
 
+## 2026-11-12
+
+**Studio OS a pantalla completa.** La demo se monta en un portal sobre el sitio (z-80) y marca `header`, `#contenido` y `footer` como `inert` mientras existe; así desaparece la navegación pública sin tocar el layout raíz. El servidor solo pinta un telón oscuro con el único `<h1>` (lo exige `seo-check`). La bienvenida espera a `afterSplash` para no animarse detrás de la pantalla de carga.
+
+**`motion` vuelve, pero acotado.** Se retiró del sitio por no usarse; ahora solo lo importan componentes de `studio-os`, que se cargan con `dynamic(..., { ssr: false })`, así que no entra en el bundle de las páginas públicas. Versión fijada con más de dos semanas de publicada.
+
+**Vista previa con el motor real.** En lugar de un dibujo, el configurador genera el estado con `createDemo` (memorizado por los campos estructurales) y lo pinta en un lienzo de tamaño real escalado. El alto se mide con `ResizeObserver` porque depende de los módulos activos.
+
+
 ## 2026-10-12
 
 **Logotipo provisional.** No se recibieron archivos oficiales; las capturas disponibles no son assets de SUMA. Se usa un wordmark tipográfico marcado con `data-provisional="wordmark"` y un registro (`src/content/brand-assets.ts`) para que los SVG oficiales sustituyan todo el sitio al añadirse. No se dibujó ni se "recreó" ningún logo. Favicon y OG también son tipográficos y provisionales.

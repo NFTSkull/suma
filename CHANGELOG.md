@@ -2,6 +2,14 @@
 
 ## [Sin publicar]
 
+### SUMA Studio OS: rediseño premium de la demo (rama `feat/studio-os-demo-20261111`, sin publicar)
+- La demo ocupa toda la pantalla, sin navegación pública: bienvenida oscura y editorial ("Tu estudio merece un sistema hecho a su medida"), configurador de ocho preguntas (una por pantalla) y revelación animada con marca, nombre y módulos antes de entrar al sistema.
+- Vista previa viva a tamaño real escalada: usa el mismo motor (`createDemo`) que el sistema; nombre, disciplina, color (interpolado con `@property`), logotipo, clases, tamaño, paquetes y módulos se reflejan al instante y la zona afectada se resalta. Al crear el estudio se usa el mismo reloj, así el sistema es exactamente el que se vio tomar forma.
+- Sistema visual propio: Fraunces (eje SOFT, itálicas) + Geist; marfil, piedra, salvia, terracota y grafito; primitivas de UI rediseñadas que se propagan a todas las vistas.
+- CRM: navegación con indicador animado, barra móvil flotante, Inicio editorial (banda de indicadores, línea de "ahora", próxima clase con anillo, ingresos de 8 semanas, asistencia), agenda semanal en cuadrícula horaria con carriles por sala y detalle en panel, membresías con precio por clase y participación, reportes con anillos y gráfica de ingresos.
+- Movimiento con `motion` (solo dentro de la demo, carga diferida) y `MotionConfig reducedMotion="user"`.
+- Pruebas: 260 (flujo del configurador reescrito para bienvenida → 8 preguntas → revelación → sistema).
+
 ### SUMA Studio OS: demo interactiva de CRM para estudios (rama `feat/studio-os-demo-20261111`, sin publicar)
 - Ruta privada `/demo/studio-os`: hero, configurador de tres pasos (tu estudio, cómo trabajas, qué necesitas controlar) con vista previa en vivo y CRM a pantalla completa con el nombre, colores, logotipo y módulos elegidos.
 - Secciones: Inicio, Agenda (día/semana, crear clase, cupos, inscribir, cancelar, asistencia, lista de espera, sustituciones), Alumnas (fichas editables), Membresías (vender, renovar, pausar), Ventas (tablero por etapas con historial y tareas), Pagos (ficticios), Profesores, Reportes, Automatizaciones simuladas, Portal de alumnas, Personalizar y "Así quedaría" (resumen sin precios y WhatsApp solo al pulsar).

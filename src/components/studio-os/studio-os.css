@@ -1,35 +1,77 @@
 /* SUMA Studio OS — estilos propios de la demo (no afectan al resto del sitio). */
+
+/* Variables de acento registradas: así el cambio de tema se interpola en vez de saltar. */
+@property --os-accent { syntax: "<color>"; inherits: true; initial-value: #a4502f; }
+@property --os-hover { syntax: "<color>"; inherits: true; initial-value: #8a4227; }
+@property --os-soft { syntax: "<color>"; inherits: true; initial-value: #f6e6dd; }
+@property --os-accent-ink { syntax: "<color>"; inherits: true; initial-value: #7a3a22; }
+@property --os-canvas { syntax: "<color>"; inherits: true; initial-value: #fbf8f5; }
+
 .os-root {
   font-family: var(--font-os-sans), ui-sans-serif, system-ui, sans-serif;
   color: var(--os-ink);
-  font-feature-settings: "cv11", "ss01";
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition:
+    --os-accent 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    --os-hover 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    --os-soft 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    --os-accent-ink 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    --os-canvas 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+.os-root ::selection { background: var(--os-soft); color: var(--os-accent-ink); }
+
 .os-display {
   font-family: var(--font-os-display), ui-serif, Georgia, serif;
-  font-weight: 500;
-  letter-spacing: -0.015em;
+  font-weight: 380;
+  font-variation-settings: "SOFT" 60;
+  letter-spacing: -0.022em;
 }
-.os-fade {
-  animation: os-fade 200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+.os-display em, .os-italic {
+  font-style: italic;
+  font-variation-settings: "SOFT" 100;
 }
-.os-slide {
-  animation: os-slide 220ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+.os-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-@keyframes os-fade {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: none; }
+.os-num { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+/* Grano sutil para superficies oscuras (evita el degradado "plano" de plantilla). */
+.os-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
-@keyframes os-slide {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
+
+.os-fade { animation: os-fade 260ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.os-slide { animation: os-slide 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes os-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes os-slide { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.os-scroll-x { scrollbar-width: none; }
+.os-scroll-x::-webkit-scrollbar { display: none; }
+.os-scroll-y { scrollbar-width: thin; scrollbar-color: var(--os-line-strong) transparent; }
+
+/* Campo protagonista del configurador: una línea, tipografía editorial. */
+.os-hero-input {
+  font-family: var(--font-os-display), ui-serif, Georgia, serif;
+  font-weight: 360;
+  font-variation-settings: "SOFT" 60;
+  letter-spacing: -0.02em;
+  caret-color: var(--os-accent);
 }
-.os-scroll-x {
-  scrollbar-width: none;
-}
-.os-scroll-x::-webkit-scrollbar {
-  display: none;
-}
+.os-hero-input::placeholder { color: var(--os-faint); opacity: 0.55; font-style: italic; }
+
 @media (prefers-reduced-motion: reduce) {
+  .os-root { transition: none; }
   .os-fade, .os-slide { animation: none; }
 }

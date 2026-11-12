@@ -2,13 +2,14 @@
 
 import { stageOrder } from "@/lib/studio-os/catalog";
 import { finance, reports } from "@/lib/studio-os/selectors";
-import { fmtMoney, fmtPct } from "@/lib/studio-os/time";
+import { fmtDate, fmtMoney, fmtPct } from "@/lib/studio-os/time";
+import { AreaChart, Ring } from "../charts";
 import { useStudio } from "../context";
 import { Bars, Card, CardTitle, PageHeader } from "../ui";
 
 function Big({ value, label }: { value: string; label: string }) {
   return (
-    <p className="mt-3"><span className="text-[2.1rem] font-semibold leading-none tracking-tight tabular-nums">{value}</span><span className="ml-2 text-[13px] text-(--os-muted)">{label}</span></p>
+    <p className="mt-3"><span className="os-num text-[2.2rem] font-medium leading-none">{value}</span><span className="ml-2 text-[13px] text-(--os-muted)">{label}</span></p>
   );
 }
 
@@ -28,11 +29,17 @@ export function Reportes() {
         </Card>
         <Card className="p-4 sm:p-5">
           <CardTitle hint="Asistencias ÷ (asistencias + faltas) registradas.">Asistencia</CardTitle>
-          <Big value={r.attendanceRate === null ? "—" : fmtPct(r.attendanceRate)} label="de las reservas" />
+          <div className="mt-4 flex items-center gap-4">
+            <Ring value={Math.round((r.attendanceRate ?? 0) * 100)} max={100} size={84} stroke={7} color="var(--os-sage)"><span className="os-num text-[17px] font-semibold">{r.attendanceRate === null ? "—" : fmtPct(r.attendanceRate)}</span></Ring>
+            <p className="text-[13px] text-(--os-muted)">de las reservas registradas terminaron en asistencia.</p>
+          </div>
         </Card>
         <Card className="p-4 sm:p-5">
           <CardTitle hint="De quienes tenían paquete hace 30 días, cuántas siguen activas.">Retención</CardTitle>
-          <Big value={r.retention.rate === null ? "—" : fmtPct(r.retention.rate)} label={`${r.retention.retained} de ${r.retention.base}`} />
+          <div className="mt-4 flex items-center gap-4">
+            <Ring value={r.retention.retained} max={Math.max(1, r.retention.base)} size={84} stroke={7}><span className="os-num text-[17px] font-semibold">{r.retention.rate === null ? "—" : fmtPct(r.retention.rate)}</span></Ring>
+            <p className="text-[13px] text-(--os-muted)"><span className="os-num font-semibold text-(--os-ink)">{r.retention.retained} de {r.retention.base}</span> alumnas siguen con paquete vigente.</p>
+          </div>
         </Card>
         <Card className="p-4 sm:p-5">
           <CardTitle hint="Reservas de la semana por tipo de clase.">Clases más populares</CardTitle>
@@ -53,10 +60,11 @@ export function Reportes() {
           </Card>
         )}
         {has("pagos") && (
-          <Card className="p-4 sm:p-5">
+          <Card className="p-4 sm:p-5 md:col-span-2">
             <CardTitle hint="Pagos recibidos este mes menos reembolsos (ficticios).">Ingresos simulados</CardTitle>
             <Big value={fmtMoney(f.collectedMonth)} label="este mes" />
             <p className="mt-2 text-[13px] text-(--os-muted)">Mismos días del mes anterior: {fmtMoney(f.collectedPrev)} · Pendiente: {fmtMoney(f.pendingTotal)}</p>
+            <div className="mt-4"><AreaChart label="Ingresos por semana" format={fmtMoney} points={f.weeks.map((w) => ({ label: fmtDate(w.from), value: w.total }))} height={170} /></div>
           </Card>
         )}
         {has("marketing") && (

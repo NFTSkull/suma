@@ -7,7 +7,7 @@ import type { DemoState, StudioConfig } from "./types";
 export const STORAGE_KEY = "suma-studio-os:v1";
 
 export type SavedSession = {
-  phase: "setup" | "app";
+  phase: "welcome" | "setup" | "app";
   step: number;
   config: StudioConfig;
   state: DemoState | null;
