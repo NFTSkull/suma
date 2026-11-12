@@ -3,6 +3,7 @@ import Link from "next/link";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { ClosingCta } from "@/components/home/ClosingCta";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { WhatsAppPrivacyNotice } from "@/components/legal/WhatsAppPrivacyNotice";
 import { Accordion } from "@/components/ui/Accordion";
 import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
@@ -68,13 +69,16 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
             <p className="text-lead mt-8 max-w-2xl text-suma-navy/75 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_160ms_both]">
               {ind.hero.lead}
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
-              <ButtonLink href={whatsappUrlFor({ industry: ind.name })} size="lg" arrow target="_blank" rel="noopener noreferrer">
-                Hablemos de tu negocio
-              </ButtonLink>
-              <ButtonLink href="#prioridades" variant="link">
-                Qué podemos resolver
-              </ButtonLink>
+            <div className="mt-10 space-y-3 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+                <ButtonLink href={whatsappUrlFor({ industry: ind.name })} size="lg" arrow target="_blank" rel="noopener noreferrer">
+                  Hablemos de tu negocio
+                </ButtonLink>
+                <ButtonLink href="#prioridades" variant="link">
+                  Qué podemos resolver
+                </ButtonLink>
+              </div>
+              <WhatsAppPrivacyNotice />
             </div>
           </div>
           <div className="relative mx-auto w-full max-w-xl">
