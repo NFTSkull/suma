@@ -48,7 +48,7 @@ describe("configurador", () => {
 
     expect(screen.getByText("Paso 2 de 10")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: /^Reformer/ }));
-    expect(screen.getByRole("status")).toHaveTextContent("Actualizamos las sugerencias del paso 2 para Reformer");
+    expect(screen.getByRole("status")).toHaveTextContent("Preparamos clases y paquetes sugeridos para Reformer");
     advance();
     expect(screen.getByText("Paso 3 de 10")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: /Salvia/ }));
