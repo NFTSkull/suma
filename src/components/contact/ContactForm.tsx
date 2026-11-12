@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { challengeOptions } from "@/content/selector-rules";
-import { site } from "@/content/site";
+import { site, legalDomicile } from "@/content/site";
 import { cn } from "@/lib/cn";
 import { track, type AnalyticsEvent } from "@/lib/analytics";
 import {
@@ -330,7 +330,10 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
         <div className="space-y-2 text-sm leading-relaxed text-suma-navy/80">
           <p className="font-bold text-suma-navy">Aviso de privacidad simplificado</p>
           <p>
-            <strong>Responsable:</strong> VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V. (SUMA Studio).
+            <strong>Responsable:</strong> VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V. (SUMA Studio), domicilio: <mark className="rounded bg-suma-orange/20 px-1 font-semibold text-suma-navy">{legalDomicile}</mark>.
+          </p>
+          <p>
+            <strong>Datos que recabamos:</strong> Identificación y contacto (nombre, nombre del negocio, correo electrónico, WhatsApp), tipo de negocio, servicios de interés y tu mensaje.
           </p>
           <p>
             <strong>Finalidades primarias:</strong> Atender tu solicitud de contacto y darte seguimiento comercial directo sobre lo que nos pediste.

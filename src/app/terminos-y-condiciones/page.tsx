@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { buildMetadata, pageGraph } from "@/lib/seo";
-import { legalEffectiveDate } from "@/content/site";
+import { legalDomicile, legalEffectiveDate } from "@/content/site";
 
 const seo = {
   title: "Términos y condiciones",
@@ -41,7 +41,7 @@ export default function TerminosPage() {
         <section>
           <h2>1. Identificación</h2>
           <p className="mt-3">
-            Estos términos regulan el acceso a https://www.sumastudio.mx y, cuando se contrate, el uso de SUMA Inbox y servicios relacionados, prestados por VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V., con nombre comercial SUMA Studio, domicilio en <Placeholder>[DOMICILIO PENDIENTE DE CONFIRMAR]</Placeholder>.
+            Estos términos regulan el acceso a https://www.sumastudio.mx y, cuando se contrate, el uso de SUMA Inbox y servicios relacionados, prestados por VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V., con nombre comercial SUMA Studio, domicilio en <Placeholder>{legalDomicile}</Placeholder>.
           </p>
           <p className="mt-3">
             Contacto: ventas@sumastudio.mx.

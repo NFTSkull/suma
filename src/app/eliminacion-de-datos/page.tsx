@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { buildMetadata, pageGraph } from "@/lib/seo";
-import { legalEffectiveDate } from "@/content/site";
+import { legalDomicile, legalEffectiveDate } from "@/content/site";
 
 const seo = {
   title: "Eliminación de datos",
@@ -43,7 +43,7 @@ export default function EliminacionPage() {
             Esta página explica cómo pedirnos que eliminemos tus datos personales, incluidos los relacionados con el uso de aplicaciones de SUMA conectadas a Meta (por ejemplo, SUMA Inbox, cuando exista). Forma parte de las instrucciones que Meta pide en los ajustes de la aplicación («User Data Deletion» / URL de instrucciones de eliminación).
           </p>
           <p className="mt-3">
-            El responsable es VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V., con nombre comercial SUMA Studio y domicilio en <Placeholder>[DOMICILIO PENDIENTE DE CONFIRMAR]</Placeholder>. El tratamiento general se describe en el <a href="/aviso-de-privacidad" className="underline decoration-suma-purple underline-offset-4">Aviso de privacidad</a>.
+            El responsable es VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V., con nombre comercial SUMA Studio y domicilio en <Placeholder>{legalDomicile}</Placeholder>. El tratamiento general se describe en el <a href="/aviso-de-privacidad" className="underline decoration-suma-purple underline-offset-4">Aviso de privacidad</a>.
           </p>
         </section>
 
@@ -64,7 +64,7 @@ export default function EliminacionPage() {
             También puedes ejercer el derecho de cancelación u otros derechos ARCO por la misma vía, en los términos del aviso de privacidad y de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.
           </p>
           <p className="mt-3">
-            Responderemos en un plazo máximo de <strong>veinte días hábiles</strong> y, si la solicitud procede, haremos efectiva la eliminación dentro de los <strong>quince días</strong> siguientes a nuestra respuesta, salvo ampliación justificada por una sola vez, conforme al artículo 31 de la Ley.
+            Responderemos en un plazo máximo de <strong>veinte días hábiles</strong>, contados desde la recepción de la solicitud, y, si la solicitud procede, haremos efectiva la eliminación dentro de los <strong>quince días hábiles</strong> siguientes a la comunicación de la respuesta, de acuerdo con el artículo 31 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares. Estos plazos pueden ampliarse una sola vez por un periodo igual, cuando las circunstancias del caso lo justifiquen.
           </p>
         </section>
 
@@ -88,7 +88,7 @@ export default function EliminacionPage() {
             <li>Cualquier contenido que hayas compartido a través de la aplicación de SUMA.</li>
           </ul>
           <p className="mt-3">
-            <strong>Plazo de eliminación:</strong> Una vez confirmada tu identidad, procederemos a la eliminación de tus datos en un plazo máximo de 15 días hábiles. Te enviaremos una confirmación por correo electrónico una vez completado el proceso.
+            <strong>Plazo de eliminación:</strong> Una vez que tu solicitud proceda, haremos efectiva la eliminación dentro de los quince días hábiles siguientes a la comunicación de nuestra respuesta, conforme a los plazos legales arriba indicados. Te enviaremos una confirmación por correo electrónico una vez completado el proceso.
           </p>
           <p className="mt-3">
             <strong>Nota importante:</strong> La eliminación de datos en SUMA no afecta los datos que Meta o WhatsApp conserven en sus propias plataformas. Para eliminar datos directamente de Meta o WhatsApp, consulta sus políticas de privacidad y herramientas de gestión de datos.
@@ -127,7 +127,7 @@ export default function EliminacionPage() {
           <h2>5. Contacto</h2>
           <p className="mt-3">
             VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V.<br />
-            <Placeholder>[DOMICILIO PENDIENTE DE CONFIRMAR]</Placeholder><br />
+            <Placeholder>{legalDomicile}</Placeholder><br />
             Correo: <a href="mailto:ventas@sumastudio.mx" className="underline decoration-suma-purple underline-offset-4">ventas@sumastudio.mx</a>
           </p>
         </section>

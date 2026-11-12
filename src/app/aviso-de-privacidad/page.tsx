@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { buildMetadata, pageGraph } from "@/lib/seo";
-import { legalEffectiveDate } from "@/content/site";
+import { legalDomicile, legalPhone, legalEffectiveDate } from "@/content/site";
 
 const seo = {
   title: "Aviso de privacidad",
@@ -44,7 +44,7 @@ export default function AvisoPage() {
             VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V., conocida comercialmente como SUMA Studio («SUMA», «nosotros»), es la persona moral <strong>responsable</strong> del tratamiento de los datos personales que recaba a través de este sitio y, en su caso, de los datos de sus propios clientes, prospectos y usuarios de SUMA Inbox cuando actúa por cuenta propia. SUMA STUDIO es el nombre comercial de esa sociedad; en el registro fiscal el nombre comercial inscrito es VIOZ CREACIONES Y PRODUCCIONES.
           </p>
           <p className="mt-3">
-            Domicilio para oír y recibir notificaciones: <Placeholder>[DOMICILIO PENDIENTE DE CONFIRMAR]</Placeholder>.
+            Domicilio para oír y recibir notificaciones: <Placeholder>{legalDomicile}</Placeholder>.
           </p>
           <p className="mt-3">
             Régimen fiscal: Régimen General de Ley Personas Morales.
@@ -53,7 +53,7 @@ export default function AvisoPage() {
             Correo para privacidad y derechos ARCO: <a href="mailto:ventas@sumastudio.mx" className="underline decoration-suma-purple underline-offset-4">ventas@sumastudio.mx</a>.
           </p>
           <p className="mt-3">
-            Teléfono de contacto: <Placeholder>[TELÉFONO OFICIAL DEL NEGOCIO — PENDIENTE DE CONFIRMACIÓN]</Placeholder>.
+            Teléfono de contacto: <Placeholder>{legalPhone}</Placeholder>.
           </p>
         </section>
 
@@ -296,7 +296,7 @@ export default function AvisoPage() {
         <section>
           <h2>12. Aviso simplificado</h2>
           <p className="mt-3">
-            En los formularios electrónicos pondremos a tu disposición un aviso simplificado con la identidad y el domicilio del responsable, las categorías de datos, las finalidades (distinguiendo las que requieren consentimiento) y las opciones para limitar el uso, más el enlace a este aviso integral, conforme al artículo 16, fracción II.
+            En los formularios electrónicos ponemos a tu disposición un aviso simplificado con la identidad y el domicilio del responsable, las categorías de datos, las finalidades (distinguiendo las que requieren consentimiento) y las opciones para limitar el uso, más el enlace a este aviso integral, conforme al artículo 16, fracción II.
           </p>
         </section>
       </article>
