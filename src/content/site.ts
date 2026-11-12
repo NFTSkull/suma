@@ -39,3 +39,6 @@ export const site = {
 
 export const demoDisclaimer =
   "Demostración conceptual. Las soluciones se personalizan para cada negocio.";
+
+/** Fecha de entrada en vigor del aviso de privacidad y documentos legales (pendiente de confirmar al publicar). */
+export const legalEffectiveDate = "[FECHA DE ENTRADA EN VIGOR — PENDIENTE]";

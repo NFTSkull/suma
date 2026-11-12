@@ -91,6 +91,7 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
   const [servicios, setServicios] = useState<string[]>(context ? context.servicios.filter((s) => serviceIds.has(s)) : []);
   const [mensaje, setMensaje] = useState("");
   const [privacidad, setPrivacidad] = useState(false);
+  const [marketing, setMarketing] = useState(false);
   const [sitio, setSitio] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
@@ -129,6 +130,7 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
       servicios,
       mensaje,
       privacidad,
+      marketing,
       ...(useContext && context ? { contexto: { negocio: context.negocio, reto: context.reto } } : {}),
     };
 
@@ -324,26 +326,64 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
         <input id="sitio" name="sitio" type="text" tabIndex={-1} autoComplete="off" value={sitio} onChange={(e) => setSitio(e.target.value)} />
       </div>
 
-      <div>
-        <label className="flex cursor-pointer items-start gap-3">
-          <input
-            type="checkbox"
-            data-field="privacidad"
-            checked={privacidad}
-            onChange={(e) => setPrivacidad(e.target.checked)}
-            aria-invalid={Boolean(errors.privacidad)}
-            aria-describedby={errors.privacidad ? "privacidad-error" : undefined}
-            className="mt-1 size-5 shrink-0 accent-suma-purple"
-          />
-          <span>
-            Acepto el{" "}
-            <Link href="/aviso-de-privacidad" className="font-bold underline decoration-suma-orange decoration-2 underline-offset-4">
-              aviso de privacidad
+      <div className="space-y-6 rounded-[1.5rem] bg-suma-purple/5 p-6">
+        <div className="space-y-2 text-sm leading-relaxed text-suma-navy/80">
+          <p className="font-bold text-suma-navy">Aviso de privacidad simplificado</p>
+          <p>
+            <strong>Responsable:</strong> VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V. (SUMA Studio).
+          </p>
+          <p>
+            <strong>Finalidades primarias:</strong> Atender tu solicitud de contacto y darte seguimiento comercial directo sobre lo que nos pediste.
+          </p>
+          <p>
+            <strong>Finalidades secundarias (requieren tu consentimiento):</strong> Enviarte contenidos informativos y promociones sobre otros servicios de SUMA.
+          </p>
+          <p>
+            Puedes negarte a las finalidades secundarias o revocar tu consentimiento en cualquier momento escribiendo a{" "}
+            <a href="mailto:ventas@sumastudio.mx" className="font-semibold underline decoration-suma-orange underline-offset-2">
+              ventas@sumastudio.mx
+            </a>
+            . Consulta el{" "}
+            <Link href="/aviso-de-privacidad" className="font-semibold underline decoration-suma-purple underline-offset-2">
+              aviso de privacidad integral
             </Link>{" "}
-            y que SUMA STUDIO me contacte sobre mi solicitud.
-          </span>
-        </label>
-        <FieldError id="privacidad" error={errors.privacidad} />
+            para más información.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                data-field="privacidad"
+                checked={privacidad}
+                onChange={(e) => setPrivacidad(e.target.checked)}
+                aria-invalid={Boolean(errors.privacidad)}
+                aria-describedby={errors.privacidad ? "privacidad-error" : undefined}
+                className="mt-0.5 size-5 shrink-0 accent-suma-purple"
+              />
+              <span className="text-sm">
+                He leído el aviso de privacidad y acepto que SUMA trate mis datos para atender mi solicitud. <span className="font-bold text-suma-orange-ink">*</span>
+              </span>
+            </label>
+            <FieldError id="privacidad" error={errors.privacidad} />
+          </div>
+
+          <div>
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={marketing}
+                onChange={(e) => setMarketing(e.target.checked)}
+                className="mt-0.5 size-5 shrink-0 accent-suma-purple"
+              />
+              <span className="text-sm">
+                Acepto recibir contenidos y promociones de SUMA. <span className="text-xs text-suma-navy/60">(Opcional)</span>
+              </span>
+            </label>
+          </div>
+        </div>
       </div>
 
       {feedback && (
@@ -379,7 +419,6 @@ function ContactFormBody({ context }: { context: SelectorContext | null }) {
         <Button type="submit" size="lg" arrow disabled={sending} aria-disabled={sending}>
           {sending ? "Enviando…" : "Enviar mensaje"}
         </Button>
-        <p className="text-sm text-suma-navy/60">Solo usamos tus datos para responder tu solicitud.</p>
       </div>
     </form>
   );

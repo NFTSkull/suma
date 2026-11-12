@@ -2,6 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { businessTypeOptions, serviceInterestOptions, type ContactData } from "./contact-schema";
+import { legalEffectiveDate } from "@/content/site";
 
 export type DeliveryProvider = "webhook" | "resend";
 
@@ -76,6 +77,7 @@ function escapeHtml(value: string): string {
 }
 
 export function formatLead(data: ContactData) {
+  const now = new Date();
   return {
     nombre: data.nombre,
     negocio: data.negocio,
@@ -85,7 +87,13 @@ export function formatLead(data: ContactData) {
     servicios: data.servicios.map((s) => label(serviceInterestOptions, s)),
     mensaje: data.mensaje ?? "",
     contexto: data.contexto ?? null,
-    recibido: new Date().toISOString(),
+    recibido: now.toISOString(),
+    consentimientos: {
+      privacidad: true,
+      marketing: data.marketing ?? false,
+      timestamp: now.toISOString(),
+      avisoVersion: legalEffectiveDate,
+    },
   };
 }
 
@@ -125,6 +133,9 @@ export async function deliverLead(
     Servicios: lead.servicios.join(", "),
     Mensaje: lead.mensaje || "—",
     "Contexto del selector": lead.contexto ? JSON.stringify(lead.contexto) : "—",
+    "Consiente marketing": lead.consentimientos.marketing ? "Sí" : "No",
+    "Consentimiento registrado": lead.consentimientos.timestamp,
+    "Versión del aviso": lead.consentimientos.avisoVersion,
   });
   const html = `<table cellpadding="6">${fields
     .map(([k, v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(String(v))}</td></tr>`)

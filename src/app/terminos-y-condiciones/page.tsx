@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { buildMetadata, pageGraph } from "@/lib/seo";
+import { legalEffectiveDate } from "@/content/site";
 
 const seo = {
   title: "Términos y condiciones",
@@ -33,7 +34,7 @@ export default function TerminosPage() {
 
         <section>
           <p className="text-sm text-suma-navy/60">
-            <strong>Última actualización:</strong> <Placeholder>[FECHA DE ENTRADA EN VIGOR — PENDIENTE]</Placeholder>
+            <strong>Última actualización:</strong> <Placeholder>{legalEffectiveDate}</Placeholder>
           </p>
         </section>
 
@@ -174,7 +175,7 @@ export default function TerminosPage() {
         <section>
           <h2>16. Ley aplicable y jurisdicción</h2>
           <p className="mt-3">
-            Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de <Placeholder>[CIUDAD Y ESTADO PARA JURISDICCIÓN — PENDIENTE DE CONFIRMAR]</Placeholder>, con renuncia a cualquier otro fuero que pudiera corresponderles, salvo norma de orden público en contrario.
+            Estos términos se rigen por las leyes federales de los Estados Unidos Mexicanos. Para cualquier controversia, las partes se someten a los tribunales competentes de Monterrey, Nuevo León, México, con renuncia expresa a cualquier otro fuero que pudiera corresponderles por razón de sus domicilios presentes o futuros, sin perjuicio de los derechos del consumidor para acudir a la Procuraduría Federal del Consumidor (PROFECO) en los términos de la Ley Federal de Protección al Consumidor.
           </p>
         </section>
       </article>

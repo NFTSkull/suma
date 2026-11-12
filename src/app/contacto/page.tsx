@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { WhatsAppPrivacyNotice } from "@/components/legal/WhatsAppPrivacyNotice";
 import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { site } from "@/content/site";
@@ -44,16 +45,19 @@ export default function ContactoPage() {
               Cuéntanos qué necesitas para tu negocio. El mensaje llega a nuestro número de atención.
             </p>
             <p className="mt-5 font-display text-2xl font-bold text-suma-navy">{site.contact.phoneDisplay}</p>
-            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer">
-                Abrir WhatsApp
-              </ButtonLink>
-              <a
-                href={`tel:${site.contact.phoneE164}`}
-                className="inline-flex min-h-12 items-center font-bold text-suma-navy underline decoration-2 decoration-suma-orange underline-offset-4"
-              >
-                Llamar al {site.contact.phoneDisplay}
-              </a>
+            <div className="mt-6 space-y-3">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <ButtonLink href={site.contact.whatsappUrl} size="lg" arrow target="_blank" rel="noopener noreferrer">
+                  Abrir WhatsApp
+                </ButtonLink>
+                <a
+                  href={`tel:${site.contact.phoneE164}`}
+                  className="inline-flex min-h-12 items-center font-bold text-suma-navy underline decoration-2 decoration-suma-orange underline-offset-4"
+                >
+                  Llamar al {site.contact.phoneDisplay}
+                </a>
+              </div>
+              <WhatsAppPrivacyNotice />
             </div>
           </div>
           <div className="mt-12 rounded-[2rem] bg-suma-navy p-8 text-suma-cream">

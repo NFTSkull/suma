@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { buildMetadata, pageGraph } from "@/lib/seo";
+import { legalEffectiveDate } from "@/content/site";
 
 const seo = {
   title: "Eliminación de datos",
@@ -33,7 +34,7 @@ export default function EliminacionPage() {
 
         <section>
           <p className="text-sm text-suma-navy/60">
-            <strong>Última actualización:</strong> <Placeholder>[FECHA DE ENTRADA EN VIGOR — PENDIENTE]</Placeholder>
+            <strong>Última actualización:</strong> <Placeholder>{legalEffectiveDate}</Placeholder>
           </p>
         </section>
 
@@ -49,19 +50,21 @@ export default function EliminacionPage() {
         <section>
           <h2>1. Cómo solicitar la eliminación</h2>
           <p className="mt-3">
-            Envía un correo a <a href="mailto:ventas@sumastudio.mx" className="underline decoration-suma-purple underline-offset-4">ventas@sumastudio.mx</a> con el asunto «Solicitud de eliminación de datos» e incluye:
+            Envía un correo a <a href="mailto:ventas@sumastudio.mx" className="underline decoration-suma-purple underline-offset-4">ventas@sumastudio.mx</a> <strong>desde el correo electrónico o número de WhatsApp que registraste con nosotros</strong>, con el asunto «Solicitud de eliminación de datos», e incluye:
           </p>
           <ul>
             <li>tu nombre completo;</li>
             <li>un medio para responderte;</li>
-            <li>una descripción de los datos o del servicio a los que se refiere la solicitud (por ejemplo, formulario de este sitio, cuenta de cliente, o uso de una aplicación de SUMA en Facebook o WhatsApp);</li>
-            <li>un documento o dato que permita acreditar tu identidad.</li>
+            <li>una descripción de los datos o del servicio a los que se refiere la solicitud (por ejemplo, formulario de este sitio, cuenta de cliente, o uso de una aplicación de SUMA en Facebook o WhatsApp).</li>
           </ul>
+          <p className="mt-3">
+            <strong>Verificación de identidad:</strong> Para proteger tus datos, verificaremos tu identidad mediante el canal desde el que nos escribes (correo o WhatsApp registrado) o enviándote un código de confirmación a ese medio. Solo si no podemos confirmar tu identidad por este método, te solicitaremos que acredites tu identidad o, en su caso, la personalidad e identidad de tu representante, a través de un medio seguro que te indicaremos (nunca envíes documentos de identificación por correo electrónico sin cifrar).
+          </p>
           <p className="mt-3">
             También puedes ejercer el derecho de cancelación u otros derechos ARCO por la misma vía, en los términos del aviso de privacidad y de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.
           </p>
           <p className="mt-3">
-            Responderemos en un plazo máximo de veinte días hábiles y, si la solicitud procede, haremos efectiva la eliminación dentro de los quince días siguientes a nuestra respuesta, salvo ampliación justificada por una sola vez, conforme al artículo 31 de la Ley.
+            Responderemos en un plazo máximo de <strong>veinte días hábiles</strong> y, si la solicitud procede, haremos efectiva la eliminación dentro de los <strong>quince días</strong> siguientes a nuestra respuesta, salvo ampliación justificada por una sola vez, conforme al artículo 31 de la Ley.
           </p>
         </section>
 
@@ -72,6 +75,23 @@ export default function EliminacionPage() {
           </p>
           <p className="mt-3">
             Si tus datos los trata un cliente de SUMA Inbox (mensajes de WhatsApp u otros datos de sus contactos), ese cliente es el responsable. En ese caso, canalizaremos tu solicitud hacia él y cooperaremos en lo que nos corresponda como encargada. También puedes dirigirla primero a ese negocio.
+          </p>
+          
+          <h3 className="mt-6 text-xl font-bold text-suma-navy">Datos relacionados con aplicaciones de Meta o WhatsApp</h3>
+          <p className="mt-3">
+            Si utilizaste una aplicación de SUMA con tu cuenta de Facebook o WhatsApp, la eliminación incluirá:
+          </p>
+          <ul>
+            <li>Datos de autenticación de tu cuenta de Facebook o Meta (si los recabamos).</li>
+            <li>Historial de mensajes de WhatsApp almacenados en SUMA Inbox (si fuiste contacto de un cliente).</li>
+            <li>Preferencias y configuraciones relacionadas con la aplicación.</li>
+            <li>Cualquier contenido que hayas compartido a través de la aplicación de SUMA.</li>
+          </ul>
+          <p className="mt-3">
+            <strong>Plazo de eliminación:</strong> Una vez confirmada tu identidad, procederemos a la eliminación de tus datos en un plazo máximo de 15 días hábiles. Te enviaremos una confirmación por correo electrónico una vez completado el proceso.
+          </p>
+          <p className="mt-3">
+            <strong>Nota importante:</strong> La eliminación de datos en SUMA no afecta los datos que Meta o WhatsApp conserven en sus propias plataformas. Para eliminar datos directamente de Meta o WhatsApp, consulta sus políticas de privacidad y herramientas de gestión de datos.
           </p>
         </section>
 

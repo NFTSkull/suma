@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { buildMetadata, pageGraph } from "@/lib/seo";
+import { legalEffectiveDate } from "@/content/site";
 
 const seo = {
   title: "Aviso de privacidad",
@@ -26,14 +27,14 @@ export default function AvisoPage() {
         title="Aviso de privacidad"
         lead="Aviso de privacidad integral de VIOZ CREACIONES Y PRODUCCIONES, S.A. de C.V., conocida comercialmente como SUMA Studio, conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares."
       />
-      <article className="container-suma max-w-3xl space-y-10 pb-28 text-lg leading-relaxed text-suma-navy/85 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-suma-navy [&_li]:mt-2 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-6">
+      <article className="container-suma max-w-3xl space-y-10 pb-28 text-lg leading-relaxed text-suma-navy/85 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-suma-navy [&_h3]:font-display [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-suma-navy [&_li]:mt-2 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:mt-3 [&_ol]:list-decimal [&_ol]:pl-6">
         <p className="rounded-2xl border-2 border-dashed border-suma-orange-ink/40 bg-suma-orange/10 p-5 text-base">
           <strong>Aviso:</strong> Este documento contiene placeholders visibles (datos entre corchetes) que deben completarse antes de su publicación definitiva. La información jurídica aquí incluida debe ser revisada por un especialista legal.
         </p>
 
         <section>
           <p className="text-sm text-suma-navy/60">
-            <strong>Última actualización:</strong> <Placeholder>[FECHA DE ENTRADA EN VIGOR — PENDIENTE]</Placeholder>
+            <strong>Última actualización:</strong> <Placeholder>{legalEffectiveDate}</Placeholder>
           </p>
         </section>
 
@@ -74,27 +75,27 @@ export default function AvisoPage() {
         <section>
           <h2>3. Datos personales que recabamos (SUMA como responsable)</h2>
           
-          <h3 className="mt-6 text-xl font-bold text-suma-navy">3.1 Formulario de contacto y comunicación comercial</h3>
+          <h3 className="mt-6">3.1 Formulario de contacto y comunicación comercial</h3>
           <p className="mt-3">
             Nombre; nombre del negocio; tipo de negocio; correo electrónico; número de teléfono o WhatsApp; servicios de interés; el mensaje que nos escribas; y, si llegaste desde el selector de soluciones, el tipo de negocio y el reto que elegiste.
           </p>
 
-          <h3 className="mt-6 text-xl font-bold text-suma-navy">3.2 Datos de clientes y de la relación comercial</h3>
+          <h3 className="mt-6">3.2 Datos de clientes y de la relación comercial</h3>
           <p className="mt-3">
             Datos de contacto de representantes, información contractual, facturación y, cuando aplique, datos fiscales necesarios para emitir comprobantes. Los datos financieros o patrimoniales, si se recabaran, requieren consentimiento expreso (artículo 7 de la Ley), salvo las excepciones legales.
           </p>
 
-          <h3 className="mt-6 text-xl font-bold text-suma-navy">3.3 Datos técnicos del sitio</h3>
+          <h3 className="mt-6">3.3 Datos técnicos del sitio</h3>
           <p className="mt-3">
             Para proteger el formulario contra abusos, el servidor puede usar de forma temporal la dirección IP. El proveedor de alojamiento registra datos técnicos de las solicitudes (por ejemplo, fecha, ruta y datos del navegador).
           </p>
 
-          <h3 className="mt-6 text-xl font-bold text-suma-navy">3.4 Estadísticas de uso, solo con tu permiso</h3>
+          <h3 className="mt-6">3.4 Estadísticas de uso, solo con tu permiso</h3>
           <p className="mt-3">
             Si aceptas la medición, Google Analytics puede registrar páginas visitadas, tipo de dispositivo y navegador, ubicación aproximada y acciones en el sitio (por ejemplo, enviar el formulario), sin tu nombre, correo, teléfono ni el contenido de tus mensajes.
           </p>
 
-          <h3 className="mt-6 text-xl font-bold text-suma-navy">3.5 Datos personales sensibles</h3>
+          <h3 className="mt-6">3.5 Datos personales sensibles</h3>
           <p className="mt-3">
             No recabamos de forma intencional datos personales sensibles a través de este sitio (artículo 2, fracción VI, de la Ley). Te pedimos que no nos envíes datos de salud, información genética, creencias, opiniones políticas, origen étnico ni preferencia sexual en el formulario de contacto. Si un mensaje los incluyera de manera incidental, los trataremos solo para atender esa solicitud y los eliminaremos cuando ya no sean necesarios, con el consentimiento expreso y por escrito que exige el artículo 8, en la medida en que el tratamiento proceda.
           </p>
@@ -106,7 +107,7 @@ export default function AvisoPage() {
         <section>
           <h2>4. Finalidades</h2>
           
-          <h3 className="mt-6 text-xl font-bold text-suma-navy">4.1 Finalidades primarias (necesarias para la relación o para atender tu solicitud)</h3>
+          <h3 className="mt-6">4.1 Finalidades primarias (necesarias para la relación o para atender tu solicitud)</h3>
           <p className="mt-3">
             No requieren un consentimiento adicional distinto del que se deriva de tu solicitud o del contrato, sin perjuicio de las excepciones y reglas de la Ley:
           </p>
@@ -119,7 +120,7 @@ export default function AvisoPage() {
             <li>Proteger la seguridad del sitio y prevenir abusos del formulario.</li>
           </ul>
 
-          <h3 className="mt-6 text-xl font-bold text-suma-navy">4.2 Finalidades secundarias (requieren tu consentimiento y puedes oponerte)</h3>
+          <h3 className="mt-6">4.2 Finalidades secundarias (requieren tu consentimiento y puedes oponerte)</h3>
           <ul>
             <li>Enviarte información comercial posterior sobre servicios de SUMA que puedan interesarte, distinta del seguimiento inmediato de una solicitud que tú iniciaste.</li>
             <li>Invitarte a demostraciones, eventos o contenidos informativos de SUMA.</li>
@@ -139,8 +140,7 @@ export default function AvisoPage() {
           </p>
           <ul>
             <li><strong>Vercel</strong>, que aloja el sitio y procesa las solicitudes al formulario. Su infraestructura puede situarse fuera de México, incluidos los Estados Unidos.</li>
-            <li><strong>Resend</strong>, que recibe los datos del formulario para enviarlos por correo a nuestro buzón. Sus servidores se ubican en Estados Unidos, según la información pública del proveedor.</li>
-            <li><strong>Proveedor del buzón</strong> que recibe las solicitudes: <Placeholder>[PROVEEDOR DE CORREO — PENDIENTE DE CONFIRMAR]</Placeholder>.</li>
+            <li><strong>Resend, Inc.</strong> (Estados Unidos), servicio de envío y recepción de correo electrónico. Los datos del formulario se envían a través de Resend a nuestro buzón. Los mensajes recibidos se conservan en la plataforma hasta 30 días.</li>
             <li><strong>Google</strong> (Google Tag Manager y Google Analytics 4), solo si aceptas la medición.</li>
           </ul>
           <p className="mt-3">
@@ -161,6 +161,9 @@ export default function AvisoPage() {
           </p>
           <p className="mt-3">
             Guardamos tu decisión en el almacenamiento local del navegador para no volver a preguntarte en cada página. El selector de soluciones guarda temporalmente, durante la sesión, el tipo de negocio y el reto que elegiste para prellenar el formulario; no incluye tu nombre ni tus datos de contacto.
+          </p>
+          <p className="mt-3">
+            Google Analytics 4 está configurado con retención de datos de eventos de 2 meses y de datos de usuario de 14 meses, con reinicio de retención ante nueva actividad. Google Signals está desactivado. No se envían datos personales identificables a Google Analytics, y el servicio solo se activa con tu consentimiento de cookies.
           </p>
           <p className="mt-3">
             No usamos cookies publicitarias. Puedes cambiar tu decisión en cualquier momento desde «Preferencias de privacidad», al pie de cada página, o borrar las cookies y el almacenamiento desde la configuración de tu navegador.
@@ -198,13 +201,46 @@ export default function AvisoPage() {
         <section>
           <h2>8. Conservación</h2>
           <p className="mt-3">
-            Conservamos los datos del formulario y de la relación comercial mientras resulta necesario para las finalidades informadas, para el cumplimiento del contrato y para las obligaciones legales o fiscales aplicables. El plazo operativo interno, cuando se defina, será: <Placeholder>[PLAZO DE CONSERVACIÓN — PENDIENTE DE DEFINIR]</Placeholder>.
+            Conservamos los datos del formulario y de la relación comercial mientras resulta necesario para las finalidades informadas, para el cumplimiento del contrato y para las obligaciones legales o fiscales aplicables. Los plazos de conservación son:
           </p>
+          <div className="mt-4 overflow-x-auto">
+            <table className="min-w-full border-collapse border border-suma-navy/20 text-base">
+              <thead>
+                <tr className="bg-suma-navy/5">
+                  <th className="border border-suma-navy/20 px-4 py-2 text-left font-semibold">Categoría de datos</th>
+                  <th className="border border-suma-navy/20 px-4 py-2 text-left font-semibold">Plazo de conservación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-suma-navy/20 px-4 py-2">Prospectos sin contrato</td>
+                  <td className="border border-suma-navy/20 px-4 py-2">12 meses desde el último contacto</td>
+                </tr>
+                <tr>
+                  <td className="border border-suma-navy/20 px-4 py-2">Clientes</td>
+                  <td className="border border-suma-navy/20 px-4 py-2">Durante la relación contractual y hasta 5 años después para obligaciones fiscales y legales (artículo 30 del Código Fiscal de la Federación)</td>
+                </tr>
+                <tr>
+                  <td className="border border-suma-navy/20 px-4 py-2">Datos tratados en SUMA Inbox por cuenta de clientes (SUMA como encargada)</td>
+                  <td className="border border-suma-navy/20 px-4 py-2">Conforme al contrato con el cliente y por defecto 12 meses tras su terminación, con eliminación o devolución a solicitud del cliente</td>
+                </tr>
+                <tr>
+                  <td className="border border-suma-navy/20 px-4 py-2">Consentimiento de mercadotecnia</td>
+                  <td className="border border-suma-navy/20 px-4 py-2">Hasta su revocación (conservando solo una ficha mínima de baja para respetar la oposición)</td>
+                </tr>
+                <tr>
+                  <td className="border border-suma-navy/20 px-4 py-2">Estadísticas de Google Analytics</td>
+                  <td className="border border-suma-navy/20 px-4 py-2">Eventos: 2 meses; datos de usuario: 14 meses con reinicio ante nueva actividad</td>
+                </tr>
+                <tr>
+                  <td className="border border-suma-navy/20 px-4 py-2">Respaldos</td>
+                  <td className="border border-suma-navy/20 px-4 py-2">Hasta 90 días</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p className="mt-3">
-            Las estadísticas de Google Analytics se conservan según el periodo configurado en esa herramienta: <Placeholder>[PERIODO DE RETENCIÓN EN GOOGLE ANALYTICS — PENDIENTE DE CONFIRMAR]</Placeholder>.
-          </p>
-          <p className="mt-3">
-            Los datos tratados como encargada se conservan durante la vigencia del servicio y el tiempo adicional que el cliente responsable nos indique o que exija la ley, y se bloquean o suprimen después, conforme a los artículos 2, fracción III, y 10 de la Ley.
+            Al término del periodo de conservación, los datos se eliminan o anonimizan, pasando por bloqueo y supresión conforme a los artículos 2, fracción III, y 10 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.
           </p>
         </section>
 
@@ -222,18 +258,20 @@ export default function AvisoPage() {
         <section>
           <h2>10. Derechos ARCO, revocación del consentimiento y procedimiento</h2>
           <p className="mt-3">
-            Puedes solicitar el acceso, la rectificación, la cancelación o la oposición al tratamiento de tus datos personales (derechos ARCO, artículos 21 a 34 de la Ley), así como revocar tu consentimiento (artículo 7) o limitar el uso o la divulgación de tus datos, escribiendo a <a href="mailto:ventas@sumastudio.mx" className="underline decoration-suma-purple underline-offset-4">ventas@sumastudio.mx</a>.
+            Puedes solicitar el acceso, la rectificación, la cancelación o la oposición al tratamiento de tus datos personales (derechos ARCO, artículos 21 a 34 de la Ley), así como revocar tu consentimiento (artículo 7) o limitar el uso o la divulgación de tus datos, escribiendo a <a href="mailto:ventas@sumastudio.mx" className="underline decoration-suma-purple underline-offset-4">ventas@sumastudio.mx</a> <strong>desde el correo electrónico o número de WhatsApp que registraste con nosotros</strong>.
           </p>
           <p className="mt-3">
             Tu solicitud debe incluir, conforme al artículo 28:
           </p>
-          <ul>
-            <li>tu nombre y un domicilio o medio para recibir notificaciones;</li>
-            <li>los documentos que acrediten tu identidad o, en su caso, la personalidad e identidad de tu representante;</li>
+          <ol>
+            <li>tu nombre y un medio para recibir notificaciones;</li>
             <li>la descripción clara de los datos respecto de los que buscas ejercer el derecho, salvo que se trate del derecho de acceso;</li>
             <li>la descripción del derecho que pretendes ejercer, o lo que solicitas;</li>
             <li>cualquier otro elemento que facilite la localización de los datos.</li>
-          </ul>
+          </ol>
+          <p className="mt-3">
+            <strong>Verificación de identidad:</strong> Para proteger tus datos, verificaremos tu identidad mediante el canal desde el que nos escribes (correo o WhatsApp registrado) o enviándote un código de confirmación a ese medio. Solo si no podemos confirmar tu identidad por este método, te solicitaremos que acredites tu identidad o, en su caso, la personalidad e identidad de tu representante, a través de un medio seguro que te indicaremos (nunca envíes documentos de identificación por correo electrónico sin cifrar).
+          </p>
           <p className="mt-3">
             Responderemos en un plazo máximo de <strong>veinte días hábiles</strong>, contados desde la recepción de la solicitud, y, si resulta procedente, haremos efectiva la determinación dentro de los <strong>quince días</strong> siguientes a la comunicación de la respuesta, de acuerdo con el artículo 31 de la Ley. Estos plazos pueden ampliarse una sola vez por un periodo igual, cuando las circunstancias del caso lo justifiquen.
           </p>

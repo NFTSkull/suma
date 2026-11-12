@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PrivacyPreferences } from "@/components/analytics/PrivacyPreferences";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { SumaLogo } from "@/components/brand/SumaLogo";
+import { WhatsAppPrivacyNotice } from "@/components/legal/WhatsAppPrivacyNotice";
 import { ButtonLink } from "@/components/ui/Button";
 import { footerNav, legalLinks, primaryCta } from "@/content/navigation";
 import { site } from "@/content/site";
@@ -76,9 +77,12 @@ export function Footer() {
               </nav>
             )}
 
-            <ButtonLink href={primaryCta.href} variant="accent" className="mt-8" arrow target="_blank" rel="noopener noreferrer">
-              {primaryCta.label}
-            </ButtonLink>
+            <div className="mt-8 space-y-3">
+              <ButtonLink href={primaryCta.href} variant="accent" arrow target="_blank" rel="noopener noreferrer">
+                {primaryCta.label}
+              </ButtonLink>
+              <WhatsAppPrivacyNotice className="text-xs text-suma-cream/60" />
+            </div>
           </div>
 
           <nav aria-label="Pie de página" className="grid gap-10 sm:grid-cols-3">

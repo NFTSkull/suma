@@ -71,6 +71,7 @@ export const contactSchema = z.object({
     .optional()
     .transform((v) => (v ? v : undefined)),
   privacidad: z.literal(true, { error: "Necesitamos tu consentimiento para responderte." }),
+  marketing: z.boolean().optional().default(false),
   contexto: z
     .object({ negocio: slug.optional(), reto: slug.optional() })
     .strict()
