@@ -33,11 +33,24 @@ src/
   lib/                      contact-schema, recommend, seo, rate-limit, action-log, contact-delivery, cn
 ```
 
-## SUMA Studio OS (`/demo/studio-os`, demo privada)
-Demostración de un CRM para estudios con datos ficticios. Sin red, sin base de datos ni servicios externos; el estado vive en React y en `sessionStorage` (el logotipo nunca se guarda).
-- `src/lib/studio-os/`: `types` (modelo), `catalog` (sugerencias por tipo de estudio, temas, módulos, roles), `seed` (datos ficticios deterministas creados con el propio motor), `rules` y `engine` (acciones puras `estado → { estado, ok, mensaje }`: reservas, cancelaciones, lista de espera, membresías, pagos, ventas, automatizaciones simuladas, configuración), `selectors` (todos los indicadores se derivan del estado), `summary` y `storage`.
-- `src/components/studio-os/`: configurador de tres pasos, `AppShell` (portal a pantalla completa; el sitio de fondo queda `inert`) y una vista por sección en `views/`.
-- Fuera del menú y del sitemap, `noindex, nofollow`. `src/proxy.ts` responde 404 en `/demo/*` cuando `VERCEL_ENV=production`; en previews el acceso lo protege Vercel.
+## SUMA Wellness OS (`/demo/studio-os`, demo privada)
+Showroom comercial: un sistema de gestión para negocios wellness que la persona configura y explora con datos ficticios. Sin red, sin base de datos ni servicios externos; el estado vive en React y en `sessionStorage` (clave `v4`; el logotipo nunca se guarda).
+
+**Núcleo común + giros.** Un solo modelo (clientes, agenda, equipo, espacios, planes, pagos, ventas) sirve a todos los giros. Lo que cambia por giro vive en `src/lib/studio-os/verticals.ts`: terminología (`terms`), catálogos de servicios y planes, presets de operación, módulos sugeridos, automatizaciones, nombres ficticios y preguntas del configurador. Agregar un giro = agregar una entrada.
+
+**Modalidad derivada, no condicionales por giro.** `modeOf(config)` sale de lo que se ofrece: solo grupal → `grupal`, solo individual → `citas`, ambos → `hibrido`. `capabilitiesOf` expone `groups`, `appointments`, `waitlist` y `serviceCatalog`; vistas, navegación, indicadores y reportes consultan esas capacidades y los `terms`.
+
+**Dos reglas de reserva separadas.**
+- Clases grupales (`Session.kind = "grupal"`): cupo, créditos, lista de espera y asistencia. Motor original sin cambios de comportamiento, más una regla nueva: nadie puede estar en dos clases simultáneas.
+- Citas individuales (`Session.kind = "cita"`, cupo 1): `findSlot` / `applyBookAppointment` validan horario de atención, día del especialista y que no haya empalmes de especialista, espacio individual ni cliente. Sin lista de espera. Se paga con una sesión del paquete o al llegar (el cobro se registra al marcar "Llegó"; si no asiste no se cobra). Cancelar libera el horario y devuelve la sesión según la regla de anticipación.
+- Híbrido: grupos solo en espacios grupales; citas solo en espacios individuales.
+
+**Archivos.**
+- `src/lib/studio-os/`: `types`, `verticals` (registro de giros), `catalog` (temas, módulo→vistas, roles y automatizaciones redactadas con los `terms`), `seed` (datos deterministas por giro creados con el propio motor), `rules` y `engine` (acciones puras `estado → { estado, ok, mensaje }`), `selectors` (indicadores derivados, horarios libres, vista previa de automatizaciones), `summary` (resumen comercial) y `storage`.
+- `src/components/studio-os/`: `Welcome`, `Configurator` (ocho preguntas, una por pantalla), `LivePreview` (el mismo sistema, generado con `createDemo`, escalado), `Reveal`, `AppShell` y `views/`. `home.ts` comparte indicadores entre vista previa e inicio; `nav.ts` traduce vistas con los `terms`.
+- Nombres internos heredados por compatibilidad: `students` = clientes, `instructors` = equipo, `rooms` = espacios, `classTypes` = servicios, módulo `alumnas` = clientes.
+
+**Privacidad.** Fuera del menú y del sitemap, `noindex, nofollow`. `src/proxy.ts` responde 404 en `/demo/*` cuando `VERCEL_ENV=production`; en previews el acceso lo protege Vercel. No se guardan expedientes ni datos clínicos.
 
 ## Formulario de contacto
 `ContactForm` (cliente) → `POST /api/contacto` → validación Zod → anti-spam (honeypot + tiempo mínimo + rate limit en memoria) → entrega por `CONTACT_WEBHOOK_URL` o Resend (`RESEND_API_KEY` + `CONTACT_TO_EMAIL`). Si no hay proveedor configurado responde `503 not_configured` y la UI lo comunica sin simular éxito.

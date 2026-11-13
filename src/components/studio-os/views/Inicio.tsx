@@ -4,24 +4,24 @@ import { motion } from "motion/react";
 import { studioDisplayName } from "@/lib/studio-os/catalog";
 import { toggleTask } from "@/lib/studio-os/engine";
 import { sessionTaken } from "@/lib/studio-os/rules";
-import { className, dashboard, finance, instructorName, reports, roomName, visibleViews } from "@/lib/studio-os/selectors";
+import { className, dashboard, finance, instructorName, reports, visibleViews } from "@/lib/studio-os/selectors";
 import { cap, fmtDate, fmtDay, fmtLongDay, fmtMoney, fmtPct, fmtRelative, fmtTime } from "@/lib/studio-os/time";
 import { AreaChart, Ring } from "../charts";
 import { useStudio } from "../context";
-import { Icon, type IconName } from "../icons";
+import { homeKpis, sessionLines } from "../home";
+import { Icon } from "../icons";
 import { ease } from "../motion";
 import { Badge, Button, Card, CardTitle, cx, Empty, focusRing, Meter } from "../ui";
 
 const section = (i: number) => ({ initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, ease, delay: 0.05 + i * 0.07 } });
 
 export function Inicio() {
-  const { state, go, apply } = useStudio();
+  const { state, go, apply, t, caps } = useStudio();
   const d = dashboard(state);
   const has = (m: string) => state.config.modules.includes(m as never);
   const isInstructor = state.role === "instructor";
   const hour = new Date(state.now).getHours();
   const greeting = hour < 12 ? "Buenos días" : hour < 19 ? "Buenas tardes" : "Buenas noches";
-  const started = d.attendance.attended + d.attendance.missed + d.attendance.pending;
   const views = visibleViews(state);
   const attention = d.attention.filter((a) => views.includes(a.view));
   const who = isInstructor ? instructorName(state, state.viewAsInstructorId).split(" ")[0] : studioDisplayName(state.config);
@@ -30,15 +30,7 @@ export function Inicio() {
   const r = reports(state);
   const now = new Date(state.now);
 
-  const kpis: { label: string; value: string | number; hint: string; icon: IconName; view: Parameters<typeof go>[0] }[] = [];
-  if (has("clases")) {
-    kpis.push({ icon: "calendar", label: "Clases hoy", value: d.today.length, hint: `${d.bookedToday} de ${d.capacityToday} lugares`, view: "agenda" });
-    kpis.push({ icon: "check", label: "Asistencia hoy", value: started ? `${d.attendance.attended}/${started}` : "—", hint: d.attendance.pending ? `${d.attendance.pending} por registrar` : started ? "Lista al día" : "Aún no empieza ninguna", view: "agenda" });
-    kpis.push({ icon: "clock", label: "Reservas próximas", value: d.upcomingReservations, hint: "En clases que no han empezado", view: "agenda" });
-  }
-  if (!isInstructor) kpis.push({ icon: "users", label: "Alumnas activas", value: d.activeStudents, hint: "Con paquete vigente", view: "alumnas" });
-  if (!isInstructor && has("membresias")) kpis.push({ icon: "card", label: "Por vencer", value: d.expiring.length, hint: `En ${state.settings.expiryWarningDays} días o con 1 crédito`, view: "membresias" });
-  if (!isInstructor && has("marketing")) kpis.push({ icon: "funnel", label: "Consultas pendientes", value: d.pendingLeads.length, hint: "Nuevas o contactadas", view: "ventas" });
+  const kpis = homeKpis(state);
 
   return (
     <>
@@ -49,13 +41,13 @@ export function Inicio() {
             {greeting}, <em className="text-(--os-accent-ink)">{who}</em>
           </h2>
           <p className="mt-3 max-w-xl text-[15.5px] leading-relaxed text-(--os-muted)">
-            {isInstructor ? "Estas son tus clases de hoy y quién viene a cada una." :
-              attention.length ? `Tienes ${attention.length} cosa${attention.length === 1 ? "" : "s"} por resolver y ${d.today.length} clase${d.today.length === 1 ? "" : "s"} en agenda.` : "Todo está en orden. Así va tu estudio hoy."}
+            {isInstructor ? `Esta es tu agenda de hoy y quién viene a cada ${t.booking.one}.` :
+              attention.length ? `Tienes ${attention.length} cosa${attention.length === 1 ? "" : "s"} por resolver y ${d.today.length} horario${d.today.length === 1 ? "" : "s"} en agenda.` : `Todo está en orden. Así va tu ${t.business} hoy.`}
           </p>
         </div>
         {has("clases") && (
           <Button variant="primary" size="lg" icon={isInstructor ? "check" : "plus"} onClick={() => go("agenda")}>
-            {isInstructor ? "Pasar lista" : "Reservar una clase"}
+            {isInstructor ? "Pasar lista" : caps.appointments ? `Agendar ${t.booking.one}` : "Reservar una clase"}
           </Button>
         )}
       </motion.div>
@@ -83,11 +75,11 @@ export function Inicio() {
           {has("clases") && (
             <motion.div {...section(2)}>
               <Card className="p-5 sm:p-6">
-                <CardTitle hint={d.today.length ? "Toca una clase para ver su lista." : undefined} action={<Button size="sm" variant="ghost" iconRight="chevronRight" onClick={() => go("agenda")}>Agenda</Button>}>Hoy en el estudio</CardTitle>
+                <CardTitle hint={d.today.length ? "Toca un horario para ver el detalle." : undefined} action={<Button size="sm" variant="ghost" iconRight="chevronRight" onClick={() => go("agenda")}>{t.agenda}</Button>}>Hoy en tu {t.business}</CardTitle>
                 {d.today.length ? (
                   <ol className="relative mt-4">
                     {d.today.map((s, i) => {
-                      const taken = sessionTaken(state, s.id);
+                      const line = sessionLines(state, s);
                       const past = new Date(s.start) <= now;
                       const nowLine = !past && (i === 0 || new Date(d.today[i - 1].start) <= now);
                       return (
@@ -100,20 +92,24 @@ export function Inicio() {
                           <button type="button" onClick={() => go("agenda", s.id)} className={cx("grid w-full grid-cols-[3.25rem_minmax(0,1fr)_6rem] items-center gap-3 rounded-2xl px-2 py-3 text-left transition-colors duration-200 hover:bg-(--os-ivory) sm:grid-cols-[3.25rem_minmax(0,1fr)_8rem]", focusRing)}>
                             <span className={cx("os-num text-[15px] font-semibold", past && "text-(--os-faint)")}>{fmtTime(s.start)}</span>
                             <span className="min-w-0">
-                              <span className={cx("block truncate text-[15px] font-semibold", past && "text-(--os-muted)")}>{className(state, s)}</span>
-                              <span className="block truncate text-[12.5px] text-(--os-muted)">{instructorName(state, s.instructorId)} · {roomName(state, s.roomId)} · {s.minutes} min</span>
+                              <span className={cx("flex items-center gap-2 truncate text-[15px] font-semibold", past && "text-(--os-muted)")}>{line.client ? line.client.name : line.title}{s.kind === "grupal" && caps.appointments && <span className="rounded-full bg-(--os-sage-soft) px-2 text-[10.5px] font-semibold text-(--os-success)">Grupo</span>}</span>
+                              <span className="block truncate text-[12.5px] text-(--os-muted)">{line.client ? `${line.title} · ${instructorName(state, s.instructorId)} · ${s.minutes} min` : `${line.detail} · ${s.minutes} min`}</span>
                             </span>
-                            <span className="text-right">
-                              <span className="os-num block text-[12.5px] text-(--os-muted)"><span className="font-semibold text-(--os-ink)">{taken}</span>/{s.capacity}{taken >= s.capacity && <span className="ml-1.5 text-(--os-accent-ink)">Llena</span>}</span>
-                              <span className="mt-1.5 block"><Meter value={taken} max={s.capacity} label={`Ocupación ${className(state, s)}`} /></span>
-                            </span>
+                            {line.right.kind === "cupo" ? (
+                              <span className="text-right">
+                                <span className="os-num block text-[12.5px] text-(--os-muted)"><span className="font-semibold text-(--os-ink)">{line.right.taken}</span>/{line.right.capacity}{line.right.taken >= line.right.capacity && <span className="ml-1.5 text-(--os-accent-ink)">Llena</span>}</span>
+                                <span className="mt-1.5 block"><Meter value={line.right.taken} max={line.right.capacity} label={`Ocupación ${line.title}`} /></span>
+                              </span>
+                            ) : (
+                              <span className="os-num text-right text-[13.5px] font-semibold">{line.right.label}</span>
+                            )}
                           </button>
                         </li>
                       );
                     })}
                   </ol>
                 ) : (
-                  <div className="mt-4"><Empty icon="calendar" title="Hoy no hay clases" text="Crea una desde la agenda." action={<Button size="sm" onClick={() => go("agenda")}>Ir a la agenda</Button>} /></div>
+                  <div className="mt-4"><Empty icon="calendar" title="Hoy no hay horarios" text="Agenda algo desde la agenda." action={<Button size="sm" onClick={() => go("agenda")}>Ir a {t.agenda.toLowerCase()}</Button>} /></div>
                 )}
               </Card>
             </motion.div>
@@ -139,14 +135,35 @@ export function Inicio() {
         </div>
 
         <div className="min-w-0 space-y-5">
-          {has("clases") && d.nextSession && (
+          {has("clases") && caps.appointments && !caps.groups && !isInstructor && (
+            <motion.div {...section(2)}>
+              <div className="relative overflow-hidden rounded-[22px] bg-(--os-accent) p-5 text-white sm:p-6">
+                <span aria-hidden="true" className="absolute -right-12 -top-12 size-44 rounded-full bg-white/10" />
+                <p className="os-eyebrow relative text-white/75">{cap(t.space.many)} hoy</p>
+                <div className="relative mt-2 flex items-end justify-between gap-4">
+                  <p className="os-display text-[2.4rem] leading-none">{fmtPct(d.roomOccupancy)}</p>
+                  <p className="text-right text-[13px] text-white/80">{fmtMoney(d.expectedToday)}<br />estimados hoy</p>
+                </div>
+                <ul className="relative mt-4 space-y-2">
+                  {d.roomUse.map((r) => (
+                    <li key={r.room.id} className="grid grid-cols-[minmax(0,1fr)_7rem_2.5rem] items-center gap-3 text-[13px]">
+                      <span className="truncate">{r.room.name}</span>
+                      <span className="h-1.5 overflow-hidden rounded-full bg-white/20"><span className="block h-full rounded-full bg-white transition-[width] duration-700" style={{ width: `${Math.round(r.rate * 100)}%` }} /></span>
+                      <span className="os-num text-right text-white/80">{fmtPct(r.rate)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          )}
+          {has("clases") && d.nextSession && (caps.groups || isInstructor) && (
             <motion.div {...section(2)}>
               <div className="relative overflow-hidden rounded-[22px] bg-(--os-accent) p-5 text-white sm:p-6">
                 <span aria-hidden="true" className="absolute -right-12 -top-12 size-44 rounded-full bg-white/10" />
                 <span aria-hidden="true" className="absolute -bottom-16 right-10 size-32 rounded-full bg-white/[0.06]" />
                 <div className="relative flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="os-eyebrow text-white/75">Próxima clase</p>
+                    <p className="os-eyebrow text-white/75">{d.nextSession.kind === "cita" ? `Próxima ${t.booking.one}` : "Próxima clase"}</p>
                     <p className="os-display mt-2 text-[1.75rem] leading-tight">{className(state, d.nextSession)}</p>
                     <p className="mt-1 text-[13px] text-white/80">{fmtDay(d.nextSession.start)} · {fmtTime(d.nextSession.start)} · {instructorName(state, d.nextSession.instructorId)}</p>
                   </div>
@@ -187,7 +204,23 @@ export function Inicio() {
             </motion.div>
           )}
 
-          {!isInstructor && has("clases") && (
+          {!isInstructor && has("clases") && caps.appointments && (
+            <motion.div {...section(4)}>
+              <Card className="p-5 sm:p-6">
+                <CardTitle hint={`${cap(t.booking.many)} agendadas esta semana.`} action={<Button size="sm" variant="ghost" iconRight="chevronRight" onClick={() => go("servicios")}>{cap(t.offering.many)}</Button>}>{cap(t.offering.many)} más pedid{t.offering.g}s</CardTitle>
+                <ol className="mt-3 space-y-2">
+                  {r.services.slice(0, 4).map((x, i) => (
+                    <li key={x.name} className="flex items-center gap-3 text-[14px]">
+                      <span className="grid size-6 place-items-center rounded-full bg-(--os-soft) text-[12px] font-semibold text-(--os-accent-ink)">{i + 1}</span>
+                      <span className="min-w-0 flex-1 truncate font-medium">{x.name}</span>
+                      <span className="os-num text-(--os-muted)">{x.count}</span>
+                    </li>
+                  ))}
+                </ol>
+              </Card>
+            </motion.div>
+          )}
+          {!isInstructor && has("clases") && caps.groups && !caps.appointments && (
             <motion.div {...section(4)}>
               <Card className="flex items-center gap-5 p-5 sm:p-6">
                 <Ring value={Math.round((r.attendanceRate ?? 0) * 100)} max={100} size={76} stroke={6} color="var(--os-sage)" label="Asistencia">

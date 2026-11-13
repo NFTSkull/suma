@@ -11,7 +11,7 @@ import type { DemoState, Session } from "./types";
 
 /** Miércoles 11 de noviembre de 2026, 10:00 hora local. */
 const NOW = new Date(2026, 10, 11, 10, 0).toISOString();
-const fresh = (type: Parameters<typeof defaultConfig>[0] = "reformer") => createDemo(defaultConfig(type), NOW);
+const fresh = (type: Parameters<typeof defaultConfig>[0] = "pilates") => createDemo(defaultConfig(type), NOW);
 
 const hoursAhead = (state: DemoState, s: Session) => (new Date(s.start).getTime() - new Date(state.now).getTime()) / 3_600_000;
 const future = (state: DemoState, minHours: number, maxHours = Infinity) =>

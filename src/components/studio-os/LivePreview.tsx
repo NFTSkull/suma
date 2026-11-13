@@ -5,20 +5,22 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { studioDisplayName } from "@/lib/studio-os/catalog";
 import { sessionTaken } from "@/lib/studio-os/rules";
 import { createDemo } from "@/lib/studio-os/seed";
-import { className as classLabel, dashboard, finance, instructorName, roomName, visibleViews } from "@/lib/studio-os/selectors";
-import { fmtDate, fmtLongDay, fmtMoney, fmtTime } from "@/lib/studio-os/time";
+import { className as classLabel, dashboard, finance, instructorName, visibleViews } from "@/lib/studio-os/selectors";
+import { fmtDate, fmtLongDay, fmtMoney, fmtPct, fmtTime } from "@/lib/studio-os/time";
 import type { DemoState, StudioConfig } from "@/lib/studio-os/types";
+import { cap, capabilitiesOf, termsOf, verticalOf } from "@/lib/studio-os/verticals";
 import { Monogram } from "./brand";
 import { AreaChart } from "./charts";
 import { Icon } from "./icons";
 import { ease } from "./motion";
-import { navGroups, viewMeta } from "./nav";
+import { homeKpis, sessionLines } from "./home";
+import { navGroups, viewInfo } from "./nav";
 import { cx } from "./ui";
 
 export type PreviewFocus = "brand" | "nav" | "classes" | "capacity" | "plans" | "all";
 
 /** Campos que definen los datos de ejemplo; si cambian, la demo se vuelve a generar. */
-export const structuralKey = (c: StudioConfig) => JSON.stringify([c.type, c.classes, c.instructors, c.rooms, c.capacity, c.plans]);
+export const structuralKey = (c: StudioConfig) => JSON.stringify([c.vertical, c.offerings, c.instructors, c.rooms, c.capacity, c.plans]);
 
 /** Genera el estado de la demo con el motor real; solo se recalcula cuando cambia la estructura. */
 export function usePreviewState(config: StudioConfig, now: string): DemoState {
@@ -43,15 +45,7 @@ function useWidth<T extends HTMLElement>() {
   return [ref, width] as const;
 }
 
-const focusCopy: Record<Exclude<PreviewFocus, "all">, string> = {
-  brand: "Tu marca",
-  nav: "Tu menú",
-  classes: "Tus clases",
-  capacity: "Tu espacio",
-  plans: "Tus paquetes",
-};
-
-function Region({ id, focus, children, className }: { id: Exclude<PreviewFocus, "all">; focus: PreviewFocus; children: ReactNode; className?: string }) {
+function Region({ id, focus, children, className, label }: { id: Exclude<PreviewFocus, "all">; focus: PreviewFocus; children: ReactNode; className?: string; label: string }) {
   const on = focus === id;
   const dim = focus !== "all" && !on;
   return (
@@ -61,7 +55,7 @@ function Region({ id, focus, children, className }: { id: Exclude<PreviewFocus, 
         {on && (
           <motion.div key="spot" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.45, ease }}
             className="pointer-events-none absolute -inset-2.5 rounded-[22px] ring-2 ring-(--os-accent) shadow-[0_0_0_10px_color-mix(in_srgb,var(--os-accent)_10%,transparent)]">
-            <span className="absolute -top-3 left-4 rounded-full bg-(--os-accent) px-3 py-1 text-[12px] font-semibold text-white shadow-md">{focusCopy[id]}</span>
+            <span className="absolute -top-3 left-4 rounded-full bg-(--os-accent) px-3 py-1 text-[12px] font-semibold text-white shadow-md">{label}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -89,6 +83,10 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
   const H = compact ? 600 : 780;
   const scale = width ? width / W : 0.5;
   const name = studioDisplayName(state.config);
+  const t = termsOf(state.config);
+  const caps = capabilitiesOf(state.config);
+  const vertical = verticalOf(state.config);
+  const kpis = homeKpis(state).slice(0, 4);
   const d = dashboard(state);
   const views = visibleViews(state);
   const has = (m: string) => state.config.modules.includes(m as never);
@@ -102,7 +100,7 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
       <div ref={canvas} className="absolute left-0 top-0 flex origin-top-left select-none" style={{ width: W, minHeight: H, transform: `scale(${scale})` }}>
         {/* Barra lateral */}
         <aside className={cx("flex shrink-0 flex-col border-r border-(--os-line) bg-(--os-paper) p-5", compact ? "w-[210px]" : "w-[236px]")}>
-          <Region id="brand" focus={focus} className="rounded-2xl">
+          <Region id="brand" focus={focus} className="rounded-2xl" label="Tu marca">
             <div className="flex items-center gap-3 rounded-2xl p-1">
               <Monogram name={name} logo={logo} size={40} />
               <div className="min-w-0">
@@ -110,11 +108,11 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
                   <motion.p key={name} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.3, ease }}
                     className="os-display truncate text-[18px] leading-tight">{name}</motion.p>
                 </AnimatePresence>
-                <p className="text-[11.5px] text-(--os-muted)">Studio OS</p>
+                <p className="truncate text-[11.5px] text-(--os-muted)">{vertical.name}</p>
               </div>
             </div>
           </Region>
-          <Region id="nav" focus={focus} className="mt-6 rounded-2xl">
+          <Region id="nav" focus={focus} className="mt-6 rounded-2xl" label="Tu menú">
             <div className="space-y-4 p-1">
               {navGroups.map((g) => {
                 const items = g.views.filter((v) => views.includes(v) && v !== "resumen" && v !== "personalizar");
@@ -126,8 +124,8 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
                       {items.map((v) => (
                         <motion.div key={v} layout initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 36 }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.35, ease }}
                           className={cx("flex items-center gap-2.5 overflow-hidden rounded-xl px-2.5 text-[14px] font-medium", v === "inicio" ? "bg-(--os-soft) text-(--os-accent-ink)" : "text-(--os-ink-2)")}>
-                          <Icon name={viewMeta[v].icon} className="size-[17px] shrink-0" />
-                          <span className="truncate">{viewMeta[v].label}</span>
+                          <Icon name={viewInfo(v, state.config).icon} className="size-[17px] shrink-0" />
+                          <span className="truncate">{viewInfo(v, state.config).label}</span>
                         </motion.div>
                       ))}
                     </AnimatePresence>
@@ -138,7 +136,7 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
           </Region>
           <div className="mt-auto flex items-center gap-2.5 rounded-xl border border-(--os-line) p-2.5">
             <span className="grid size-8 place-items-center rounded-full bg-(--os-subtle) text-(--os-ink-2)"><Icon name="user" className="size-4" /></span>
-            <span className="text-[12.5px]"><span className="block font-semibold">Dueña</span><span className="text-(--os-muted)">Acceso total</span></span>
+            <span className="text-[12.5px]"><span className="block font-semibold">Dirección</span><span className="text-(--os-muted)">Acceso total</span></span>
           </div>
         </aside>
 
@@ -149,49 +147,50 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
               <p className="os-eyebrow text-(--os-accent-ink)">{fmtLongDay(state.now)}</p>
               <p className="os-display mt-2 truncate text-[38px] leading-none">Buenos días, <em className="text-(--os-accent-ink)">{name}</em></p>
             </div>
-            <span className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-(--os-accent) px-5 text-[14px] font-semibold text-white shadow-[0_8px_20px_-10px_var(--os-accent)]"><Icon name="plus" className="size-4" /> Reservar clase</span>
+            <span className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-(--os-accent) px-5 text-[14px] font-semibold text-white shadow-[0_8px_20px_-10px_var(--os-accent)]"><Icon name="plus" className="size-4" /> {caps.appointments ? `Nueva ${t.booking.one}` : "Reservar clase"}</span>
           </div>
 
-          <Region id="capacity" focus={focus} className="mt-7 rounded-[20px]">
+          <Region id="capacity" focus={focus} className="mt-7 rounded-[20px]" label={`Tu ${t.business}`}>
             <div className="grid grid-cols-4 divide-x divide-(--os-line) rounded-[20px] border border-(--os-line) bg-(--os-paper)">
-              {[
-                ["Clases hoy", String(d.today.length), `${state.classTypes.length} tipos de clase`],
-                ["Lugares hoy", `${d.bookedToday}/${d.capacityToday}`, `${state.config.capacity} por clase`],
-                ["Equipo", String(state.instructors.length), `${state.rooms.length} sala${state.rooms.length === 1 ? "" : "s"}`],
-                ["Alumnas activas", String(d.activeStudents), `${d.expiring.length} por vencer`],
-              ].map(([k, v, h]) => (
-                <div key={k} className="px-5 py-4">
-                  <p className="text-[12.5px] text-(--os-muted)">{k}</p>
-                  <p className="os-num mt-2 text-[30px] font-medium leading-none">{v}</p>
-                  <p className="mt-1.5 text-[12px] text-(--os-faint)">{h}</p>
-                </div>
-              ))}
+              {[...kpis.slice(0, 3), { label: cap(t.staff.many), value: String(state.instructors.length), hint: `${state.rooms.length} ${state.rooms.length === 1 ? t.space.one : t.space.many}` }].map((show) => {
+                return (
+                  <div key={show.label} className="px-5 py-4">
+                    <p className="truncate text-[12.5px] text-(--os-muted)">{show.label}</p>
+                    <p className="os-num mt-2 text-[30px] font-medium leading-none">{show.value}</p>
+                    <p className="mt-1.5 truncate text-[12px] text-(--os-faint)">{show.hint}</p>
+                  </div>
+                );
+              })}
             </div>
           </Region>
 
           <div className="mt-6 grid grid-cols-[1.45fr_1fr] gap-5">
-            <Region id="classes" focus={focus} className="rounded-[20px]">
+            <Region id="classes" focus={focus} className="rounded-[20px]" label={`Tus ${t.offering.many}`}>
               <div className="rounded-[20px] border border-(--os-line) bg-(--os-paper) p-5">
                 <div className="flex items-center justify-between">
-                  <p className="text-[15px] font-semibold">Hoy en el estudio</p>
-                  <p className="text-[12.5px] text-(--os-muted)">{d.today.length} clases</p>
+                  <p className="text-[15px] font-semibold">Hoy en tu {t.business}</p>
+                  <p className="text-[12.5px] text-(--os-muted)">{d.today.length} {caps.appointments && !caps.groups ? t.booking.many : "horarios"}</p>
                 </div>
                 <ul className="mt-3 space-y-1">
                   <AnimatePresence initial={false} mode="popLayout">
                     {(today.length ? today : state.sessions.slice(0, 4)).map((s) => {
-                      const taken = sessionTaken(state, s.id);
+                      const line = sessionLines(state, s);
                       return (
                         <motion.li key={s.id} layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4, ease }}
                           className="grid grid-cols-[52px_minmax(0,1fr)_96px] items-center gap-3 rounded-xl px-2 py-2.5 odd:bg-(--os-ivory)/60">
                           <span className="os-num text-[14px] font-semibold">{fmtTime(s.start)}</span>
                           <span className="min-w-0">
-                            <span className="block truncate text-[14px] font-semibold">{classLabel(state, s)}</span>
-                            <span className="block truncate text-[12px] text-(--os-muted)">{instructorName(state, s.instructorId)} · {roomName(state, s.roomId)}</span>
+                            <span className="flex items-center gap-1.5 truncate text-[14px] font-semibold">{line.title}{s.kind === "grupal" && caps.appointments && <span className="rounded-full bg-(--os-soft) px-1.5 text-[10px] text-(--os-accent-ink)">Grupo</span>}</span>
+                            <span className="block truncate text-[12px] text-(--os-muted)">{line.detail}</span>
                           </span>
-                          <span>
-                            <span className="os-num block text-right text-[12px] text-(--os-muted)">{taken}/{s.capacity}</span>
-                            <span className="mt-1 block h-[5px] overflow-hidden rounded-full bg-(--os-subtle)"><span className="block h-full rounded-full bg-(--os-accent)" style={{ width: `${Math.min(100, (taken / s.capacity) * 100)}%` }} /></span>
-                          </span>
+                          {line.right.kind === "cupo" ? (
+                            <span>
+                              <span className="os-num block text-right text-[12px] text-(--os-muted)">{line.right.label}</span>
+                              <span className="mt-1 block h-[5px] overflow-hidden rounded-full bg-(--os-subtle)"><span className="block h-full rounded-full bg-(--os-accent)" style={{ width: `${Math.min(100, (line.right.taken / line.right.capacity) * 100)}%` }} /></span>
+                            </span>
+                          ) : (
+                            <span className="os-num text-right text-[13px] font-semibold">{line.right.label}</span>
+                          )}
                         </motion.li>
                       );
                     })}
@@ -201,18 +200,33 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
             </Region>
 
             <div className="space-y-5">
-              {next && (
+              {caps.appointments && !caps.groups ? (
                 <div className="relative overflow-hidden rounded-[20px] bg-(--os-accent) p-5 text-white">
                   <span aria-hidden="true" className="absolute -right-10 -top-10 size-36 rounded-full bg-white/10" />
-                  <p className="os-eyebrow text-white/75">Próxima clase</p>
+                  <p className="os-eyebrow text-white/75">{cap(t.space.many)} hoy</p>
+                  <p className="os-num os-display mt-2 text-[30px] leading-none">{fmtPct(d.roomOccupancy)}</p>
+                  <ul className="mt-3 space-y-1.5">
+                    {d.roomUse.slice(0, 3).map((r) => (
+                      <li key={r.room.id} className="grid grid-cols-[1fr_70px] items-center gap-3 text-[12px]">
+                        <span className="truncate text-white/85">{r.room.name}</span>
+                        <span className="h-1.5 overflow-hidden rounded-full bg-white/20"><span className="block h-full rounded-full bg-white" style={{ width: `${Math.round(r.rate * 100)}%` }} /></span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : next && (
+                <div className="relative overflow-hidden rounded-[20px] bg-(--os-accent) p-5 text-white">
+                  <span aria-hidden="true" className="absolute -right-10 -top-10 size-36 rounded-full bg-white/10" />
+                  <p className="os-eyebrow text-white/75">{next.kind === "cita" ? `Próxima ${t.booking.one}` : "Próxima clase"}</p>
                   <p className="os-display mt-2 text-[24px] leading-tight">{classLabel(state, next)}</p>
                   <p className="mt-1 text-[13px] text-white/80">{fmtTime(next.start)} · {instructorName(state, next.instructorId)}</p>
-                  <p className="mt-3 text-[13px]"><strong className="os-num">{sessionTaken(state, next.id)}</strong> de {next.capacity} lugares</p>
+                  {next.kind === "grupal" && <p className="mt-3 text-[13px]"><strong className="os-num">{sessionTaken(state, next.id)}</strong> de {next.capacity} lugares</p>}
                 </div>
               )}
-              <Region id="plans" focus={focus} className="rounded-[20px]">
+              <Region id="plans" focus={focus} className="rounded-[20px]" label={`Tus ${t.plans.toLowerCase()}`}>
                 <div className="rounded-[20px] border border-(--os-line) bg-(--os-paper) p-5">
-                  <p className="text-[15px] font-semibold">Membresías</p>
+                  <p className="text-[15px] font-semibold">{t.plans}</p>
+                  {caps.appointments && <p className="mt-1 text-[12px] text-(--os-muted)">Pago por {t.offering.one} incluido</p>}
                   <ul className="mt-3 space-y-2">
                     <AnimatePresence initial={false} mode="popLayout">
                       {plans.slice(0, compact ? 2 : 3).map((p) => (
@@ -220,7 +234,7 @@ export function LivePreview({ state, logo, focus = "all", compact = false }: { s
                           className="flex items-center justify-between gap-3 rounded-xl border border-(--os-line) px-3 py-2.5">
                           <span className="min-w-0">
                             <span className="block truncate text-[13.5px] font-semibold">{p.name}</span>
-                            <span className="text-[12px] text-(--os-muted)">{p.credits === null ? "Ilimitado" : `${p.credits} clase${p.credits === 1 ? "" : "s"}`} · {p.validityDays} días</span>
+                            <span className="text-[12px] text-(--os-muted)">{p.credits === null ? "Ilimitado" : `${p.credits} ${p.credits === 1 ? t.credit.one : t.credit.many}`} · {p.validityDays} días</span>
                           </span>
                           <span className="os-num text-[14px] font-semibold">{fmtMoney(p.price)}</span>
                         </motion.li>

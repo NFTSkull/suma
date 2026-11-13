@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { markPaid, refundTransaction } from "@/lib/studio-os/engine";
 import { finance, studentName } from "@/lib/studio-os/selectors";
+import { cap } from "@/lib/studio-os/verticals";
 import { fmtDate, fmtMoney } from "@/lib/studio-os/time";
 import { useStudio } from "../context";
 import { Icon } from "../icons";
@@ -12,7 +13,7 @@ import { SellForm } from "./shared";
 type Filter = "todos" | "pendiente" | "pagado" | "reembolso";
 
 export function Pagos() {
-  const { state, apply } = useStudio();
+  const { state, apply, t, caps } = useStudio();
   const [filter, setFilter] = useState<Filter>("todos");
   const [selling, setSelling] = useState(false);
   const f = finance(state);
@@ -35,7 +36,7 @@ export function Pagos() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Cobrado este mes" value={fmtMoney(f.collectedMonth)} hint={delta === null ? "Sin datos del mes anterior" : `${delta >= 0 ? "+" : ""}${Math.round(delta * 100)}% vs. mismos días del mes anterior`} />
         <Stat label="Pendiente de cobro" value={fmtMoney(f.pendingTotal)} hint={`${f.pendingCount} pago${f.pendingCount === 1 ? "" : "s"}`} onClick={() => setFilter("pendiente")} />
-        <Stat label="Renovaciones del mes" value={f.renewalsMonth} hint="Alumnas que volvieron a comprar" />
+        <Stat label="Renovaciones del mes" value={f.renewalsMonth} hint={`${cap(t.client.many)} que volvieron a comprar`} />
         <Stat label="Descuentos y reembolsos" value={fmtMoney(f.discountsMonth + f.refundsMonth)} hint={`${fmtMoney(f.discountsMonth)} desc. · ${fmtMoney(f.refundsMonth)} reemb.`} />
       </div>
 
@@ -56,9 +57,9 @@ export function Pagos() {
           <p className="mt-2 text-[12px] text-(--os-muted)">Semana que inicia el día indicado. La última barra es esta semana.</p>
         </Card>
         <Card className="p-4 sm:p-5">
-          <CardTitle hint="Ventas y renovaciones pagadas este mes.">Ventas por membresía</CardTitle>
+          <CardTitle hint={caps.appointments ? `${cap(t.offering.many)} cobrados y paquetes vendidos este mes.` : "Ventas y renovaciones pagadas este mes."}>{caps.appointments ? "Ventas por concepto" : "Ventas por membresía"}</CardTitle>
           <div className="mt-4">
-            {f.byPlan.length ? <Bars label="Ventas por membresía" items={f.byPlan.map((p) => ({ label: p.name, value: p.total }))} format={fmtMoney} /> : <p className="text-sm text-(--os-muted)">Sin ventas este mes.</p>}
+            {[...f.byService, ...f.byPlan].length ? <Bars label="Ventas por concepto" items={[...f.byService, ...f.byPlan].sort((a, b) => b.total - a.total).slice(0, 6).map((p) => ({ label: p.name, value: p.total }))} format={fmtMoney} /> : <p className="text-sm text-(--os-muted)">Sin ventas este mes.</p>}
           </div>
         </Card>
       </div>

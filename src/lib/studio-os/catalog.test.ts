@@ -31,7 +31,7 @@ describe("datos ficticios y resumen", () => {
   it("el resumen describe la configuración sin precios", () => {
     const state = createDemo({ ...defaultConfig("yoga"), name: "Casa Aurora", integrations: ["Cobros en línea"], needs: "Dos sucursales" }, new Date(2026, 10, 11, 10).toISOString());
     const { text } = configSummary(state);
-    expect(text).toContain("Casa Aurora · Yoga");
+    expect(text).toContain("Casa Aurora · Yoga / Barre");
     expect(text).toContain("Cobros en línea");
     expect(text).toContain("Dos sucursales");
     expect(text).not.toMatch(/\$\s?\d/);

@@ -20,12 +20,12 @@ export function Monogram({ name, logo, size = 36, className, tone = "accent" }: 
   );
 }
 
-/** Firma de SUMA Studio OS para las pantallas propias de la demo. */
+/** Firma de SUMA Wellness OS para las pantallas propias de la demo. */
 export function OsWordmark({ tone = "ink" }: { tone?: "ink" | "ivory" }) {
   return (
     <span className={cx("inline-flex items-baseline gap-2 text-[13px]", tone === "ivory" ? "text-(--os-ivory)" : "text-(--os-ink)")}>
       <span className="font-semibold tracking-[0.18em]">SUMA</span>
-      <span className={cx("os-display text-[15px] italic", tone === "ivory" ? "text-(--os-ivory)/70" : "text-(--os-muted)")}>Studio OS</span>
+      <span className={cx("os-display text-[15px] italic", tone === "ivory" ? "text-(--os-ivory)/70" : "text-(--os-muted)")}>Wellness OS</span>
     </span>
   );
 }

@@ -2,6 +2,15 @@
 
 ## [Sin publicar]
 
+### SUMA Wellness OS: showroom multi-giro (rama `feat/studio-os-demo-20261111`, sin publicar)
+- La demo pasa de "estudio de Pilates" a **SUMA Wellness OS**: Pilates/Reformer, Yoga/Barre, Spa, Wellness Center y "Otro negocio wellness", con un núcleo común y un registro central de giros (`verticals.ts`).
+- Configurador de ocho preguntas, una por pantalla: tipo de negocio, nombre, estilo, logotipo, qué ofreces, tu operación, cómo vendes y qué quieres controlar. Las preguntas 5–8 cambian de contenido según el giro y la vista previa se transforma en vivo (menú, indicadores, agenda, paquetes).
+- Motor de citas individuales: horarios libres reales, sin empalmes de terapeuta/especialista, cabina/espacio ni cliente; pago con paquete o al llegar; cancelación que libera el horario. Pilates conserva cupos, créditos y lista de espera; nueva regla: nadie en dos clases simultáneas.
+- Vistas por giro: agenda por especialista o espacio, nueva sección de servicios/tratamientos/experiencias, portal con reserva de citas, reportes de ocupación de cabinas y clientes recurrentes, automatizaciones visuales CUANDO → EL SISTEMA PREPARA (11 reglas, todas simuladas).
+- "Así quedaría" como resumen comercial: lo que funciona en la demo, beneficios, módulos a sumar e integraciones a cotizar; CTA "Quiero una propuesta para mi negocio" que prepara el texto y solo abre WhatsApp al pulsar.
+- `sessionStorage` v4: las sesiones anteriores se descartan sin errores.
+- Pruebas: 281 (21 nuevas: giros, citas sin empalmes, datos por giro y recorridos de Spa y Wellness).
+
 ### SUMA Studio OS: rediseño premium de la demo (rama `feat/studio-os-demo-20261111`, sin publicar)
 - La demo ocupa toda la pantalla, sin navegación pública: bienvenida oscura y editorial ("Tu estudio merece un sistema hecho a su medida"), configurador de ocho preguntas (una por pantalla) y revelación animada con marca, nombre y módulos antes de entrar al sistema.
 - Vista previa viva a tamaño real escalada: usa el mismo motor (`createDemo`) que el sistema; nombre, disciplina, color (interpolado con `@property`), logotipo, clases, tamaño, paquetes y módulos se reflejan al instante y la zona afectada se resalta. Al crear el estudio se usa el mismo reloj, así el sistema es exactamente el que se vio tomar forma.

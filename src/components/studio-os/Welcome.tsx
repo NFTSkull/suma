@@ -43,20 +43,20 @@ export function Welcome({ onStart, resume }: { onStart: () => void; resume: bool
 
       <main className="relative mx-auto grid w-full max-w-[1320px] flex-1 items-center gap-12 px-5 sm:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <div className="max-w-[44rem]">
-          <motion.p {...item(0.15)} className="os-eyebrow text-[#E2B79F]">Yoga · Pilates · Reformer · Wellness</motion.p>
+          <motion.p {...item(0.15)} className="os-eyebrow text-[#E2B79F]">Pilates · Yoga · Spa · Wellness</motion.p>
           <motion.h2 {...item(0.25)} className="os-display mt-5 text-[2.75rem] leading-[0.98] sm:text-[4rem] lg:text-[5.2rem]" style={{ fontWeight: 300 }}>
-            Tu estudio merece un sistema hecho <em className="text-[#E9C4AE]">a su medida.</em>
+            Tu negocio. Tu esencia. <em className="text-[#E9C4AE]">Tu propio sistema.</em>
           </motion.h2>
           <motion.p {...item(0.4)} className="mt-6 max-w-lg text-[16.5px] leading-relaxed text-white/70 sm:text-[18px]">
-            En unos pasos podrás descubrir cómo se vería y funcionaría tu propio espacio de gestión.
+            Diseña y explora cómo funcionaría tu negocio con reservas, clientes, equipo, pagos y seguimiento en un solo lugar.
           </motion.p>
           <motion.div {...item(0.55)} className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
             <button ref={cta} type="button" onClick={onStart}
               className={cx("group inline-flex min-h-14 items-center gap-3 rounded-full bg-(--os-ivory) py-2 pl-7 pr-2 text-[16px] font-semibold text-(--os-night) shadow-[0_20px_50px_-20px_rgba(233,196,174,0.6)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--os-ivory)")}>
-              {resume ? "Continuar mi estudio" : "Crear mi estudio"}
+              {resume ? "Continuar mi sistema" : "Diseñar mi sistema"}
               <span className="grid size-10 place-items-center rounded-full bg-(--os-night) text-(--os-ivory) transition-transform duration-300 group-hover:translate-x-0.5"><Icon name="arrowRight" className="size-[18px]" /></span>
             </button>
-            <span className="text-[13px] text-white/50">8 decisiones · unos 2 minutos · sin registro</span>
+            <span className="text-[13px] text-white/50">Una pregunta a la vez · unos 2 minutos · sin registro</span>
           </motion.div>
         </div>
 
@@ -64,8 +64,8 @@ export function Welcome({ onStart, resume }: { onStart: () => void; resume: bool
       </main>
 
       <motion.footer {...item(0.8)} className="relative flex flex-wrap items-center justify-between gap-3 px-5 pb-5 text-[12px] text-white/40 sm:px-10 sm:pb-8">
-        <span>Todo es ficticio: no se guardan datos, no se cobra ni se envían mensajes.</span>
-        <span className="max-sm:hidden">Agenda · Alumnas · Membresías · Reportes</span>
+        <span>Demostración personalizada, no un software contratado. Datos ficticios: no se cobra ni se envían mensajes.</span>
+        <span className="max-sm:hidden">Reservas · Clientes · Equipo · Pagos · Seguimiento</span>
       </motion.footer>
     </div>
   );
@@ -81,7 +81,7 @@ function Glimpse({ ready, reduce }: { ready: boolean; reduce: boolean }) {
         <motion.div {...float(0)} className="rounded-[22px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl">
           <p className="os-eyebrow text-white/50">Hoy · jueves</p>
           <ul className="mt-3 space-y-2.5">
-            {[["07:00", "Reformer básico", 100], ["09:00", "Mat Pilates", 75], ["18:00", "Reformer power", 88], ["19:30", "Stretching", 50]].map(([t, n, p]) => (
+            {[["07:00", "Reformer básico", 100], ["10:00", "Masaje relajante · Cabina Jade", 100], ["12:30", "Sesión de recuperación", 60], ["19:00", "Meditación grupal", 75]].map(([t, n, p]) => (
               <li key={t as string} className="grid grid-cols-[44px_1fr_56px] items-center gap-3 text-[13px]">
                 <span className="os-num text-white/60">{t}</span>
                 <span className="truncate font-medium text-white/90">{n}</span>

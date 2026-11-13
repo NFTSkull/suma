@@ -2,6 +2,7 @@
 
 import { createContext, useContext } from "react";
 import type { DemoState, Result, ViewId } from "@/lib/studio-os/types";
+import { capabilitiesOf, termsOf, type Terms } from "@/lib/studio-os/verticals";
 
 export type StudioContext = {
   state: DemoState;
@@ -15,8 +16,8 @@ export type StudioContext = {
 
 const Ctx = createContext<StudioContext | null>(null);
 export const StudioProvider = Ctx.Provider;
-export function useStudio(): StudioContext {
+export function useStudio(): StudioContext & { t: Terms; caps: ReturnType<typeof capabilitiesOf> } {
   const value = useContext(Ctx);
   if (!value) throw new Error("useStudio fuera de StudioProvider");
-  return value;
+  return { ...value, t: termsOf(value.state.config), caps: capabilitiesOf(value.state.config) };
 }

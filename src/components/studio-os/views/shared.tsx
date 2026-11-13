@@ -4,7 +4,9 @@ import { useId, useState } from "react";
 import { sellPlan } from "@/lib/studio-os/engine";
 import type { MembershipStatus } from "@/lib/studio-os/rules";
 import { fmtMoney } from "@/lib/studio-os/time";
+import { statusLabel } from "@/lib/studio-os/selectors";
 import type { PlanKind, Transaction } from "@/lib/studio-os/types";
+import { cap, type Terms } from "@/lib/studio-os/verticals";
 import { useStudio } from "../context";
 import { Button, Field, inputClass } from "../ui";
 
@@ -12,9 +14,12 @@ export const statusTone: Record<MembershipStatus | "sin", "success" | "warn" | "
   activa: "success", por_vencer: "warn", agotada: "warn", pausada: "neutral", vencida: "danger", cancelada: "neutral", sin: "neutral",
 };
 
+/** Estados de un paquete con la palabra del giro ("Sin sesiones" en un spa). */
+export const statusText = (t: Terms) => ({ ...statusLabel, agotada: `Sin ${t.credit.many}`, sin: "Sin paquete" });
+
 /** Registrar una venta simulada: crea la membresía y la transacción. No procesa cobros. */
 export function SellForm({ studentId: fixed, onDone }: { studentId?: string; onDone?: () => void }) {
-  const { state, apply } = useStudio();
+  const { state, apply, t } = useStudio();
   const id = useId();
   const plans = state.plans.filter((p) => p.enabled);
   const [studentId, setStudentId] = useState(fixed ?? "");
@@ -31,9 +36,9 @@ export function SellForm({ studentId: fixed, onDone }: { studentId?: string; onD
     <div className="os-fade rounded-xl border border-(--os-line) bg-white p-3 sm:p-4">
       <div className="grid gap-3 sm:grid-cols-2">
         {!fixed && (
-          <Field label="Alumna" htmlFor={`${id}-s`} className="sm:col-span-2">
+          <Field label={cap(t.client.one)} htmlFor={`${id}-s`} className="sm:col-span-2">
             <select id={`${id}-s`} className={inputClass} value={studentId} onChange={(e) => setStudentId(e.target.value)}>
-              <option value="">Elige una alumna…</option>
+              <option value="">Elige…</option>
               {[...state.students].sort((a, b) => a.name.localeCompare(b.name)).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </Field>
@@ -61,7 +66,7 @@ export function SellForm({ studentId: fixed, onDone }: { studentId?: string; onD
         </Field>
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm">Total <strong className="tabular-nums">{fmtMoney(total)}</strong>{plan && <span className="text-(--os-muted)"> · {plan.credits === null ? "ilimitado" : `${plan.credits} clase${plan.credits === 1 ? "" : "s"}`} · {plan.validityDays} días</span>}</p>
+        <p className="text-sm">Total <strong className="tabular-nums">{fmtMoney(total)}</strong>{plan && <span className="text-(--os-muted)"> · {plan.credits === null ? "ilimitado" : `${plan.credits} ${plan.credits === 1 ? t.credit.one : t.credit.many}`} · {plan.validityDays} días</span>}</p>
         <Button variant="primary" icon="check" disabled={!studentId} onClick={submit}>Registrar venta</Button>
       </div>
       <p className="mt-2 text-[12px] text-(--os-muted)">Datos ficticios — no se procesa ningún pago.</p>

@@ -2,7 +2,8 @@
 
 import { useId, useState } from "react";
 import { addInstructor, substituteInstructor, updateInstructor } from "@/lib/studio-os/engine";
-import { className, instructorStats, roomName } from "@/lib/studio-os/selectors";
+import { appointmentClient, className, instructorStats, roomName } from "@/lib/studio-os/selectors";
+import { cap } from "@/lib/studio-os/verticals";
 import { fmtDay, fmtMoney, fmtTime } from "@/lib/studio-os/time";
 import { useStudio } from "../context";
 import { Icon } from "../icons";
@@ -12,8 +13,9 @@ const WEEK = [1, 2, 3, 4, 5, 6, 0];
 const DAY = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 export function Profesores() {
-  const { state, apply } = useStudio();
+  const { state, apply, t, caps } = useStudio();
   const id = useId();
+  const unit = caps.appointments && !caps.groups ? "sesión" : caps.appointments ? "sesión o clase" : "clase";
   const [open, setOpen] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
@@ -22,9 +24,9 @@ export function Profesores() {
   return (
     <>
       <PageHeader
-        title="Profesores"
-        description={`Honorarios estimados de la semana: ${fmtMoney(totalWeek)}. Ajusta el honorario por clase y la disponibilidad.`}
-        action={<Button variant="primary" icon={adding ? "x" : "plus"} onClick={() => setAdding((v) => !v)}>{adding ? "Cerrar" : "Agregar profesor"}</Button>}
+        title={cap(t.staff.many)}
+        description={`Honorarios estimados de la semana: ${fmtMoney(totalWeek)}. Ajusta el honorario por ${unit} y la disponibilidad.`}
+        action={<Button variant="primary" icon={adding ? "x" : "plus"} onClick={() => setAdding((v) => !v)}>{adding ? "Cerrar" : `Agregar ${t.staff.one}`}</Button>}
       />
       {adding && (
         <Card className="os-fade mb-4 p-4">
@@ -62,19 +64,19 @@ export function Profesores() {
                   </div>
                 </div>
                 <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
-                  {[["Clases", st.sessions.length], ["Impartidas", st.taught], ["Sustituciones", st.substitutions]].map(([k, v]) => (
+                  {[[caps.appointments ? "Agenda" : "Clases", st.sessions.length], [caps.appointments ? "Atendidas" : "Impartidas", st.taught], caps.groups ? ["Sustituciones", st.substitutions] : ["Por atender", st.upcoming]].map(([k, v]) => (
                     <div key={k} className="rounded-xl bg-(--os-subtle) px-2 py-2.5"><dt className="text-[11.5px] text-(--os-muted)">{k}</dt><dd className="text-lg font-semibold tabular-nums">{v}</dd></div>
                   ))}
                 </dl>
                 <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
-                  <Field label="Honorario por clase (MXN)" htmlFor={`${id}-${ins.id}-rate`} className="w-40">
+                  <Field label={`Honorario por ${unit} (MXN)`} htmlFor={`${id}-${ins.id}-rate`} className="w-40">
                     <input id={`${id}-${ins.id}-rate`} type="number" min={0} step={50} className={inputClass} value={ins.ratePerClass}
                       onChange={(e) => apply(updateInstructor(state, ins.id, { ratePerClass: Number(e.target.value) }))} />
                   </Field>
-                  <p className="text-right text-[13px] text-(--os-muted)">Estimado semana<br /><strong className="text-base tabular-nums text-(--os-ink)">{fmtMoney(st.feesWeek)}</strong> <span className="text-[12px]">({fmtMoney(st.feesTaught)} ya impartido)</span></p>
+                  <p className="text-right text-[13px] text-(--os-muted)">Estimado semana<br /><strong className="text-base tabular-nums text-(--os-ink)">{fmtMoney(st.feesWeek)}</strong> <span className="text-[12px]">({fmtMoney(st.feesTaught)} ya atendido)</span></p>
                 </div>
                 <Button size="sm" variant="ghost" iconRight="chevronRight" className="mt-3 -ml-2" aria-expanded={expanded} onClick={() => setOpen(expanded ? null : ins.id)}>
-                  {expanded ? "Ocultar clases" : `Ver próximas clases (${upcoming.length})`}
+                  {expanded ? "Ocultar agenda" : `Ver agenda próxima (${upcoming.length})`}
                 </Button>
                 {expanded && <Upcoming instructorId={ins.id} />}
               </Card>
@@ -89,25 +91,25 @@ export function Profesores() {
 function Upcoming({ instructorId }: { instructorId: string }) {
   const { state, apply } = useStudio();
   const sessions = instructorStats(state, instructorId).sessions.filter((s) => new Date(s.start) > new Date(state.now));
-  if (!sessions.length) return <p className="mt-2 text-sm text-(--os-muted)">Sin clases próximas esta semana.</p>;
+  if (!sessions.length) return <p className="mt-2 text-sm text-(--os-muted)">Sin nada próximo esta semana.</p>;
   return (
     <ul className="os-fade mt-2 divide-y divide-(--os-line)">
       {sessions.map((s) => {
-        const options = state.instructors.filter((i) => i.id !== instructorId && i.days.includes(new Date(s.start).getDay()));
+        const options = s.kind === "cita" ? [] : state.instructors.filter((i) => i.id !== instructorId && i.days.includes(new Date(s.start).getDay()));
         return (
           <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-2.5 text-sm">
             <span className="min-w-0 flex-1 basis-40">
-              <span className="block font-medium">{className(state, s)}{s.substituteFor && <Badge className="ml-1.5">Sustitución</Badge>}</span>
+              <span className="block font-medium">{className(state, s)}{s.kind === "cita" && ` · ${appointmentClient(state, s)?.name ?? ""}`}{s.substituteFor && <Badge className="ml-1.5">Sustitución</Badge>}</span>
               <span className="block text-[12.5px] text-(--os-muted)">{fmtDay(s.start)} · {fmtTime(s.start)} · {roomName(state, s.roomId)}</span>
             </span>
-            <label className="flex items-center gap-2">
+            {s.kind === "grupal" && <label className="flex items-center gap-2">
               <span className="sr-only">Sustituir en {className(state, s)}</span>
               <Icon name="restore" className="size-4 text-(--os-muted)" />
               <select value="" disabled={!options.length} onChange={(e) => e.target.value && apply(substituteInstructor(state, s.id, e.target.value))} className={cx(inputClass, "h-9 w-44 text-[13px] sm:text-[13px]")}>
                 <option value="">{options.length ? "Sustituir con…" : "Sin sustitutos"}</option>
                 {options.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
               </select>
-            </label>
+            </label>}
           </li>
         );
       })}

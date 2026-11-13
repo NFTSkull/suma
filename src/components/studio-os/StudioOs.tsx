@@ -92,7 +92,7 @@ export default function StudioOs() {
 
   return createPortal(
     <MotionConfig reducedMotion="user">
-      <div role="region" aria-label={`${studioDisplayName(config)} · SUMA Studio OS`} className={cx(osFontClasses, "os-root fixed inset-0 z-[80] overflow-hidden transition-colors duration-500", phase === "welcome" || phase === "reveal" ? "bg-(--os-night)" : "bg-(--os-ivory)")} style={themeStyle(theme)}>
+      <div role="region" aria-label={`${studioDisplayName(config)} · SUMA Wellness OS`} className={cx(osFontClasses, "os-root fixed inset-0 z-[80] overflow-hidden transition-colors duration-500", phase === "welcome" || phase === "reveal" ? "bg-(--os-night)" : "bg-(--os-ivory)")} style={themeStyle(theme)}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={phase === "reveal" ? "reveal" : phase} className="h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.45, ease }}>
             {screen}

@@ -2,18 +2,20 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { roles, studioDisplayName } from "@/lib/studio-os/catalog";
+import { roleCopy, roles, studioDisplayName } from "@/lib/studio-os/catalog";
 import { setRole } from "@/lib/studio-os/engine";
 import { visibleViews } from "@/lib/studio-os/selectors";
 import { cap, fmtLongDay } from "@/lib/studio-os/time";
+import { verticalOf } from "@/lib/studio-os/verticals";
 import type { DemoState, Result, RoleId, ViewId } from "@/lib/studio-os/types";
 import { Monogram } from "./brand";
 import { StudioProvider } from "./context";
 import { Icon } from "./icons";
 import { ease, spring } from "./motion";
-import { navGroups, viewMeta } from "./nav";
+import { navGroups, viewInfo } from "./nav";
 import { Badge, Button, ConfirmButton, cx, focusRing } from "./ui";
 import { Agenda } from "./views/Agenda";
+import { Servicios } from "./views/Servicios";
 import { Alumnas } from "./views/Alumnas";
 import { Automatizaciones } from "./views/Automatizaciones";
 import { Inicio } from "./views/Inicio";
@@ -26,7 +28,6 @@ import { Reportes } from "./views/Reportes";
 import { Resumen } from "./views/Resumen";
 import { Ventas } from "./views/Ventas";
 
-export { viewMeta };
 const PRIMARY_MOBILE: ViewId[] = ["inicio", "agenda", "alumnas", "membresias", "ventas", "pagos"];
 
 type Props = {
@@ -39,19 +40,19 @@ type Props = {
   dismissToast: (id: number) => void;
 };
 
-function Brand({ name, logo }: { name: string; logo: string | null }) {
+function Brand({ name, logo, sub = "Wellness OS" }: { name: string; logo: string | null; sub?: string }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
       <Monogram name={name} logo={logo} size={38} />
       <span className="min-w-0">
         <span className="os-display block truncate text-[17px] leading-tight">{name}</span>
-        <span className="block text-[11.5px] leading-tight text-(--os-muted)">Studio OS</span>
+        <span className="block truncate text-[11.5px] leading-tight text-(--os-muted)">{sub}</span>
       </span>
     </div>
   );
 }
 
-function NavLink({ v, current, onGo, compact = false }: { v: ViewId; current: ViewId; onGo: (v: ViewId) => void; compact?: boolean }) {
+function NavLink({ v, current, onGo, compact = false, info }: { v: ViewId; current: ViewId; onGo: (v: ViewId) => void; compact?: boolean; info: ReturnType<typeof viewInfo> }) {
   const active = current === v;
   return (
     <button type="button" onClick={() => onGo(v)} aria-current={active ? "page" : undefined}
@@ -59,8 +60,8 @@ function NavLink({ v, current, onGo, compact = false }: { v: ViewId; current: Vi
         active ? "text-(--os-ink)" : "text-(--os-muted) hover:text-(--os-ink)")}>
       {active && !compact && <motion.span layoutId="os-nav-active" transition={spring.snappy} className="absolute inset-0 rounded-xl bg-(--os-paper) shadow-[0_1px_2px_rgba(29,27,25,0.06),0_0_0_1px_rgba(29,27,25,0.05)]" />}
       {active && compact && <span className="absolute inset-0 rounded-xl bg-(--os-soft)" />}
-      <Icon name={viewMeta[v].icon} className={cx("relative size-[18px] shrink-0", active && "text-(--os-accent)")} />
-      <span className="relative">{viewMeta[v].label}</span>
+      <Icon name={info.icon} className={cx("relative size-[18px] shrink-0", active && "text-(--os-accent)")} />
+      <span className="relative">{info.label}</span>
     </button>
   );
 }
@@ -71,7 +72,7 @@ function RoleSelect({ id, state, apply }: { id: string; state: DemoState; apply:
       <span className="whitespace-nowrap">Ver como</span>
       <select id={id} value={state.role} onChange={(e) => apply(setRole(state, e.target.value as RoleId))}
         className={cx("h-9 min-w-0 rounded-full border border-(--os-line) bg-(--os-paper) pl-3 pr-2 text-[13px] font-semibold text-(--os-ink)", focusRing)}>
-        {(Object.keys(roles) as RoleId[]).map((r) => <option key={r} value={r}>{roles[r].name}</option>)}
+        {(Object.keys(roles) as RoleId[]).map((r) => <option key={r} value={r}>{roleCopy(r, state.config).name}</option>)}
       </select>
     </label>
   );
@@ -86,6 +87,8 @@ export function AppShell({ state, apply, logo, onRestore, onExit, toasts, dismis
   const rootRef = useRef<HTMLDivElement>(null);
   const current: ViewId = views.includes(view) ? view : "inicio";
   const name = studioDisplayName(state.config);
+  const info = (v: ViewId) => viewInfo(v, state.config);
+  const vertical = verticalOf(state.config).name;
 
   useEffect(() => { rootRef.current?.focus({ preventScroll: true }); }, []);
 
@@ -102,6 +105,7 @@ export function AppShell({ state, apply, logo, onRestore, onExit, toasts, dismis
   switch (current) {
     case "inicio": content = <Inicio />; break;
     case "agenda": content = <Agenda />; break;
+    case "servicios": content = <Servicios />; break;
     case "alumnas": content = <Alumnas />; break;
     case "membresias": content = <Membresias />; break;
     case "ventas": content = <Ventas />; break;
@@ -116,9 +120,9 @@ export function AppShell({ state, apply, logo, onRestore, onExit, toasts, dismis
 
   return (
     <StudioProvider value={{ state, apply, go, target, logo }}>
-      <div ref={rootRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`${name} · SUMA Studio OS`} className="flex h-full bg-(--os-canvas) outline-none">
+      <div ref={rootRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`${name} · SUMA Wellness OS`} className="flex h-full bg-(--os-canvas) outline-none">
         <aside className="hidden w-[264px] shrink-0 flex-col border-r border-(--os-line) bg-(--os-ivory) lg:flex">
-          <div className="px-5 pb-4 pt-6"><Brand name={name} logo={logo} /></div>
+          <div className="px-5 pb-4 pt-6"><Brand name={name} logo={logo} sub={vertical} /></div>
           <nav aria-label="Secciones" className="os-scroll-y flex-1 space-y-6 overflow-y-auto px-3 pb-4 pt-2">
             {navGroups.map((g) => {
               const items = g.views.filter((v) => views.includes(v));
@@ -126,7 +130,7 @@ export function AppShell({ state, apply, logo, onRestore, onExit, toasts, dismis
               return (
                 <div key={g.label}>
                   <p className="os-eyebrow px-3 pb-2 !text-[10px] text-(--os-faint)">{g.label}</p>
-                  <div className="space-y-0.5">{items.map((v) => <NavLink key={v} v={v} current={current} onGo={go} />)}</div>
+                  <div className="space-y-0.5">{items.map((v) => <NavLink key={v} v={v} current={current} onGo={go} info={info(v)} />)}</div>
                 </div>
               );
             })}
@@ -142,12 +146,12 @@ export function AppShell({ state, apply, logo, onRestore, onExit, toasts, dismis
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex h-14 shrink-0 items-center gap-3 border-b border-(--os-line) bg-(--os-canvas)/85 px-4 backdrop-blur-md lg:h-16 lg:px-10">
-            <div className="min-w-0 flex-1 lg:hidden"><Brand name={name} logo={logo} /></div>
+            <div className="min-w-0 flex-1 lg:hidden"><Brand name={name} logo={logo} sub={vertical} /></div>
             <nav aria-label="Ruta" className="hidden min-w-0 flex-1 items-center gap-2 text-[13px] lg:flex">
               <span className="text-(--os-muted)">{name}</span>
               <Icon name="chevronRight" className="size-3.5 text-(--os-faint)" />
-              <span className="font-semibold text-(--os-ink)">{viewMeta[current].label}</span>
-              <span className="ml-3 hidden truncate text-(--os-faint) xl:inline">{viewMeta[current].hint}</span>
+              <span className="font-semibold text-(--os-ink)">{info(current).label}</span>
+              <span className="ml-3 hidden truncate text-(--os-faint) xl:inline">{info(current).hint}</span>
             </nav>
             <span className="hidden text-[12.5px] text-(--os-muted) md:inline">{cap(fmtLongDay(state.now))}</span>
             <Badge tone="warn" className="max-sm:hidden">Datos ficticios</Badge>
@@ -179,8 +183,8 @@ export function AppShell({ state, apply, logo, onRestore, onExit, toasts, dismis
                   {...(isMore ? { "aria-expanded": moreOpen, "aria-controls": "os-more" } : {})}
                   className={cx("relative flex min-h-[54px] flex-col items-center justify-center gap-0.5 rounded-[18px] text-[10.5px] font-semibold transition-colors", focusRing, active ? "text-(--os-accent-ink)" : "text-(--os-muted)")}>
                   {active && <motion.span layoutId="os-tab-active" transition={spring.snappy} className="absolute inset-0 rounded-[18px] bg-(--os-soft)" />}
-                  <Icon name={isMore ? "more" : viewMeta[v].icon} className="relative size-[19px]" />
-                  <span className="relative">{isMore ? "Más" : viewMeta[v].label}</span>
+                  <Icon name={isMore ? "more" : info(v).icon} className="relative size-[19px]" />
+                  <span className="relative">{isMore ? "Más" : info(v).label}</span>
                 </button>
               );
             })}
@@ -196,7 +200,7 @@ export function AppShell({ state, apply, logo, onRestore, onExit, toasts, dismis
                 className="os-scroll-y absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-[28px] bg-(--os-paper) p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                 <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-(--os-line-strong)" aria-hidden="true" />
                 <div className="mb-3 flex items-center justify-between gap-3"><Brand name={name} logo={logo} /><Button variant="ghost" size="sm" onClick={() => setMoreOpen(false)} aria-label="Cerrar"><Icon name="x" className="size-[18px]" /></Button></div>
-                <div className="space-y-0.5">{mobileMore.map((v) => <NavLink key={v} v={v} current={current} onGo={go} compact />)}</div>
+                <div className="space-y-0.5">{mobileMore.map((v) => <NavLink key={v} v={v} current={current} onGo={go} compact info={info(v)} />)}</div>
                 <div className="mt-4 rounded-2xl bg-(--os-subtle) p-3"><RoleSelect id="os-role-mobile" state={state} apply={apply} /></div>
                 <div className="mt-3 grid gap-2">
                   <ConfirmButton label="Restaurar demostración" confirmLabel="Sí, restaurar todo" icon="restore" variant="secondary" size="md" onConfirm={() => { setMoreOpen(false); onRestore(); }} />

@@ -2,21 +2,23 @@
 
 import { useId, useState } from "react";
 import { addStudent, cancelBooking, pauseMembership, renewMembership, resumeMembership, updateStudent } from "@/lib/studio-os/engine";
-import { className, planName, scopedSessions, statusLabel, studentInfo } from "@/lib/studio-os/selectors";
+import { className, planName, scopedSessions, studentInfo } from "@/lib/studio-os/selectors";
+import { cap } from "@/lib/studio-os/verticals";
 import { fmtDate, fmtDay, fmtPct, fmtTime } from "@/lib/studio-os/time";
 import { useStudio } from "../context";
 import { Icon } from "../icons";
 import { Avatar, Badge, Button, Card, cx, DetailPanel, Empty, Field, focusRing, inputClass, Meter, PageHeader, Segmented } from "../ui";
-import { SellForm, statusTone } from "./shared";
+import { SellForm, statusText, statusTone } from "./shared";
 
 type Filter = "todas" | "activa" | "por_vencer" | "agotada" | "pausada" | "vencida" | "sin";
 const filters: { value: Filter; label: string }[] = [
   { value: "todas", label: "Todas" }, { value: "activa", label: "Activas" }, { value: "por_vencer", label: "Por vencer" },
-  { value: "agotada", label: "Sin créditos" }, { value: "pausada", label: "Pausadas" }, { value: "vencida", label: "Vencidas" }, { value: "sin", label: "Sin membresía" },
+  { value: "agotada", label: "Sin saldo" }, { value: "pausada", label: "Pausadas" }, { value: "vencida", label: "Vencidas" }, { value: "sin", label: "Sin paquete" },
 ];
 
 export function Alumnas() {
-  const { state, apply, target } = useStudio();
+  const { state, apply, target, t, caps } = useStudio();
+  const statusLabel = statusText(t);
   const id = useId();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("todas");
@@ -49,15 +51,15 @@ export function Alumnas() {
   return (
     <>
       <PageHeader
-        title="Alumnas"
-        description={isInstructor ? "Alumnas inscritas en tus clases de esta semana." : `${infos.length} fichas. Busca, filtra y abre una para ver todo.`}
-        action={!isInstructor && <Button variant="primary" icon={adding ? "x" : "plus"} onClick={() => setAdding((v) => !v)}>{adding ? "Cerrar" : "Nueva alumna"}</Button>}
+        title={cap(t.client.many)}
+        description={isInstructor ? `${cap(t.client.many)} en tu agenda de esta semana.` : `${infos.length} fichas. Busca, filtra y abre una para ver todo.`}
+        action={!isInstructor && <Button variant="primary" icon={adding ? "x" : "plus"} onClick={() => setAdding((v) => !v)}>{adding ? "Cerrar" : `${t.client.g === "a" ? "Nueva" : "Nuevo"} ${t.client.one}`}</Button>}
       />
       {adding && (
         <Card className="os-fade mb-4 p-4">
           <Field label="Nombre" htmlFor={`${id}-new`} hint="Usa un nombre ficticio: esta demo no guarda datos reales.">
             <div className="flex gap-2">
-              <input id={`${id}-new`} className={inputClass} value={newName} maxLength={40} placeholder="Ej. Alumna de prueba" autoComplete="off"
+              <input id={`${id}-new`} className={inputClass} value={newName} maxLength={40} placeholder={`Ej. ${cap(t.client.one)} de prueba`} autoComplete="off"
                 onChange={(e) => setNewName(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") create(); }} />
               <Button variant="primary" onClick={create} disabled={!newName.trim()}>Agregar</Button>
             </div>
@@ -70,7 +72,7 @@ export function Alumnas() {
           <div className="mb-3 flex flex-col gap-3">
             <div className="relative">
               <Icon name="search" className="pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2 text-(--os-muted)" />
-              <label htmlFor={`${id}-q`} className="sr-only">Buscar alumna</label>
+              <label htmlFor={`${id}-q`} className="sr-only">Buscar {t.client.one}</label>
               <input id={`${id}-q`} type="search" className={cx(inputClass, "pl-10")} placeholder="Buscar por nombre o etiqueta" value={query} onChange={(e) => setQuery(e.target.value)} />
             </div>
             {!isInstructor && <Segmented label="Filtrar por estado" value={filter} onChange={setFilter} options={filters.map((f) => ({ ...f, count: count(f.value) }))} />}
@@ -86,8 +88,8 @@ export function Alumnas() {
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-semibold">{i.student.name}</span>
                         <span className="block truncate text-[12.5px] text-(--os-muted)">
-                          {i.membership ? planName(state, i.membership.planId) : "Sin paquete"}
-                          {!isInstructor && i.canBook && ` · ${i.credits === null ? "ilimitado" : `${i.credits} crédito${i.credits === 1 ? "" : "s"}`}`}
+                          {i.membership ? planName(state, i.membership.planId) : caps.appointments ? `Paga por ${t.offering.one}` : "Sin paquete"}
+                          {!isInstructor && i.canBook && ` · ${i.credits === null ? "ilimitado" : `${i.credits} ${i.credits === 1 ? t.credit.one : t.credit.many}`}`}
                         </span>
                       </span>
                       <span className="hidden text-right text-[12.5px] text-(--os-muted) md:block">{i.lastVisit ? `Vino el ${fmtDate(i.lastVisit)}` : "Sin visitas"}</span>
@@ -108,7 +110,8 @@ export function Alumnas() {
 }
 
 function StudentDetail({ id, onClose }: { id: string; onClose: () => void }) {
-  const { state, apply } = useStudio();
+  const { state, apply, t, caps } = useStudio();
+  const statusLabel = statusText(t);
   const fid = useId();
   const info = studentInfo(state, id);
   const { student, membership } = info;
@@ -120,7 +123,7 @@ function StudentDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const [selling, setSelling] = useState(false);
 
   return (
-    <DetailPanel title={student.name} onClose={onClose} closeLabel="Alumnas">
+    <DetailPanel title={student.name} onClose={onClose} closeLabel={cap(t.client.many)}>
       <div className="flex items-center gap-3">
         <Avatar name={student.name} hue={student.hue} size="lg" />
         <div className="min-w-0">
@@ -134,8 +137,8 @@ function StudentDetail({ id, onClose }: { id: string; onClose: () => void }) {
 
       <dl className="mt-4 grid grid-cols-2 gap-2">
         {[
-          ["Créditos", !info.canBook ? "0" : info.credits === null ? "Ilimitado" : String(info.credits)],
-          ["Clases reservadas", String(info.upcoming.length)],
+          [cap(t.credit.many), !info.canBook ? "0" : info.credits === null ? "Ilimitado" : String(info.credits)],
+          [`${cap(t.booking.many)} próximas`, String(info.upcoming.length)],
           ["Asistencia", info.attendanceRate === null ? "—" : `${fmtPct(info.attendanceRate)} · ${info.visits} visitas`],
           ["Última visita", info.lastVisit ? fmtDate(info.lastVisit) : "Aún no viene"],
         ].map(([k, v]) => (
@@ -147,7 +150,7 @@ function StudentDetail({ id, onClose }: { id: string; onClose: () => void }) {
       </dl>
 
       {!isInstructor && (
-        <section aria-label="Membresía" className="mt-4 rounded-xl border border-(--os-line) p-3">
+        <section aria-label="Paquete" className="mt-4 rounded-xl border border-(--os-line) p-3">
           {membership ? (
             <>
               <div className="flex items-start justify-between gap-2">
@@ -157,10 +160,10 @@ function StudentDetail({ id, onClose }: { id: string; onClose: () => void }) {
                 </div>
                 {membership.creditsTotal !== null && <span className="text-[12.5px] tabular-nums text-(--os-muted)">{membership.creditsUsed}/{membership.creditsTotal} usadas</span>}
               </div>
-              {membership.creditsTotal !== null && <div className="mt-2"><Meter value={membership.creditsUsed} max={membership.creditsTotal} label="Créditos usados" /></div>}
+              {membership.creditsTotal !== null && <div className="mt-2"><Meter value={membership.creditsUsed} max={membership.creditsTotal} label={`${cap(t.credit.many)} usadas`} /></div>}
             </>
           ) : (
-            <p className="text-sm text-(--os-muted)">Sin paquete. Véndele uno para que pueda reservar.</p>
+            <p className="text-sm text-(--os-muted)">{caps.appointments ? `Sin paquete: paga cada ${t.offering.one} al llegar. Puedes venderle uno.` : "Sin paquete. Véndele uno para que pueda reservar."}</p>
           )}
           {canManage && (
             <div className="mt-3 flex flex-wrap gap-2">
@@ -174,7 +177,7 @@ function StudentDetail({ id, onClose }: { id: string; onClose: () => void }) {
         </section>
       )}
 
-      <h4 className="mt-5 text-[13px] font-semibold uppercase tracking-[0.06em] text-(--os-muted)">Próximas clases</h4>
+      <h4 className="mt-5 text-[13px] font-semibold uppercase tracking-[0.06em] text-(--os-muted)">Próximas {t.booking.many}</h4>
       {info.upcoming.length ? (
         <ul className="mt-2 space-y-1.5">
           {info.upcoming.map(({ booking, session }) => (
@@ -188,7 +191,7 @@ function StudentDetail({ id, onClose }: { id: string; onClose: () => void }) {
           ))}
         </ul>
       ) : (
-        <p className="mt-2 text-sm text-(--os-muted)">Sin clases reservadas.</p>
+        <p className="mt-2 text-sm text-(--os-muted)">Sin {t.booking.many} próximas.</p>
       )}
 
       {!isInstructor && (

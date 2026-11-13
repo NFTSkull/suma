@@ -1,5 +1,18 @@
 # DEVLOG — decisiones
 
+## 2026-11-12 (tarde) — SUMA Wellness OS
+
+**Un núcleo, varios giros.** No se crearon CRMs por industria. `verticals.ts` concentra terminología, catálogos, presets y automatizaciones; la modalidad (`grupal`, `citas`, `hibrido`) se deriva de los servicios elegidos y las pantallas consultan capacidades en lugar de preguntar por el giro. Así un spa nunca muestra cupos ni lista de espera, y un giro nuevo no toca el configurador.
+
+**Citas como sesiones de cupo 1, con reglas propias.** Reutilizar `Session`/`Booking` mantiene una sola fuente de verdad para agenda, fichas, reportes y pagos. Las citas tienen su propio camino en el motor (`findSlot`, `applyBookAppointment`, `cancelAppointment`) y no heredan cupo ni lista de espera. El cobro por servicio se registra al llegar, no al agendar, para no llenar Pagos de pendientes fantasma.
+
+**Defecto encontrado y corregido.** Al probar que nadie estuviera en dos sesiones a la vez apareció que el seed de Pilates podía inscribir a una alumna en dos clases simultáneas de salas distintas. Se agregó la regla al motor; el seed la respeta porque reserva con el mismo motor.
+
+**Sesiones guardadas.** Clave `suma-studio-os:v4` y estado `version: 2`; al cargar se borran las claves v1–v3 y cualquier sesión inválida, de modo que una pestaña abierta con la versión anterior nunca provoca errores.
+
+**Sin datos sensibles.** Los giros de bienestar no guardan expedientes, diagnósticos ni notas clínicas; las notas de ejemplo son de preferencias (presión, cabina, horario).
+
+
 ## 2026-11-12
 
 **Studio OS a pantalla completa.** La demo se monta en un portal sobre el sitio (z-80) y marca `header`, `#contenido` y `footer` como `inert` mientras existe; así desaparece la navegación pública sin tocar el layout raíz. El servidor solo pinta un telón oscuro con el único `<h1>` (lo exige `seo-check`). La bienvenida espera a `afterSplash` para no animarse detrás de la pantalla de carga.

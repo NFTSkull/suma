@@ -3,16 +3,18 @@
 import { useState } from "react";
 import { pauseMembership, renewMembership, resumeMembership } from "@/lib/studio-os/engine";
 import { membershipStatus, type MembershipStatus } from "@/lib/studio-os/rules";
-import { currentMembership, planName, statusLabel } from "@/lib/studio-os/selectors";
+import { currentMembership, planName } from "@/lib/studio-os/selectors";
+import { cap } from "@/lib/studio-os/verticals";
 import { fmtDate, fmtMoney } from "@/lib/studio-os/time";
 import { useStudio } from "../context";
 import { Avatar, Badge, Button, Card, cx, Empty, focusRing, Meter, PageHeader, Segmented } from "../ui";
-import { SellForm, statusTone } from "./shared";
+import { SellForm, statusText, statusTone } from "./shared";
 
 type Filter = "por_vencer" | "activa" | "pausada" | "vencida" | "todas";
 
 export function Membresias() {
-  const { state, apply, go } = useStudio();
+  const { state, apply, go, t, caps } = useStudio();
+  const statusLabel = statusText(t);
   const [filter, setFilter] = useState<Filter>("por_vencer");
   const [selling, setSelling] = useState(false);
   const rows = state.students
@@ -27,8 +29,8 @@ export function Membresias() {
   return (
     <>
       <PageHeader
-        title="Membresías"
-        description="Paquetes, créditos y vencimientos. Lo que cambies aquí se refleja en fichas, reservas y reportes."
+        title={t.plans}
+        description={`Paquetes, ${t.credit.many} y vencimientos. Lo que cambies aquí se refleja en fichas, ${t.booking.many} y reportes.${caps.appointments ? ` Quien no tiene paquete paga por ${t.offering.one}.` : ""}`}
         action={<Button variant="primary" icon={selling ? "x" : "plus"} onClick={() => setSelling((v) => !v)}>{selling ? "Cerrar" : "Vender paquete"}</Button>}
       />
       {selling && <div className="mb-5"><SellForm onDone={() => setSelling(false)} /></div>}
@@ -43,10 +45,10 @@ export function Membresias() {
             <Card key={p.id} className={cx("relative min-w-[15rem] shrink-0 snap-start overflow-hidden p-5", featured && "border-(--os-accent)/50")}>
               <p className="flex min-h-6 flex-wrap items-center gap-2 text-[14px] font-semibold">{p.name}{featured && <Badge tone="accent">Más vendido</Badge>}</p>
               <p className="os-num mt-3 text-[2rem] font-medium leading-none">{fmtMoney(p.price)}</p>
-              <p className="mt-2 text-[12.5px] text-(--os-muted)">{p.credits === null ? "Clases ilimitadas" : `${p.credits} clase${p.credits === 1 ? "" : "s"}`} · vigencia {p.validityDays} días</p>
-              {per && p.credits! > 1 && <p className="mt-0.5 text-[12.5px] text-(--os-accent-ink)">{fmtMoney(per)} por clase</p>}
+              <p className="mt-2 text-[12.5px] text-(--os-muted)">{p.credits === null ? "Sin límite" : `${p.credits} ${p.credits === 1 ? t.credit.one : t.credit.many}`} · vigencia {p.validityDays} días</p>
+              {per && p.credits! > 1 && <p className="mt-0.5 text-[12.5px] text-(--os-accent-ink)">{fmtMoney(per)} por {t.credit.one}</p>}
               <div className="mt-4 border-t border-(--os-line) pt-3">
-                <p className="flex items-baseline justify-between text-[12.5px]"><span className="text-(--os-muted)">Alumnas con este plan</span><span className="os-num font-semibold">{active}</span></p>
+                <p className="flex items-baseline justify-between text-[12.5px]"><span className="text-(--os-muted)">{cap(t.client.many)} con este plan</span><span className="os-num font-semibold">{active}</span></p>
                 <div className="mt-2"><Meter value={active} max={total} label={`Participación de ${p.name}`} /></div>
               </div>
             </Card>
@@ -55,14 +57,14 @@ export function Membresias() {
       </div>
 
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <Segmented label="Filtrar membresías" value={filter} onChange={setFilter} options={[
+        <Segmented label="Filtrar paquetes" value={filter} onChange={setFilter} options={[
           { value: "por_vencer", label: "Por vencer", count: rows.filter((r) => matches("por_vencer", r.status)).length },
           { value: "activa", label: "Activas", count: rows.filter((r) => r.status === "activa").length },
           { value: "pausada", label: "Pausadas", count: rows.filter((r) => r.status === "pausada").length },
           { value: "vencida", label: "Vencidas", count: rows.filter((r) => r.status === "vencida").length },
           { value: "todas", label: "Todas", count: rows.length },
         ]} />
-        <p className="text-[12.5px] text-(--os-muted)">Precios de ejemplo de tu estudio. Se editan en Personalizar.</p>
+        <p className="text-[12.5px] text-(--os-muted)">Precios de ejemplo de tu {t.business}. Se editan en Personalizar.</p>
       </div>
 
       {list.length ? (
@@ -81,7 +83,7 @@ export function Membresias() {
                   {m.creditsTotal === null ? <p className="text-[12.5px] text-(--os-muted)">Ilimitado</p> : (
                     <>
                       <p className="text-[12.5px] tabular-nums text-(--os-muted)">{m.creditsTotal - m.creditsUsed} de {m.creditsTotal} libres</p>
-                      <Meter value={m.creditsUsed} max={m.creditsTotal} label="Créditos usados" />
+                      <Meter value={m.creditsUsed} max={m.creditsTotal} label={`${cap(t.credit.many)} usadas`} />
                     </>
                   )}
                 </div>
@@ -96,7 +98,7 @@ export function Membresias() {
           </ul>
         </Card>
       ) : (
-        <Empty icon="card" title="Nada en esta lista" text={filter === "por_vencer" ? "Ninguna membresía vence pronto." : "Prueba otro filtro."} />
+        <Empty icon="card" title="Nada en esta lista" text={filter === "por_vencer" ? "Ningún paquete vence pronto." : "Prueba otro filtro."} />
       )}
     </>
   );

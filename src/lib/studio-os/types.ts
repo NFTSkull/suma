@@ -1,29 +1,49 @@
 /**
- * SUMA Studio OS — modelo de dominio de la demostración.
+ * SUMA Wellness OS — modelo de dominio de la demostración.
+ *
+ * Un núcleo común (clientes, agenda, equipo, espacios, planes, pagos, ventas)
+ * sirve a todos los giros. Lo que cambia por giro vive en `verticals.ts`.
+ * Por compatibilidad con la primera versión algunos nombres internos conservan
+ * el vocabulario de estudio: `students` = clientes, `instructors` = equipo,
+ * `rooms` = espacios (salas o cabinas), `classTypes` = servicios ofrecidos.
  * Todo es ficticio y vive en el navegador: no hay base de datos, cobros,
  * reservas reales ni mensajes. Las fechas son ISO 8601 en hora local.
  */
 
-export type StudioType = "yoga" | "pilates" | "reformer" | "mixto";
+export type VerticalId = "pilates" | "yoga" | "spa" | "wellness" | "otro";
+/** Cómo se presta un servicio: en grupo con cupo, o como cita individual. */
+export type OfferingKind = "grupal" | "individual";
+/** Modalidad derivada de lo que ofrece el negocio. */
+export type OperationMode = "grupal" | "citas" | "hibrido";
 export type ThemeId = "arcilla" | "salvia" | "lavanda" | "oceano" | "rosa" | "grafito";
 export type ModuleId = "alumnas" | "clases" | "membresias" | "pagos" | "equipo" | "marketing";
-export type PlanKind = "individual" | "prueba" | "pack5" | "pack10" | "pack20" | "mensual" | "ilimitado";
+/** Identificador de un plan del catálogo del giro (ver `planCatalog`). */
+export type PlanKind = string;
+/** Papel comercial de un plan: suelto, de prueba, paquete de sesiones o membresía. */
+export type PlanRole = "suelta" | "prueba" | "paquete" | "membresia";
 export type RoleId = "duena" | "recepcion" | "instructor";
 export type LeadStage = "nuevo" | "contactado" | "prueba" | "cliente" | "seguimiento";
-export type AutomationId = "vencimiento" | "bienvenida" | "sin_reserva" | "inactiva" | "clase_cancelada";
+export type AutomationId =
+  | "vencimiento" | "bienvenida" | "sin_reserva" | "inactiva" | "clase_cancelada" | "lugar_liberado"
+  | "confirmacion" | "recordatorio" | "seguimiento_visita" | "reactivacion" | "renovacion_paquete";
 
 export type ViewId =
-  | "inicio" | "alumnas" | "agenda" | "membresias" | "ventas" | "pagos" | "profesores"
+  | "inicio" | "alumnas" | "agenda" | "servicios" | "membresias" | "ventas" | "pagos" | "profesores"
   | "reportes" | "automatizaciones" | "portal" | "personalizar" | "resumen";
 
 /** Respuestas del configurador guiado. */
+export type OfferingInput = { name: string; minutes: number; kind: OfferingKind; price: number };
 export type StudioConfig = {
   name: string;
-  type: StudioType;
+  vertical: VerticalId;
   theme: ThemeId;
-  classes: { name: string; minutes: number }[];
+  /** Servicios que ofrece: clases grupales, tratamientos o sesiones individuales. */
+  offerings: OfferingInput[];
+  /** Personas del equipo (instructores, terapeutas, especialistas). */
   instructors: number;
+  /** Espacios (salas o cabinas). */
   rooms: number;
+  /** Cupo por clase grupal; no aplica a citas individuales. */
   capacity: number;
   plans: PlanKind[];
   modules: ModuleId[];
@@ -43,9 +63,9 @@ export type Settings = {
   stageLabels: Record<LeadStage, string>;
 };
 
-export type ClassType = { id: string; name: string; minutes: number };
+export type ClassType = { id: string; name: string; minutes: number; kind: OfferingKind; price: number };
 export type Branch = { id: string; name: string };
-export type Room = { id: string; name: string; branchId: string; capacity: number };
+export type Room = { id: string; name: string; branchId: string; capacity: number; kind: OfferingKind };
 export type Instructor = {
   id: string;
   name: string;
@@ -56,6 +76,7 @@ export type Instructor = {
 };
 export type Plan = {
   id: PlanKind;
+  role: PlanRole;
   name: string;
   price: number;
   /** `null` = ilimitado dentro de la vigencia. */
@@ -66,6 +87,8 @@ export type Plan = {
 
 export type Session = {
   id: string;
+  /** "grupal": clase con cupo y lista de espera. "cita": servicio individual (cupo 1, sin lista de espera). */
+  kind: "grupal" | "cita";
   classTypeId: string;
   instructorId: string;
   roomId: string;
@@ -143,6 +166,8 @@ export type Transaction = {
   method: "Tarjeta" | "Efectivo" | "Transferencia";
   at: string;
   membershipId?: string;
+  /** Cita cobrada por servicio (sin paquete). */
+  bookingId?: string;
   refunded?: boolean;
 };
 
@@ -152,7 +177,7 @@ export type Activity = { id: string; at: string; text: string; kind: ActivityKin
 export type Automation = { id: AutomationId; enabled: boolean; lastRun?: string };
 
 export type DemoState = {
-  version: 1;
+  version: 2;
   /** Reloj de la simulación: se fija al entrar al estudio. */
   now: string;
   seq: number;

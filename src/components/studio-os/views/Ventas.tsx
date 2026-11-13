@@ -4,6 +4,7 @@ import { useId, useState, type DragEvent } from "react";
 import { stageOrder } from "@/lib/studio-os/catalog";
 import { addLead, moveLead, toggleTask } from "@/lib/studio-os/engine";
 import { daysBetween, fmtDate } from "@/lib/studio-os/time";
+import { cap } from "@/lib/studio-os/verticals";
 import type { Lead, LeadStage } from "@/lib/studio-os/types";
 import { useStudio } from "../context";
 import { Icon } from "../icons";
@@ -12,7 +13,7 @@ import { Badge, Button, Card, CardTitle, cx, Field, focusRing, inputClass, PageH
 const sources: Lead["source"][] = ["Instagram", "WhatsApp", "Recomendación", "Sitio web"];
 
 export function Ventas() {
-  const { state, apply } = useStudio();
+  const { state, apply, t } = useStudio();
   const id = useId();
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState<{ name: string; interest: string; source: Lead["source"] }>({ name: "", interest: state.classTypes[0]?.name ?? "", source: "Instagram" });
@@ -86,7 +87,7 @@ export function Ventas() {
                       </button>
                       <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         <Badge>{l.source}</Badge>
-                        {l.studentId && <Badge tone="success">Alumna</Badge>}
+                        {l.studentId && <Badge tone="success">{cap(t.client.one)}</Badge>}
                       </div>
                       {expanded && (
                         <ol className="os-fade mt-3 space-y-1.5 border-t border-(--os-line) pt-2 text-[12.5px]">

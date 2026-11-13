@@ -1,4 +1,7 @@
-import type { AutomationId, LeadStage, ModuleId, PlanKind, RoleId, StudioConfig, StudioType, ThemeId, ViewId } from "./types";
+import type { AutomationId, LeadStage, ModuleId, RoleId, StudioConfig, ThemeId, VerticalId, ViewId } from "./types";
+import { cap, termsOf, verticals, withVertical, type Terms } from "./verticals";
+
+export { planCatalog } from "./verticals";
 
 /**
  * Tokens de color por tema. `accent` lleva texto blanco encima y `ink` se usa
@@ -14,134 +17,62 @@ export const themes: Record<ThemeId, { name: string; accent: string; hover: stri
 };
 export const themeIds = Object.keys(themes) as ThemeId[];
 
-export const studioTypes: Record<StudioType, {
-  name: string;
-  classes: { name: string; minutes: number }[];
-  instructors: number;
-  rooms: number;
-  capacity: number;
-  plans: PlanKind[];
-}> = {
-  yoga: {
-    name: "Yoga",
-    classes: [{ name: "Vinyasa", minutes: 60 }, { name: "Hatha", minutes: 60 }, { name: "Yin", minutes: 75 }, { name: "Yoga prenatal", minutes: 60 }],
-    instructors: 3, rooms: 1, capacity: 18,
-    plans: ["individual", "prueba", "pack10", "mensual", "ilimitado"],
-  },
-  pilates: {
-    name: "Pilates",
-    classes: [{ name: "Mat Pilates", minutes: 50 }, { name: "Pilates principiantes", minutes: 50 }, { name: "Pilates intermedio", minutes: 50 }, { name: "Stretching", minutes: 45 }],
-    instructors: 3, rooms: 1, capacity: 12,
-    plans: ["individual", "prueba", "pack5", "pack10", "mensual"],
-  },
-  reformer: {
-    name: "Reformer",
-    classes: [{ name: "Reformer básico", minutes: 50 }, { name: "Reformer intermedio", minutes: 50 }, { name: "Reformer power", minutes: 45 }, { name: "Reformer + barre", minutes: 50 }],
-    instructors: 4, rooms: 2, capacity: 8,
-    plans: ["individual", "prueba", "pack5", "pack10", "pack20"],
-  },
-  mixto: {
-    name: "Mixto",
-    classes: [{ name: "Reformer básico", minutes: 50 }, { name: "Mat Pilates", minutes: 50 }, { name: "Vinyasa", minutes: 60 }, { name: "Yin", minutes: 75 }],
-    instructors: 4, rooms: 2, capacity: 10,
-    plans: ["individual", "prueba", "pack5", "pack10", "pack20", "mensual", "ilimitado"],
-  },
-};
-
-/** Precios de ejemplo del estudio para sus alumnas (editables). No son precios de SUMA. */
-export const planCatalog: Record<PlanKind, { name: string; price: number; credits: number | null; validityDays: number; hint: string }> = {
-  individual: { name: "Clase individual", price: 250, credits: 1, validityDays: 30, hint: "Una clase suelta." },
-  prueba: { name: "Clase de prueba", price: 150, credits: 1, validityDays: 15, hint: "Primera visita a precio especial." },
-  pack5: { name: "Paquete 5 clases", price: 1100, credits: 5, validityDays: 45, hint: "Cinco clases en 45 días." },
-  pack10: { name: "Paquete 10 clases", price: 2000, credits: 10, validityDays: 60, hint: "Diez clases en 60 días." },
-  pack20: { name: "Paquete 20 clases", price: 3600, credits: 20, validityDays: 90, hint: "Veinte clases en 90 días." },
-  mensual: { name: "Membresía mensual", price: 2200, credits: 12, validityDays: 30, hint: "Hasta 12 clases al mes." },
-  ilimitado: { name: "Plan ilimitado", price: 2900, credits: null, validityDays: 30, hint: "Clases sin límite durante 30 días." },
-};
-export const planKinds = Object.keys(planCatalog) as PlanKind[];
-
-export const modules: Record<ModuleId, { name: string; purpose: string; example: string; views: ViewId[] }> = {
-  alumnas: {
-    name: "Alumnas y seguimiento",
-    purpose: "Ten a cada alumna en una ficha: paquete, asistencia, notas y pendientes.",
-    example: "Ves que Daniela no viene desde hace dos semanas y le dejas un recordatorio para escribirle.",
-    views: ["alumnas"],
-  },
-  clases: {
-    name: "Clases y reservas",
-    purpose: "Agenda por día y semana con cupos, lista de espera y asistencia.",
-    example: "Una alumna cancela a tiempo: recupera su crédito y la primera de la lista de espera toma el lugar.",
-    views: ["agenda", "portal"],
-  },
-  membresias: {
-    name: "Membresías y paquetes",
-    purpose: "Paquetes, créditos, vencimientos, pausas y renovaciones.",
-    example: "Pausas la membresía de una alumna que viaja y su vencimiento se recorre al volver.",
-    views: ["membresias"],
-  },
-  pagos: {
-    name: "Cobros y pagos",
-    purpose: "Qué se cobró, qué está pendiente y cuánto vendes por periodo.",
-    example: "Ves de un vistazo los tres pagos pendientes de esta semana y los marcas al cobrarlos.",
-    views: ["pagos"],
-  },
-  equipo: {
-    name: "Profesores y equipo",
-    purpose: "Disponibilidad, clases asignadas, sustituciones y honorarios estimados.",
-    example: "Una instructora se enferma: eliges quién la sustituye y la agenda se actualiza.",
-    views: ["profesores"],
-  },
-  marketing: {
-    name: "Marketing y automatizaciones",
-    purpose: "Interesados por etapa y reglas que te avisan qué hacer.",
-    example: "Alguien preguntó por Instagram y no reservó: el sistema te deja una tarea para darle seguimiento.",
-    views: ["ventas", "automatizaciones"],
-  },
+/** Módulo → vistas que habilita. Nombres y descripciones por giro: `moduleCopy`. */
+export const modules: Record<ModuleId, { views: ViewId[] }> = {
+  alumnas: { views: ["alumnas"] },
+  clases: { views: ["agenda", "servicios", "portal"] },
+  membresias: { views: ["membresias"] },
+  pagos: { views: ["pagos"] },
+  equipo: { views: ["profesores"] },
+  marketing: { views: ["ventas", "automatizaciones"] },
 };
 export const moduleIds = Object.keys(modules) as ModuleId[];
 
-export const roles: Record<RoleId, { name: string; description: string; views: ViewId[] }> = {
-  duena: {
-    name: "Dueña",
-    description: "Ve y administra todo, incluidos pagos, reportes y configuración.",
-    views: ["inicio", "alumnas", "agenda", "membresias", "ventas", "pagos", "profesores", "reportes", "automatizaciones", "portal", "personalizar", "resumen"],
-  },
-  recepcion: {
-    name: "Recepción",
-    description: "Reservas, alumnas, membresías, ventas y cobros. Sin reportes, honorarios ni configuración.",
-    views: ["inicio", "alumnas", "agenda", "membresias", "ventas", "pagos", "portal"],
-  },
-  instructor: {
-    name: "Instructor",
-    description: "Solo sus clases: agenda propia, lista de alumnas y asistencia. Sin datos de pagos ni notas internas.",
-    views: ["inicio", "agenda", "alumnas"],
-  },
+export const roles: Record<RoleId, { views: ViewId[] }> = {
+  duena: { views: ["inicio", "alumnas", "agenda", "servicios", "membresias", "ventas", "pagos", "profesores", "reportes", "automatizaciones", "portal", "personalizar", "resumen"] },
+  recepcion: { views: ["inicio", "alumnas", "agenda", "servicios", "membresias", "ventas", "pagos", "portal"] },
+  instructor: { views: ["inicio", "agenda", "alumnas"] },
 };
+export function roleCopy(r: RoleId, c: Pick<StudioConfig, "vertical">): { name: string; description: string } {
+  const t = termsOf(c);
+  return {
+    duena: { name: "Dirección", description: "Ve y administra todo, incluidos pagos, reportes y configuración." },
+    recepcion: { name: "Recepción", description: `${cap(t.booking.many)}, ${t.client.many}, ${t.plans.toLowerCase()}, ventas y cobros. Sin reportes, honorarios ni configuración.` },
+    instructor: { name: cap(t.staff.one), description: `Solo su agenda, sus ${t.client.many} y la asistencia. Sin pagos ni notas internas.` },
+  }[r];
+}
 
-export const automationCatalog: Record<AutomationId, { name: string; when: string; then: string; outcome: string }> = {
-  vencimiento: { name: "Recordatorio de renovación", when: "Una membresía está por vencer", then: "Preparar un recordatorio de renovación", outcome: "recordatorio de renovación" },
-  bienvenida: { name: "Bienvenida a alumnas nuevas", when: "Se registra una alumna nueva", then: "Preparar un mensaje de bienvenida", outcome: "mensaje de bienvenida" },
-  sin_reserva: { name: "Seguimiento de interesados", when: "Alguien preguntó y no ha reservado", then: "Crear una tarea de seguimiento", outcome: "tarea de seguimiento" },
-  inactiva: { name: "Recuperar alumnas inactivas", when: "Una alumna activa no viene en 14 días", then: "Preparar un mensaje para invitarla de vuelta", outcome: "mensaje de regreso" },
-  clase_cancelada: { name: "Aviso de clase cancelada", when: "Se cancela una clase", then: "Avisar a las alumnas inscritas", outcome: "aviso de cancelación" },
-};
-export const automationIds = Object.keys(automationCatalog) as AutomationId[];
+/**
+ * Automatizaciones: CUANDO sucede algo → EL SISTEMA prepara una acción.
+ * Se redactan con la terminología del giro. Ninguna envía mensajes.
+ */
+export function automationCopy(id: AutomationId, t: Terms): { name: string; when: string; then: string; outcome: string } {
+  const c1 = t.client.one;
+  const copy: Record<AutomationId, { name: string; when: string; then: string; outcome: string }> = {
+    vencimiento: { name: "Membresía por vencer", when: "Una membresía está por vencer o le queda un crédito", then: "Preparar un recordatorio de renovación", outcome: "recordatorio de renovación" },
+    bienvenida: { name: "Nueva inscripción", when: `Se registra ${t.client.g === "a" ? "una" : "un"} ${c1} nuev${t.client.g}`, then: "Preparar un mensaje de bienvenida", outcome: "mensaje de bienvenida" },
+    lugar_liberado: { name: "Lugar liberado", when: "Se libera un lugar en una clase llena", then: "Avisar a quien sigue en la lista de espera", outcome: "aviso de lugar liberado" },
+    inactiva: { name: `${cap(c1)} inactiva`, when: `Una ${c1} con paquete no viene en 14 días`, then: "Preparar un mensaje para invitarla de vuelta", outcome: "mensaje de regreso" },
+    clase_cancelada: { name: "Clase cancelada", when: "Se cancela una clase", then: `Avisar a las ${t.client.many} inscritas`, outcome: "aviso de cancelación" },
+    sin_reserva: { name: "Seguimiento de interesados", when: `Alguien preguntó y no ha agendado`, then: "Crear una tarea de seguimiento", outcome: "tarea de seguimiento" },
+    confirmacion: { name: `Confirmación de ${t.booking.one}`, when: `${t.client.g === "a" ? "Una" : "Un"} ${c1} agenda ${t.booking.g === "a" ? "una" : "un"} ${t.booking.one}`, then: "Preparar la confirmación con fecha, hora y lugar", outcome: "confirmación" },
+    recordatorio: { name: "Recordatorio un día antes", when: `Se acerca ${t.booking.g === "a" ? "la" : "el"} ${t.booking.one} (mañana)`, then: "Preparar un recordatorio amable", outcome: "recordatorio" },
+    seguimiento_visita: { name: "Seguimiento después de la visita", when: `Termina ${t.offering.g === "a" ? "una" : "un"} ${t.offering.one}`, then: "Preparar un mensaje para saber cómo se sintió", outcome: "mensaje de seguimiento" },
+    reactivacion: { name: "Reactivación", when: `${t.client.g === "a" ? "Una" : "Un"} ${c1} no regresa en 30 días`, then: "Crear una tarea para invitar a volver", outcome: "tarea de reactivación" },
+    renovacion_paquete: { name: "Fin de paquete", when: `Se terminan las ${t.credit.many} de un paquete`, then: "Preparar una propuesta de renovación", outcome: "propuesta de renovación" },
+  };
+  return copy[id];
+}
 
 export const stageOrder: LeadStage[] = ["nuevo", "contactado", "prueba", "cliente", "seguimiento"];
-export const defaultStageLabels: Record<LeadStage, string> = {
-  nuevo: "Nuevo interesado",
-  contactado: "Contactado",
-  prueba: "Clase de prueba",
-  cliente: "Cliente",
-  seguimiento: "Seguimiento",
-};
 
+/** Integraciones que SUMA podría desarrollar. En la demo ninguna está conectada. */
 export const integrationOptions = [
   "Cobros en línea",
   "WhatsApp Business",
   "Calendario de Google",
   "Facturación",
-  "Mi reservador actual",
+  "Mi sistema de reservas actual",
   "Instagram",
 ] as const;
 
@@ -162,39 +93,12 @@ export const leadNames = [
   "Laura Herrera", "Claudia Vela", "Mónica Robles", "Patricia Sáenz", "Diana Montalvo",
   "Karla Elías", "Teresa Ibarra", "Rocío Domene", "Silvia Margáin",
 ];
-export const instructorNames = [
-  "Mariel Treviño", "Sofía Lozano", "Diego Cantú", "Regina Salinas", "Paola Villarreal", "Andrés Garza", "Lorena Peña", "Iván Leal",
-];
 
-export function defaultConfig(type: StudioType = "pilates"): StudioConfig {
-  const t = studioTypes[type];
-  return {
-    name: "",
-    type,
-    theme: "arcilla",
-    classes: t.classes.map((c) => ({ ...c })),
-    instructors: t.instructors,
-    rooms: t.rooms,
-    capacity: t.capacity,
-    plans: [...t.plans],
-    modules: [...moduleIds],
-    integrations: [],
-    needs: "",
-  };
+export function defaultConfig(vertical: VerticalId = "pilates"): StudioConfig {
+  return withVertical({
+    name: "", vertical, theme: "arcilla", offerings: [], instructors: 1, rooms: 1, capacity: 1, plans: [], modules: [], integrations: [], needs: "",
+  }, vertical);
 }
 
-/** Aplica las sugerencias de un tipo de estudio sin tocar nombre, colores ni módulos. */
-export function withTypeSuggestions(config: StudioConfig, type: StudioType): StudioConfig {
-  const t = studioTypes[type];
-  return {
-    ...config,
-    type,
-    classes: t.classes.map((c) => ({ ...c })),
-    instructors: t.instructors,
-    rooms: t.rooms,
-    capacity: t.capacity,
-    plans: [...t.plans],
-  };
-}
-
-export const studioDisplayName = (config: StudioConfig) => config.name.trim() || "Tu estudio";
+export const studioDisplayName = (config: StudioConfig) => config.name.trim() || `Tu ${termsOf(config).business}`;
+export { verticals };
