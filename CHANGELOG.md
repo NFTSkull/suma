@@ -2,6 +2,30 @@
 
 ## [Sin publicar]
 
+### SUMA Wellness OS: showroom multi-giro (rama `feat/studio-os-demo-20261111`, sin publicar)
+- La demo pasa de "estudio de Pilates" a **SUMA Wellness OS**: Pilates/Reformer, Yoga/Barre, Spa, Wellness Center y "Otro negocio wellness", con un núcleo común y un registro central de giros (`verticals.ts`).
+- Configurador de ocho preguntas, una por pantalla: tipo de negocio, nombre, estilo, logotipo, qué ofreces, tu operación, cómo vendes y qué quieres controlar. Las preguntas 5–8 cambian de contenido según el giro y la vista previa se transforma en vivo (menú, indicadores, agenda, paquetes).
+- Motor de citas individuales: horarios libres reales, sin empalmes de terapeuta/especialista, cabina/espacio ni cliente; pago con paquete o al llegar; cancelación que libera el horario. Pilates conserva cupos, créditos y lista de espera; nueva regla: nadie en dos clases simultáneas.
+- Vistas por giro: agenda por especialista o espacio, nueva sección de servicios/tratamientos/experiencias, portal con reserva de citas, reportes de ocupación de cabinas y clientes recurrentes, automatizaciones visuales CUANDO → EL SISTEMA PREPARA (11 reglas, todas simuladas).
+- "Así quedaría" como resumen comercial: lo que funciona en la demo, beneficios, módulos a sumar e integraciones a cotizar; CTA "Quiero una propuesta para mi negocio" que prepara el texto y solo abre WhatsApp al pulsar.
+- `sessionStorage` v4: las sesiones anteriores se descartan sin errores.
+- Pruebas: 281 (21 nuevas: giros, citas sin empalmes, datos por giro y recorridos de Spa y Wellness).
+
+### SUMA Studio OS: rediseño premium de la demo (rama `feat/studio-os-demo-20261111`, sin publicar)
+- La demo ocupa toda la pantalla, sin navegación pública: bienvenida oscura y editorial ("Tu estudio merece un sistema hecho a su medida"), configurador de ocho preguntas (una por pantalla) y revelación animada con marca, nombre y módulos antes de entrar al sistema.
+- Vista previa viva a tamaño real escalada: usa el mismo motor (`createDemo`) que el sistema; nombre, disciplina, color (interpolado con `@property`), logotipo, clases, tamaño, paquetes y módulos se reflejan al instante y la zona afectada se resalta. Al crear el estudio se usa el mismo reloj, así el sistema es exactamente el que se vio tomar forma.
+- Sistema visual propio: Fraunces (eje SOFT, itálicas) + Geist; marfil, piedra, salvia, terracota y grafito; primitivas de UI rediseñadas que se propagan a todas las vistas.
+- CRM: navegación con indicador animado, barra móvil flotante, Inicio editorial (banda de indicadores, línea de "ahora", próxima clase con anillo, ingresos de 8 semanas, asistencia), agenda semanal en cuadrícula horaria con carriles por sala y detalle en panel, membresías con precio por clase y participación, reportes con anillos y gráfica de ingresos.
+- Movimiento con `motion` (solo dentro de la demo, carga diferida) y `MotionConfig reducedMotion="user"`.
+- Pruebas: 260 (flujo del configurador reescrito para bienvenida → 8 preguntas → revelación → sistema).
+
+### SUMA Studio OS: demo interactiva de CRM para estudios (rama `feat/studio-os-demo-20261111`, sin publicar)
+- Ruta privada `/demo/studio-os`: hero, configurador de tres pasos (tu estudio, cómo trabajas, qué necesitas controlar) con vista previa en vivo y CRM a pantalla completa con el nombre, colores, logotipo y módulos elegidos.
+- Secciones: Inicio, Agenda (día/semana, crear clase, cupos, inscribir, cancelar, asistencia, lista de espera, sustituciones), Alumnas (fichas editables), Membresías (vender, renovar, pausar), Ventas (tablero por etapas con historial y tareas), Pagos (ficticios), Profesores, Reportes, Automatizaciones simuladas, Portal de alumnas, Personalizar y "Así quedaría" (resumen sin precios y WhatsApp solo al pulsar).
+- Motor de simulación con funciones puras y un solo estado: sin sobrecupo, sin reservas duplicadas, créditos que se descuentan y devuelven una sola vez, cancelación tardía según regla, membresías pausadas o vencidas que no reservan. Roles Dueña, Recepción e Instructor. "Restaurar demostración" deja todo como al entrar.
+- Sin red, base de datos, cobros ni mensajes; datos ficticios deterministas; `sessionStorage` sin logotipo. Fuera del menú y del sitemap, `noindex, nofollow`, y 404 en producción mediante `src/proxy.ts`.
+- Pruebas: 260 (29 nuevas de Studio OS, 3 del proxy).
+
 ### SUMA Vision Studio (`/showroom`): pulido de experiencia (PR #21)
 - **Hero**: explica en una frase qué se obtiene y muestra los cuatro pasos con el mismo nombre que usan después las secciones (Personaliza, Pruébalo, Calcula, Tu propuesta). Se quitaron la barra de chips, el texto intermedio y la sección de límites que repetían lo mismo. Acento morado para que "a la vista" no quede naranja sobre naranja en móvil. Title SEO sin la marca duplicada.
 - **Personaliza**: solo nombre, giro y estilo; la herramienta actual pasó a la propuesta.
