@@ -193,7 +193,7 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
                 </h2>
                 <p className="mt-3 text-suma-navy/75">
                   Revisamos cómo trabajas hoy y te ayudamos a decidir si conviene integrar tus herramientas actuales
-                  o desarrollar una solución personalizada. Sin prometer sistemas ni integraciones que aún no existen.
+                  o desarrollar una solución personalizada. Te contamos qué es viable y cuál sería el siguiente paso.
                 </p>
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-3">
