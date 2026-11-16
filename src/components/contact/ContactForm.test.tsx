@@ -23,7 +23,7 @@ async function fillValid(user: UserEvent) {
   await user.type(screen.getByLabelText("WhatsApp"), "81 1234 5678");
   await user.selectOptions(screen.getByLabelText("Tipo de negocio"), "yoga-pilates");
   await user.click(screen.getByRole("checkbox", { name: /Chatbots/ }));
-  await user.click(screen.getByRole("checkbox", { name: /Acepto el/ }));
+  await user.click(screen.getByRole("checkbox", { name: /He leído el aviso de privacidad/ }));
 }
 
 const send = () => screen.getByRole("button", { name: /Enviar mensaje|Enviando/ });

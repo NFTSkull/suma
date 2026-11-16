@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { WhatsAppPrivacyNotice } from "@/components/legal/WhatsAppPrivacyNotice";
 import { ButtonLink } from "@/components/ui/Button";
 import { businessOptions, challengeOptions, type BusinessId, type ChallengeId } from "@/content/selector-rules";
 import { serviceBySlug, serviceInlineName } from "@/content/services";
@@ -209,23 +210,26 @@ export function NeedsSelector() {
               })}
             </ul>
 
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <ButtonLink href={whatsappUrlFor({
-                industry: businessOptions.find((b) => b.id === business)?.label,
-                challenge: challengeOptions.find((c) => c.id === challenge)?.label,
-              })} size="lg" arrow target="_blank" rel="noopener noreferrer" onClick={saveContext}>
-                Conversemos por WhatsApp
-              </ButtonLink>
-              <ButtonLink href="/contacto" variant="link" onClick={saveContext}>
-                Prefiero enviar el formulario
-              </ButtonLink>
-              <button type="button" onClick={() => setStep(2)} className="min-h-12 rounded-full border-2 border-suma-navy/70 px-6 font-bold text-suma-navy hover:bg-suma-navy hover:text-suma-cream">
-                Cambiar respuestas
-              </button>
+            <div className="mt-10 space-y-3">
+              <div className="flex flex-wrap items-center gap-4">
+                <ButtonLink href={whatsappUrlFor({
+                  industry: businessOptions.find((b) => b.id === business)?.label,
+                  challenge: challengeOptions.find((c) => c.id === challenge)?.label,
+                })} size="lg" arrow target="_blank" rel="noopener noreferrer" onClick={saveContext}>
+                  Conversemos por WhatsApp
+                </ButtonLink>
+                <ButtonLink href="/contacto" variant="link" onClick={saveContext}>
+                  Prefiero enviar el formulario
+                </ButtonLink>
+                <button type="button" onClick={() => setStep(2)} className="min-h-12 rounded-full border-2 border-suma-navy/70 px-6 font-bold text-suma-navy hover:bg-suma-navy hover:text-suma-cream">
+                  Cambiar respuestas
+                </button>
+              </div>
+              <WhatsAppPrivacyNotice />
+              <p className="text-xs font-semibold text-suma-navy/60">
+                Recomendación orientativa basada en reglas simples. La definimos juntos en la primera conversación.
+              </p>
             </div>
-            <p className="mt-5 text-xs font-semibold text-suma-navy/60">
-              Recomendación orientativa basada en reglas simples. La definimos juntos en la primera conversación.
-            </p>
           </div>
         )}
       </div>

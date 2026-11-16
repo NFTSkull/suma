@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ClosingCta } from "@/components/home/ClosingCta";
 import { PageHero } from "@/components/layout/PageHero";
+import { WhatsAppPrivacyNotice } from "@/components/legal/WhatsAppPrivacyNotice";
 import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { site } from "@/content/site";
@@ -178,10 +179,13 @@ export default function ChatbotWhatsappPilatesGuidePage() {
           <p className="text-eyebrow text-suma-orange-ink">Siguiente paso</p>
           <h2 id="siguiente-title" className="text-display-md mt-4">Conecta WhatsApp con tu operación real.</h2>
           <p className="mt-5 max-w-3xl text-lg text-suma-navy/75">Cuéntanos qué agenda utilizas, qué tipo de clases impartes y qué tareas te quitan más tiempo.</p>
-          <div className="mt-8 flex flex-wrap items-center gap-5">
-            <ButtonLink href={site.contact.whatsappUrl} target="_blank" rel="noopener noreferrer" size="lg" arrow>Hablar con SUMA por WhatsApp</ButtonLink>
-            <ButtonLink href="/contacto" variant="link">Prefiero el formulario</ButtonLink>
-            <Link href="/servicios/chatbots" className="inline-flex min-h-12 items-center font-bold underline decoration-suma-orange decoration-2 underline-offset-4">Ver nuestros chatbots</Link>
+          <div className="mt-8 space-y-3">
+            <div className="flex flex-wrap items-center gap-5">
+              <ButtonLink href={site.contact.whatsappUrl} target="_blank" rel="noopener noreferrer" size="lg" arrow>Hablar con SUMA por WhatsApp</ButtonLink>
+              <ButtonLink href="/contacto" variant="link">Prefiero el formulario</ButtonLink>
+              <Link href="/servicios/chatbots" className="inline-flex min-h-12 items-center font-bold underline decoration-suma-orange decoration-2 underline-offset-4">Ver nuestros chatbots</Link>
+            </div>
+            <WhatsAppPrivacyNotice />
           </div>
           <p className="mt-8 max-w-3xl text-sm text-suma-navy/65">Material educativo de SUMA STUDIO. Los escenarios son hipotéticos y no constituyen testimonios, implementaciones reales ni resultados garantizados.</p>
         </section>

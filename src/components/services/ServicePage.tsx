@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { OrganicShape } from "@/components/brand/OrganicShape";
 import { ClosingCta } from "@/components/home/ClosingCta";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { WhatsAppPrivacyNotice } from "@/components/legal/WhatsAppPrivacyNotice";
 import { Accordion } from "@/components/ui/Accordion";
 import { ButtonLink } from "@/components/ui/Button";
 import { JsonLd } from "@/components/ui/JsonLd";
@@ -135,13 +136,16 @@ export function ServicePage({ slug }: { slug: ServiceSlug }) {
             >
               {s.hero.lead}
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
-              <ButtonLink href={whatsappUrlFor({ service: s.name })} size="lg" variant={theme.dark ? "accent" : "primary"} arrow target="_blank" rel="noopener noreferrer" {...serviceCtaAttrs(slug, "hero")}>
-                Hablemos de tu proyecto
-              </ButtonLink>
-              <ButtonLink href="#experiencia" variant={theme.dark ? "link-light" : "link"}>
-                Ver la demostración
-              </ButtonLink>
+            <div className="mt-10 space-y-3 motion-safe:animate-[enter_var(--dur-reveal)_var(--ease-flow)_240ms_both]">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+                <ButtonLink href={whatsappUrlFor({ service: s.name })} size="lg" variant={theme.dark ? "accent" : "primary"} arrow target="_blank" rel="noopener noreferrer" {...serviceCtaAttrs(slug, "hero")}>
+                  Hablemos de tu proyecto
+                </ButtonLink>
+                <ButtonLink href="#experiencia" variant={theme.dark ? "link-light" : "link"}>
+                  Ver la demostración
+                </ButtonLink>
+              </div>
+              <WhatsAppPrivacyNotice className={cn("text-xs", theme.dark ? "text-suma-cream/60" : "text-suma-navy/60")} />
             </div>
           </div>
           <div className={cn("relative", theme.layout === "stacked" && "mt-4")}>{theme.visual}</div>
