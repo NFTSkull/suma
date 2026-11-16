@@ -1,5 +1,27 @@
 # DEVLOG — decisiones
 
+## 2026-11-12 (tarde) — SUMA Wellness OS
+
+**Un núcleo, varios giros.** No se crearon CRMs por industria. `verticals.ts` concentra terminología, catálogos, presets y automatizaciones; la modalidad (`grupal`, `citas`, `hibrido`) se deriva de los servicios elegidos y las pantallas consultan capacidades en lugar de preguntar por el giro. Así un spa nunca muestra cupos ni lista de espera, y un giro nuevo no toca el configurador.
+
+**Citas como sesiones de cupo 1, con reglas propias.** Reutilizar `Session`/`Booking` mantiene una sola fuente de verdad para agenda, fichas, reportes y pagos. Las citas tienen su propio camino en el motor (`findSlot`, `applyBookAppointment`, `cancelAppointment`) y no heredan cupo ni lista de espera. El cobro por servicio se registra al llegar, no al agendar, para no llenar Pagos de pendientes fantasma.
+
+**Defecto encontrado y corregido.** Al probar que nadie estuviera en dos sesiones a la vez apareció que el seed de Pilates podía inscribir a una alumna en dos clases simultáneas de salas distintas. Se agregó la regla al motor; el seed la respeta porque reserva con el mismo motor.
+
+**Sesiones guardadas.** Clave `suma-studio-os:v4` y estado `version: 2`; al cargar se borran las claves v1–v3 y cualquier sesión inválida, de modo que una pestaña abierta con la versión anterior nunca provoca errores.
+
+**Sin datos sensibles.** Los giros de bienestar no guardan expedientes, diagnósticos ni notas clínicas; las notas de ejemplo son de preferencias (presión, cabina, horario).
+
+
+## 2026-11-12
+
+**Studio OS a pantalla completa.** La demo se monta en un portal sobre el sitio (z-80) y marca `header`, `#contenido` y `footer` como `inert` mientras existe; así desaparece la navegación pública sin tocar el layout raíz. El servidor solo pinta un telón oscuro con el único `<h1>` (lo exige `seo-check`). La bienvenida espera a `afterSplash` para no animarse detrás de la pantalla de carga.
+
+**`motion` vuelve, pero acotado.** Se retiró del sitio por no usarse; ahora solo lo importan componentes de `studio-os`, que se cargan con `dynamic(..., { ssr: false })`, así que no entra en el bundle de las páginas públicas. Versión fijada con más de dos semanas de publicada.
+
+**Vista previa con el motor real.** En lugar de un dibujo, el configurador genera el estado con `createDemo` (memorizado por los campos estructurales) y lo pinta en un lienzo de tamaño real escalado. El alto se mide con `ResizeObserver` porque depende de los módulos activos.
+
+
 ## 2026-10-12
 
 **Logotipo provisional.** No se recibieron archivos oficiales; las capturas disponibles no son assets de SUMA. Se usa un wordmark tipográfico marcado con `data-provisional="wordmark"` y un registro (`src/content/brand-assets.ts`) para que los SVG oficiales sustituyan todo el sitio al añadirse. No se dibujó ni se "recreó" ningún logo. Favicon y OG también son tipográficos y provisionales.
@@ -97,3 +119,15 @@
 **`pricing_cta_click` y el plan Ads.** La lista de planes estaba escrita a mano con un `start` que ya no existe; ahora se valida contra `pricingPlans`.
 
 **Anclas.** `globals.css` ya reserva el header con `scroll-padding-top`; el `scroll-mt-24` de las secciones lo duplicaba.
+
+## 2026-11-11 — SUMA Studio OS (demo privada)
+
+**Un solo estado y funciones puras.** Cada acción (`engine.ts`) clona el estado, aplica reglas y devuelve `{ estado, ok, mensaje }`; si una regla lo impide, el estado no cambia y el mensaje explica por qué. Los indicadores se derivan siempre del estado (`selectors.ts`), así que reservar, cancelar, vender o mover un interesado actualiza panel, fichas y reportes sin sincronización manual. `creditCharged` en cada reserva garantiza que un crédito se descuenta y se devuelve una sola vez.
+
+**Datos ficticios con el propio motor.** `seed.ts` genera alumnas, membresías y la semana actual con una semilla fija, y crea las reservas llamando al mismo `applyBook`: los datos iniciales cumplen las mismas reglas que las acciones del usuario. La última clase del día queda sin pasar lista y dos clases futuras llenas con lista de espera, para que haya algo que hacer al entrar. Volumen de alumnas proporcional al cupo semanal (24–80) para que la ocupación sea creíble.
+
+**Pantalla completa sin tocar el layout.** El layout raíz incluye header, footer y splash del sitio; en vez de reestructurar rutas, el CRM se abre en un portal a `document.body` y marca header, contenido y footer como `inert` mientras está abierto (sin eso, el configurador seguía recibiendo foco y clics detrás).
+
+**Producción.** `notFound()` en la página hacía que el build de producción prerenderizara un 404 sin canonical y `seo-check` fallaba (rompería un despliegue si se fusionara). Con `src/proxy.ts` limitado a `/demo/:path*` la página se prerenderiza completa y la respuesta en producción es 404; verificado con `VERCEL_ENV=production`. En previews el acceso lo protege Vercel; `noindex` no sustituye esa protección.
+
+**Fuentes de Google intermitentes.** El fallo local "next/font/google queries have exactly one entry" se debe a que Google Fonts a veces responde con URLs `fonts.gstatic.com/l/font?kit=…&skey=…`, y Turbopack 16.4.2 no admite el `&` en ese parámetro. Depende de la respuesta de Google en cada descarga; con una respuesta normal en la caché de `.next` compila. No borrar `.next` al validar localmente.
