@@ -179,6 +179,32 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
         </div>
       </section>
 
+      {/* Puente de conversión: enlaza desde una demo conceptual hacia un diagnóstico real. */}
+      {(slug === "spas" || slug === "yoga-pilates") && (
+        <section aria-labelledby="diagnostico-industria-title" className="bg-suma-cream py-12 md:py-16">
+          <div className="container-suma">
+            <div className="flex flex-col gap-7 rounded-[2rem] border border-suma-line bg-suma-cream-soft p-7 md:flex-row md:items-center md:justify-between md:p-10">
+              <div className="max-w-2xl">
+                <p className="text-eyebrow text-suma-orange-ink">De la idea a tu operación</p>
+                <h2 id="diagnostico-industria-title" className="mt-3 font-display text-2xl font-bold md:text-3xl">
+                  {slug === "spas"
+                    ? "¿Tu spa necesita ordenar citas, cabinas y seguimiento?"
+                    : "¿Tu estudio necesita unir reservas, paquetes y seguimiento?"}
+                </h2>
+                <p className="mt-3 text-suma-navy/75">
+                  Revisamos cómo trabajas hoy y te ayudamos a decidir si conviene integrar tus herramientas actuales
+                  o desarrollar una solución personalizada. Te contamos qué es viable y cuál sería el siguiente paso.
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-3">
+                <ButtonLink href="/contacto" size="lg" arrow>Contarnos tu caso</ButtonLink>
+                <ButtonLink href="/servicios/crm" variant="link">Conocer CRM y seguimiento</ButtonLink>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* FAQ */}
       <section aria-labelledby="faq-industria-title" className="section-y bg-suma-cream-soft">
         <div className="container-suma grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">

@@ -8,9 +8,9 @@ import { site } from "@/content/site";
 import { buildMetadata, pageGraph } from "@/lib/seo";
 
 const seo = {
-  title: "Contacto: hablemos de tu proyecto",
+  title: "Contacto para negocios wellness",
   description:
-    "Cuéntanos sobre tu negocio de bienestar. SUMA STUDIO, desde Monterrey para todo México: chatbots, CRM, apps, páginas web y publicidad digital.",
+    "Hablemos de CRM, reservas, automatización, chatbots y páginas web para spas, estudios de pilates y negocios wellness. Desde Monterrey para México.",
   path: "/contacto",
 };
 const crumbs = [{ name: "Contacto", path: "/contacto" }];
