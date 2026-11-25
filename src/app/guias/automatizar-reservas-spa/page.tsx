@@ -126,8 +126,10 @@ export default function GuiaReservasSpaPage() {
         title="Cómo automatizar las reservas de un spa sin perder el trato humano."
         lead="La experiencia de tus clientes empieza antes de entrar a la cabina. Aquí tienes un recorrido práctico para ordenar consultas, disponibilidad, confirmaciones y seguimiento sin prometer citas que aún no existen."
       >
-        <ButtonLink href="#flujo" size="lg" arrow>Ver el flujo de reservas</ButtonLink>
-        <ButtonLink href="/precios?servicio=reservas#simulador" variant="secondary" size="lg">Consultar configuración de agenda</ButtonLink>
+        <div className="flex flex-wrap items-center gap-4">
+          <ButtonLink href="#flujo" size="lg" arrow>Ver el flujo de reservas</ButtonLink>
+          <ButtonLink href="/precios?servicio=reservas#simulador" variant="secondary" size="lg">Consultar configuración de agenda</ButtonLink>
+        </div>
       </PageHero>
 
       <div className="bg-suma-cream">
