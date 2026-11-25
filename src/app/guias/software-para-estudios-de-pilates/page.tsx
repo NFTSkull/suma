@@ -91,10 +91,12 @@ export default function SoftwarePilatesGuidePage() {
         title="Software para estudios de pilates: qué elegir antes de contratar."
         lead="Reservas, reformers, paquetes y mensajes son partes de un mismo recorrido. Esta guía te ayuda a decidir qué sistema necesita tu estudio, sin comprar funciones que todavía no vas a usar."
       >
-        <ButtonLink href="#comparar" size="lg" arrow>
-          Comparar opciones
-        </ButtonLink>
-        <ButtonLink href="/precios#planes" variant="secondary" size="lg">Consultar precios y opciones</ButtonLink>
+        <div className="flex flex-wrap items-center gap-4">
+          <ButtonLink href="#comparar" size="lg" arrow>
+            Comparar opciones
+          </ButtonLink>
+          <ButtonLink href="/precios#planes" variant="secondary" size="lg">Consultar precios y opciones</ButtonLink>
+        </div>
       </PageHero>
 
       <div id="guia-pilates" className="bg-suma-cream">
