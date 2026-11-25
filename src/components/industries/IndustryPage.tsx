@@ -10,6 +10,8 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { getIndustry, industries } from "@/content/industries";
 import { photos } from "@/content/photos";
+import { individualServices, pricingPlans } from "@/content/pricing";
+import { formatMXN } from "@/lib/pricing";
 import { serviceBySlug, serviceInlineName } from "@/content/services";
 import { cn } from "@/lib/cn";
 import { colorStyles } from "@/lib/colors";
@@ -26,6 +28,34 @@ const accents: Record<IndustrySlug, { color: SumaColor; mask: "blob" | "arch" | 
   "experiencias-retiros": { color: "orange", mask: "round" },
   "profesionales-bienestar": { color: "purple", mask: "arch" },
 };
+
+const spaAgenda = individualServices.find((service) => service.id === "reservas")!;
+const spaLanding = individualServices.find((service) => service.id === "landing")!;
+const spaFlow = pricingPlans.find((plan) => plan.id === "flow")!;
+
+const spaOffers = [
+  {
+    title: "Configura tu agenda de citas",
+    price: formatMXN(spaAgenda.setup),
+    detail: "Revisamos y configuramos los horarios y recursos que permita tu agenda actual.",
+    terms: "Pago único de SUMA",
+    href: "/precios?servicio=reservas#simulador",
+  },
+  {
+    title: "Página web y agenda para tu spa",
+    price: formatMXN(spaLanding.setup + spaAgenda.setup),
+    detail: "Una página móvil para presentar un tratamiento o paquete y facilitar la consulta, junto con la configuración de tu agenda.",
+    terms: "Pago único de SUMA",
+    href: "/precios#simulador",
+  },
+  {
+    title: "Seguimiento de consultas con Flow",
+    price: formatMXN(spaFlow.setup),
+    detail: "Organizamos quién pregunta, quién responde y qué sigue en un CRM existente, con hasta dos tareas automáticas sencillas.",
+    terms: "Configuración + desde " + formatMXN(spaFlow.monthly) + "/mes",
+    href: "/precios#flow",
+  },
+];
 
 const maskClass = {
   blob: "blob",
@@ -87,6 +117,36 @@ export function IndustryPage({ slug }: { slug: IndustrySlug }) {
           </div>
         </div>
       </section>
+
+      {slug === "spas" && (
+        <section aria-labelledby="spa-opciones-title" className="section-y bg-suma-cream">
+          <div className="container-suma">
+            <SectionHeading
+              id="spa-opciones-title"
+              eyebrow="Precios en pesos mexicanos · Una sucursal"
+              title="Empieza por lo que tu spa necesita hoy."
+              lead="No hace falta contratar un software completo si solo quieres mejorar citas o consultas. Estas opciones son servicios de configuración y acompañamiento, no un reservador propio listo para instalar."
+              size="md"
+            />
+            <ul className="mt-10 grid gap-4 md:grid-cols-3">
+              {spaOffers.map((offer) => (
+                <li key={offer.title} className="flex flex-col rounded-[1.75rem] border border-suma-line bg-suma-cream-soft p-6 md:p-7">
+                  <h3 className="font-display text-2xl font-bold">{offer.title}</h3>
+                  <p className="mt-4 text-sm font-semibold text-suma-navy/65">Desde</p>
+                  <p className="mt-1 font-display text-4xl font-extrabold text-suma-navy">{offer.price}</p>
+                  <p className="mt-2 text-sm font-semibold">{offer.terms}</p>
+                  <p className="mt-4 flex-1 text-suma-navy/75">{offer.detail}</p>
+                  <ButtonLink href={offer.href} variant="secondary" className="mt-6 w-full" arrow>Consultar alcance y precio</ButtonLink>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 max-w-4xl text-sm text-suma-navy/70">
+              Referencias antes de IVA para una sucursal. Licencias, dominio, alojamiento y consumos externos se pagan aparte.
+              Validamos las funciones, permisos y condiciones de tu agenda antes de contratar. No se garantiza sincronización automática con otras plataformas.
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Prioridades */}
       <section id="prioridades" aria-labelledby="prioridades-title" className="section-y scroll-mt-16 bg-suma-cream-soft">

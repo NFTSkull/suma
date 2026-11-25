@@ -58,14 +58,14 @@ export const industries: Industry[] = [
     benefit: "Una experiencia cuidada desde la primera consulta.",
     hero: {
       eyebrow: "Spas · Masajes · Centros de bienestar",
-      title: "La calma de tu spa, desde la primera consulta.",
-      lead: "Agenda ordenada, atención digital cuidada y clientes que regresan porque se sienten recordados.",
+      title: "Software y agenda para spas que quieren operar con calma.",
+      lead: "Organiza citas, cabinas y consultas por WhatsApp con herramientas que se adapten a tu spa. Configuramos tu agenda actual o diseñamos una solución a medida según tus necesidades.",
     },
     priorities: [
       { title: "Agenda", text: "Cabinas, terapeutas y tiempos de cada tratamiento coordinados." },
       { title: "Catálogo de tratamientos", text: "Tu menú presentado con la misma elegancia que tu espacio." },
-      { title: "Confirmaciones", text: "Recordatorios que reducen ausencias y llamadas de último minuto." },
-      { title: "Clientes recurrentes", text: "Preferencias, alergias y tratamientos anteriores a la vista." },
+      { title: "Confirmaciones", text: "Recordatorios autorizados para facilitar confirmaciones y gestionar cambios de horario." },
+      { title: "Clientes recurrentes", text: "Historial y preferencias de atención con acceso limitado y protección de datos." },
       { title: "Experiencias", text: "Paquetes, rituales y certificados de regalo bien presentados." },
       { title: "Atención digital", text: "Respuestas cálidas y rápidas en los canales donde te escriben." },
     ],
@@ -83,13 +83,15 @@ export const industries: Industry[] = [
     ],
     demo: "crm",
     faqs: [
-      { q: "¿Pueden manejar varias cabinas y terapeutas?", a: "Sí. Diseñamos la agenda según tus recursos reales: cabinas, terapeutas, duración y tiempos de preparación." },
+      { q: "¿Pueden manejar varias cabinas y terapeutas?", a: "Revisamos si tu agenda permite coordinar esos recursos; si necesitas reglas adicionales, definimos alcance e integraciones antes de desarrollar." },
+      { q: "¿SUMA vende un software de reservas listo para spas?", a: "SUMA configura herramientas existentes o desarrolla soluciones a medida. No necesitas cambiar de plataforma si la actual cubre tus necesidades." },
+      { q: "¿Puedo gestionar las consultas de WhatsApp sin cambiar de agenda?", a: "Sí, podemos organizar el seguimiento comercial en un CRM existente. La sincronización automática de citas requiere revisar permisos y capacidades de tu agenda." },
       { q: "¿Se puede vender certificados de regalo en línea?", a: "Es posible integrarlo en tu sitio con un procesador de pagos. Lo evaluamos según tu operación." },
     ],
     seo: {
-      title: "Software y páginas web para spas en Monterrey",
-      description: "CRM, agenda, páginas web y atención digital para spas, centros de masaje y bienestar integral en Monterrey y México.",
-      keywords: ["software para spas", "páginas web para spas en Monterrey", "agenda para spa"],
+      title: "Software para spa: agenda y CRM en México",
+      description: "Configura tu agenda, CRM y atención por WhatsApp para tu spa. Opciones en pesos mexicanos, con acompañamiento desde Monterrey.",
+      keywords: ["software para spa", "agenda para spa", "sistema de citas para spa", "CRM para spas", "páginas web para spas en Monterrey"],
     },
   },
   {
