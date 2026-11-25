@@ -9,9 +9,9 @@ import { absoluteUrl, buildMetadata, ids, pageGraph } from "@/lib/seo";
 const path = "/guias/automatizar-reservas-spa";
 const seo = {
   path,
-  title: "Cómo automatizar reservas de un spa | Guía práctica",
+  title: "Automatizar reservas de spa por WhatsApp",
   description:
-    "Guía para automatizar reservas en un spa: consultas por WhatsApp, disponibilidad, confirmaciones, cancelaciones y seguimiento sin perder atención humana.",
+    "Organiza citas de spa por WhatsApp: disponibilidad, confirmación, cancelaciones y seguimiento. Aprende qué automatizar sin sustituir tu agenda.",
   keywords: [
     "automatizar reservas spa",
     "WhatsApp para reservas de spa",
@@ -127,6 +127,7 @@ export default function GuiaReservasSpaPage() {
         lead="La experiencia de tus clientes empieza antes de entrar a la cabina. Aquí tienes un recorrido práctico para ordenar consultas, disponibilidad, confirmaciones y seguimiento sin prometer citas que aún no existen."
       >
         <ButtonLink href="#flujo" size="lg" arrow>Ver el flujo de reservas</ButtonLink>
+        <ButtonLink href="/precios?servicio=reservas#simulador" variant="secondary" size="lg">Consultar configuración de agenda</ButtonLink>
       </PageHero>
 
       <div className="bg-suma-cream">
