@@ -10,9 +10,9 @@ import { absoluteUrl, buildMetadata, ids, pageGraph } from "@/lib/seo";
 const path = "/guias/software-para-estudios-de-pilates";
 const seo = {
   path,
-  title: "Software para estudios de pilates: CRM y reservas",
+  title: "Software para estudios de Pilates: agenda y CRM",
   description:
-    "Guía para elegir software para tu estudio de pilates: agenda, reformers, listas de espera, membresías, pagos y CRM. Desde Monterrey para México.",
+    "Compara agenda, cupos, membresías y CRM para estudios de Pilates en México. Revisa costos, integraciones y alternativas antes de contratar.",
   keywords: [
     "software para estudios de pilates",
     "CRM para estudios de pilates",
@@ -91,9 +91,12 @@ export default function SoftwarePilatesGuidePage() {
         title="Software para estudios de pilates: qué elegir antes de contratar."
         lead="Reservas, reformers, paquetes y mensajes son partes de un mismo recorrido. Esta guía te ayuda a decidir qué sistema necesita tu estudio, sin comprar funciones que todavía no vas a usar."
       >
-        <ButtonLink href="#comparar" size="lg" arrow>
-          Comparar opciones
-        </ButtonLink>
+        <div className="flex flex-wrap items-center gap-4">
+          <ButtonLink href="#comparar" size="lg" arrow>
+            Comparar opciones
+          </ButtonLink>
+          <ButtonLink href="/precios#planes" variant="secondary" size="lg">Consultar precios y opciones</ButtonLink>
+        </div>
       </PageHero>
 
       <div id="guia-pilates" className="bg-suma-cream">

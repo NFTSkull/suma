@@ -10,9 +10,9 @@ import { absoluteUrl, buildMetadata, ids, pageGraph } from "@/lib/seo";
 const path = "/guias/chatbot-whatsapp-pilates";
 const seo = {
   path,
-  title: "Chatbot WhatsApp para estudios de pilates: guía práctica",
+  title: "Chatbot de WhatsApp para estudios de Pilates",
   description:
-    "Qué automatizar en WhatsApp para un estudio de pilates: cupos, membresías, reservas reales, seguimiento y atención humana. Checklist de siete pruebas.",
+    "Guía para automatizar WhatsApp en tu estudio de Pilates: siete pruebas de reservas, cupos y seguimiento. Revisa opciones de SUMA en México.",
   keywords: ["chatbot WhatsApp pilates", "automatizar WhatsApp estudio de pilates", "reservas WhatsApp pilates"],
 };
 const crumbs = [{ name: "Guías", path: "/guias" }, { name: "WhatsApp para pilates", path }];
@@ -75,7 +75,10 @@ export default function ChatbotWhatsappPilatesGuidePage() {
         title="Un chatbot para tu estudio no debería inventar lugares disponibles."
         lead="Antes de automatizar WhatsApp, prueba estas siete situaciones de operación. Así podrás distinguir un asistente que solo responde de uno que trabaja con tu agenda y tu equipo."
       >
-        <ButtonLink href="#pruebas" size="lg" arrow>Ver las siete pruebas</ButtonLink>
+        <div className="flex flex-wrap items-center gap-4">
+          <ButtonLink href="#pruebas" size="lg" arrow>Ver las siete pruebas</ButtonLink>
+          <ButtonLink href="/precios#flow" variant="secondary" size="lg">Ver opciones de seguimiento</ButtonLink>
+        </div>
       </PageHero>
 
       <div className="bg-suma-cream">
