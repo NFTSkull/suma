@@ -75,8 +75,10 @@ export default function ChatbotWhatsappPilatesGuidePage() {
         title="Un chatbot para tu estudio no debería inventar lugares disponibles."
         lead="Antes de automatizar WhatsApp, prueba estas siete situaciones de operación. Así podrás distinguir un asistente que solo responde de uno que trabaja con tu agenda y tu equipo."
       >
-        <ButtonLink href="#pruebas" size="lg" arrow>Ver las siete pruebas</ButtonLink>
-        <ButtonLink href="/precios#flow" variant="secondary" size="lg">Ver opciones de seguimiento</ButtonLink>
+        <div className="flex flex-wrap items-center gap-4">
+          <ButtonLink href="#pruebas" size="lg" arrow>Ver las siete pruebas</ButtonLink>
+          <ButtonLink href="/precios#flow" variant="secondary" size="lg">Ver opciones de seguimiento</ButtonLink>
+        </div>
       </PageHero>
 
       <div className="bg-suma-cream">
